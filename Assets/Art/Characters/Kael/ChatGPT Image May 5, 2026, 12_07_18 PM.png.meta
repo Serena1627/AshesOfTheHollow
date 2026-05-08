@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ChatGPT Image May 5, 2026, 12_07_18 PM_0
+      name: kael_back_idle
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1774
-        height: 887
+        x: 98
+        y: 187
+        width: 420
+        height: 520
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -147,11 +147,55 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: kael_back_walk_1
+      rect:
+        serializedVersion: 2
+        x: 681
+        y: 187
+        width: 420
+        height: 520
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ef48cbd95acbb904a8e9363872cac65b
+      internalID: 1392846638
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: kael_back_walk_2
+      rect:
+        serializedVersion: 2
+        x: 1260
+        y: 187
+        width: 420
+        height: 520
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b6ca1fac6ed061b44ab6aff54bd30900
+      internalID: -711341527
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5105e63ac1ac6114595e3e6bf06b1de1
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +205,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ChatGPT Image May 5, 2026, 12_07_18 PM_0: -7256462389823613883
+      kael_back_idle: -7256462389823613883
+      kael_back_walk_1: 1392846638
+      kael_back_walk_2: -711341527
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

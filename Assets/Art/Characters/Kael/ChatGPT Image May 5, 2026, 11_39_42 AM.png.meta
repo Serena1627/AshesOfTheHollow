@@ -156,7 +156,7 @@ TextureImporter:
         width: 230
         height: 270
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -178,7 +178,7 @@ TextureImporter:
         width: 229
         height: 269
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -187,6 +187,138 @@ TextureImporter:
       bones: []
       spriteID: be252058bb355f44d8d01fd70997c96f
       internalID: 2031623333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: kael_left_idle
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 384
+        width: 186
+        height: 272
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: faae9b2aab7cd0441ac8011b737f97b9
+      internalID: 1807099619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: kael_left_walk_1
+      rect:
+        serializedVersion: 2
+        x: 529
+        y: 387
+        width: 175
+        height: 268
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 37199b43a7cf1f64ab936dfe5f783911
+      internalID: -113503070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: kael_left_walk_2
+      rect:
+        serializedVersion: 2
+        x: 862
+        y: 387
+        width: 175
+        height: 269
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1045edf3fc2e645418ae6f4d5f5c2a5c
+      internalID: -646371478
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: kael_right_idle
+      rect:
+        serializedVersion: 2
+        x: 219
+        y: 94
+        width: 168
+        height: 270
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f1052e1ef4708d646972c690789bbef6
+      internalID: -980470155
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: kael_right_walk_1
+      rect:
+        serializedVersion: 2
+        x: 520
+        y: 94
+        width: 175
+        height: 270
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8bb8e50e5c1ce1542b7fa4d95881eb1a
+      internalID: 2099728714
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: kael_right_walk_2
+      rect:
+        serializedVersion: 2
+        x: 854
+        y: 94
+        width: 174
+        height: 270
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 78aaf2d2081d3a94bbdcfc7e591f451d
+      internalID: 1057392193
       vertices: []
       indices: 
       edges: []
@@ -208,6 +340,12 @@ TextureImporter:
       kael_front_walk_1: 1410133415
       kael_front_walk_2: 2031623333
       kael_idle: 5732188054033184345
+      kael_left_idle: 1807099619
+      kael_left_walk_1: -113503070
+      kael_left_walk_2: -646371478
+      kael_right_idle: -980470155
+      kael_right_walk_1: 2099728714
+      kael_right_walk_2: 1057392193
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
