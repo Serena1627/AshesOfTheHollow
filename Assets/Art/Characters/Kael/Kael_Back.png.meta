@@ -1,10 +1,16 @@
 fileFormatVersion: 2
-guid: 5eceeb7775ced244587590c538b02fd8
+guid: dd927a906d6a5174b9bbff250eda1eb1
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5732188054033184345
-    second: ChatGPT Image May 5, 2026, 11_39_42 AM_0
+      213: -3002174082865369108
+    second: ChatGPT_Image_May_8__2026__05_04_21_AM-removebg-preview_0
+  - first:
+      213: 7172923382478181716
+    second: ChatGPT_Image_May_8__2026__05_04_21_AM-removebg-preview_1
+  - first:
+      213: -8445408600869465368
+    second: ChatGPT_Image_May_8__2026__05_04_21_AM-removebg-preview_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -126,199 +132,67 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: kael_idle
+      name: ChatGPT_Image_May_8__2026__05_04_21_AM-removebg-preview_0
       rect:
         serializedVersion: 2
-        x: 176
-        y: 957
-        width: 233
-        height: 267
+        x: 56
+        y: 82
+        width: 139
+        height: 201
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 956b26a2aa2dc8f40800000000000000
-      internalID: 5732188054033184345
+      spriteID: cefecece3922656d0800000000000000
+      internalID: -3002174082865369108
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: kael_front_walk_1
+      name: ChatGPT_Image_May_8__2026__05_04_21_AM-removebg-preview_1
       rect:
         serializedVersion: 2
-        x: 486
-        y: 954
-        width: 230
-        height: 270
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f6211c5ba8eb6e140a9c08a361e53c78
-      internalID: 1410133415
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: kael_front_walk_2
-      rect:
-        serializedVersion: 2
-        x: 818
-        y: 955
-        width: 229
-        height: 269
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: be252058bb355f44d8d01fd70997c96f
-      internalID: 2031623333
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: kael_left_idle
-      rect:
-        serializedVersion: 2
-        x: 201
-        y: 384
-        width: 186
-        height: 272
+        x: 281
+        y: 76
+        width: 152
+        height: 207
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: faae9b2aab7cd0441ac8011b737f97b9
-      internalID: 1807099619
+      spriteID: 45594b500d75b8360800000000000000
+      internalID: 7172923382478181716
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: kael_left_walk_1
+      name: ChatGPT_Image_May_8__2026__05_04_21_AM-removebg-preview_2
       rect:
         serializedVersion: 2
-        x: 529
-        y: 387
-        width: 175
-        height: 268
+        x: 506
+        y: 77
+        width: 157
+        height: 206
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 37199b43a7cf1f64ab936dfe5f783911
-      internalID: -113503070
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: kael_left_walk_2
-      rect:
-        serializedVersion: 2
-        x: 862
-        y: 387
-        width: 175
-        height: 269
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 1045edf3fc2e645418ae6f4d5f5c2a5c
-      internalID: -646371478
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: kael_right_idle
-      rect:
-        serializedVersion: 2
-        x: 219
-        y: 94
-        width: 168
-        height: 270
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f1052e1ef4708d646972c690789bbef6
-      internalID: -980470155
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: kael_right_walk_1
-      rect:
-        serializedVersion: 2
-        x: 520
-        y: 94
-        width: 175
-        height: 270
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 8bb8e50e5c1ce1542b7fa4d95881eb1a
-      internalID: 2099728714
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: kael_right_walk_2
-      rect:
-        serializedVersion: 2
-        x: 854
-        y: 94
-        width: 174
-        height: 270
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 78aaf2d2081d3a94bbdcfc7e591f451d
-      internalID: 1057392193
+      spriteID: 8e2952a8f91ebca80800000000000000
+      internalID: -8445408600869465368
       vertices: []
       indices: 
       edges: []
@@ -327,7 +201,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: e024228fb442bf741b737bfd28c3fc7d
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -337,15 +211,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      kael_front_walk_1: 1410133415
-      kael_front_walk_2: 2031623333
-      kael_idle: 5732188054033184345
-      kael_left_idle: 1807099619
-      kael_left_walk_1: -113503070
-      kael_left_walk_2: -646371478
-      kael_right_idle: -980470155
-      kael_right_walk_1: 2099728714
-      kael_right_walk_2: 1057392193
+      ChatGPT_Image_May_8__2026__05_04_21_AM-removebg-preview_0: -3002174082865369108
+      ChatGPT_Image_May_8__2026__05_04_21_AM-removebg-preview_1: 7172923382478181716
+      ChatGPT_Image_May_8__2026__05_04_21_AM-removebg-preview_2: -8445408600869465368
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
