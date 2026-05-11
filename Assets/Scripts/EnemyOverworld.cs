@@ -1,11 +1,8 @@
-using System.Collections.Generic;
-using Mono.Cecil.Cil;
-using Unity.VectorGraphics;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class EnemyOverworld : MonoBehaviour
 {
-    
+
     [SerializeField] private float moveSpeed = 4f;
     [SerializeField] public string enemyType = "template";
 

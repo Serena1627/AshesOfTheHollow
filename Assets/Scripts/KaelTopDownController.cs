@@ -142,8 +142,8 @@ public class KaelTopDownController : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other){
         if(other.tag == "Enemy"){
-            //Debug.Log("ENTERED!");
-            other.GetComponent<Enemy>().startFight();
+            Debug.Log("ENTERED!");
+            other.GetComponent<EnemyOverworld>().startFight();
         }
     }
 
