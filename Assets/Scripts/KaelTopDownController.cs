@@ -139,4 +139,13 @@ public class KaelTopDownController : MonoBehaviour
 
         return frontWalk;
     }
+
+    void OnTriggerEnter2D(Collider2D other){
+        if(other.tag == "Enemy"){
+            //Debug.Log("ENTERED!");
+            other.GetComponent<Enemy>().startFight();
+        }
+    }
+
+
 }
