@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class LevelLoader : MonoBehaviour
 {
     
+    
     public static Dictionary<string, string> enemyTypes = new Dictionary<string, string>
     {
         {"template", "testScene"}
