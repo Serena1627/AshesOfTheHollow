@@ -8,6 +8,7 @@ public class LevelLoader : MonoBehaviour
 {
     static int currentOverworldSceneIndex;
     
+    
     public static Dictionary<string, string> enemyTypes = new Dictionary<string, string>
     {
         {"template", "testScene"}
