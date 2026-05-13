@@ -161,6 +161,11 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 2.96875, y: 4.5}
   m_Direction: 0
+--- !u!4 &414669855 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6414700448965936945, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
+  m_PrefabInstance: {fileID: 4074271644303795917}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -308,10 +313,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 519420028}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 441e41e37b0054f16ad4b58fa2f6cdd9, type: 3}
+  m_Script: {fileID: 11500000, guid: 4c39266d5fe79ed45bc309275953f5df, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CameraTransform
-  targetObject: {fileID: 414669846}
+  m_EditorClassIdentifier: Assembly-CSharp::CameraFollowClamp2D
+  target: {fileID: 414669855}
+  backgroundRenderer: {fileID: 1359705204}
+  smoothSpeed: 8
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
