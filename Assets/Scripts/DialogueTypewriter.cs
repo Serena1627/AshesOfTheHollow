@@ -2,6 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class DialogueTypewriter : MonoBehaviour
 {
@@ -29,6 +30,7 @@ public class DialogueTypewriter : MonoBehaviour
     private int currentLineIndex = 0;
     private bool isTyping = false;
     private Coroutine typingCoroutine;
+    private bool dialogueActive = false;
 
     private void Start()
     {
@@ -37,7 +39,13 @@ public class DialogueTypewriter : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (!dialogueActive)
+            return;
+
+        if (Keyboard.current == null)
+            return;
+
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             if (isTyping)
             {
@@ -55,8 +63,10 @@ public class DialogueTypewriter : MonoBehaviour
         if (lines == null || lines.Length == 0)
             return;
 
+        dialogueActive = true;
         dialogueBox.SetActive(true);
         currentLineIndex = 0;
+
         ShowLine(lines[currentLineIndex]);
     }
 
@@ -122,10 +132,16 @@ public class DialogueTypewriter : MonoBehaviour
 
         if (currentLineIndex >= lines.Length)
         {
-            dialogueBox.SetActive(false);
+            EndDialogue();
             return;
         }
 
         ShowLine(lines[currentLineIndex]);
+    }
+
+    private void EndDialogue()
+    {
+        dialogueActive = false;
+        dialogueBox.SetActive(false);
     }
 }
