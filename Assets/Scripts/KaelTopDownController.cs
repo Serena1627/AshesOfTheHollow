@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SpriteRenderer))]
@@ -10,25 +10,17 @@ public class KaelTopDownController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 4f;
 
-    [Header("Tilemap Collision Rules")]
-    [Tooltip("Tilemap containing blocked object tiles: trees, ruins, fences, rocks, cottage wreckage, barrels, walls, etc.")]
+    [Header("Tilemap Logic")]
     [SerializeField] private Tilemap blockedObjectTilemap;
-
-    [Tooltip("Optional tilemap containing end/transition tiles.")]
     [SerializeField] private Tilemap endPointTilemap;
 
-    [Tooltip("Optional ground tilemap used only to prevent Kael from walking outside the painted level.")]
-    [SerializeField] private Tilemap groundTilemap;
-
-    [Tooltip("If true, Kael cannot leave the area covered by the Ground Tilemap.")]
-    [SerializeField] private bool preventLeavingMapBounds = true;
-
-    [Tooltip("How far from Kael's center to check for blocked cells. Increase if he clips into objects; decrease if he gets blocked too early.")]
+    [Header("Collision Check")]
     [SerializeField] private float collisionCheckRadius = 0.18f;
 
-    [Header("Level Transition")]
+    [Header("Scene Transition")]
     [SerializeField] private string nextSceneName;
     [SerializeField] private bool enemyMustBeDefeatedBeforeExit = true;
+
     private bool enemyDefeated = false;
 
     [Header("Idle Sprites")]
@@ -48,8 +40,10 @@ public class KaelTopDownController : MonoBehaviour
 
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
+
     private Vector2 input;
     private Vector2 lastDirection = Vector2.down;
+
     private float animationTimer;
     private int frameIndex;
 
@@ -57,6 +51,7 @@ public class KaelTopDownController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
     }
@@ -70,21 +65,30 @@ public class KaelTopDownController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        MoveWithTileCollision();
+        MoveWithBlockedTileCheck();
     }
 
     private void ReadInput()
     {
         input = Vector2.zero;
+
         Keyboard keyboard = Keyboard.current;
         if (keyboard == null) return;
 
-        if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed) input.x -= 1;
-        if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed) input.x += 1;
-        if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) input.y += 1;
-        if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) input.y -= 1;
+        if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed)
+            input.x -= 1;
 
-        if (input.sqrMagnitude > 1f) input.Normalize();
+        if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed)
+            input.x += 1;
+
+        if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed)
+            input.y += 1;
+
+        if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed)
+            input.y -= 1;
+
+        if (input.sqrMagnitude > 1f)
+            input.Normalize();
 
         if (input.sqrMagnitude > 0.01f)
         {
@@ -95,38 +99,41 @@ public class KaelTopDownController : MonoBehaviour
         }
     }
 
-    private void MoveWithTileCollision()
+    private void MoveWithBlockedTileCheck()
     {
-        if (input.sqrMagnitude <= 0.01f) return;
+        if (input.sqrMagnitude <= 0.01f)
+            return;
 
         Vector2 currentPosition = rb.position;
         Vector2 movement = input.normalized * moveSpeed * Time.fixedDeltaTime;
         Vector2 nextPosition = currentPosition + movement;
 
+        // Try full movement first.
         if (CanMoveTo(nextPosition))
         {
             rb.MovePosition(nextPosition);
             return;
         }
 
-        // Sliding lets Kael move along walls/trees instead of getting stuck on corners.
-        Vector2 xOnly = currentPosition + new Vector2(movement.x, 0f);
-        if (CanMoveTo(xOnly))
+        // If full movement is blocked, try sliding horizontally.
+        Vector2 xOnlyPosition = currentPosition + new Vector2(movement.x, 0f);
+        if (CanMoveTo(xOnlyPosition))
         {
-            rb.MovePosition(xOnly);
+            rb.MovePosition(xOnlyPosition);
             return;
         }
 
-        Vector2 yOnly = currentPosition + new Vector2(0f, movement.y);
-        if (CanMoveTo(yOnly))
+        // If horizontal movement is blocked, try sliding vertically.
+        Vector2 yOnlyPosition = currentPosition + new Vector2(0f, movement.y);
+        if (CanMoveTo(yOnlyPosition))
         {
-            rb.MovePosition(yOnly);
+            rb.MovePosition(yOnlyPosition);
         }
     }
 
     private bool CanMoveTo(Vector2 worldPosition)
     {
-        Vector2[] points =
+        Vector2[] checkPoints =
         {
             worldPosition,
             worldPosition + Vector2.up * collisionCheckRadius,
@@ -135,10 +142,10 @@ public class KaelTopDownController : MonoBehaviour
             worldPosition + Vector2.right * collisionCheckRadius
         };
 
-        foreach (Vector2 point in points)
+        foreach (Vector2 point in checkPoints)
         {
-            if (IsBlocked(point)) return false;
-            if (preventLeavingMapBounds && IsOutsideGroundMap(point)) return false;
+            if (IsBlocked(point))
+                return false;
         }
 
         return true;
@@ -146,23 +153,23 @@ public class KaelTopDownController : MonoBehaviour
 
     private bool IsBlocked(Vector2 worldPosition)
     {
-        if (blockedObjectTilemap == null) return false;
-        Vector3Int cell = blockedObjectTilemap.WorldToCell(worldPosition);
-        return blockedObjectTilemap.HasTile(cell);
-    }
+        if (blockedObjectTilemap == null)
+            return false;
 
-    private bool IsOutsideGroundMap(Vector2 worldPosition)
-    {
-        if (groundTilemap == null) return false;
-        Vector3Int cell = groundTilemap.WorldToCell(worldPosition);
-        return !groundTilemap.HasTile(cell);
+        Vector3Int cellPosition = blockedObjectTilemap.WorldToCell(worldPosition);
+
+        return blockedObjectTilemap.HasTile(cellPosition);
     }
 
     private void CheckEndPoint()
     {
-        if (endPointTilemap == null) return;
-        Vector3Int cell = endPointTilemap.WorldToCell(transform.position);
-        if (!endPointTilemap.HasTile(cell)) return;
+        if (endPointTilemap == null)
+            return;
+
+        Vector3Int cellPosition = endPointTilemap.WorldToCell(transform.position);
+
+        if (!endPointTilemap.HasTile(cellPosition))
+            return;
 
         if (enemyMustBeDefeatedBeforeExit && !enemyDefeated)
         {
@@ -170,10 +177,13 @@ public class KaelTopDownController : MonoBehaviour
             return;
         }
 
-        if (!string.IsNullOrWhiteSpace(nextSceneName))
-            SceneManager.LoadScene(nextSceneName);
-        else
+        if (string.IsNullOrWhiteSpace(nextSceneName))
+        {
             Debug.LogWarning("Next Scene Name is empty. Add a scene name in the Inspector.");
+            return;
+        }
+
+        SceneManager.LoadScene(nextSceneName);
     }
 
     public void MarkEnemyDefeated()
@@ -184,6 +194,7 @@ public class KaelTopDownController : MonoBehaviour
     private void AnimateSprite()
     {
         bool isMoving = input.sqrMagnitude > 0.01f;
+
         if (!isMoving)
         {
             frameIndex = 0;
@@ -193,6 +204,7 @@ public class KaelTopDownController : MonoBehaviour
         }
 
         Sprite[] currentWalkSprites = GetWalkSprites();
+
         if (currentWalkSprites == null || currentWalkSprites.Length == 0)
         {
             spriteRenderer.sprite = GetIdleSprite();
@@ -200,6 +212,7 @@ public class KaelTopDownController : MonoBehaviour
         }
 
         animationTimer += Time.deltaTime;
+
         if (animationTimer >= 1f / animationFPS)
         {
             animationTimer = 0f;
@@ -211,17 +224,29 @@ public class KaelTopDownController : MonoBehaviour
 
     private Sprite GetIdleSprite()
     {
-        if (lastDirection == Vector2.up) return backIdle;
-        if (lastDirection == Vector2.left) return leftIdle;
-        if (lastDirection == Vector2.right) return rightIdle;
+        if (lastDirection == Vector2.up)
+            return backIdle;
+
+        if (lastDirection == Vector2.left)
+            return leftIdle;
+
+        if (lastDirection == Vector2.right)
+            return rightIdle;
+
         return frontIdle;
     }
 
     private Sprite[] GetWalkSprites()
     {
-        if (lastDirection == Vector2.up) return backWalk;
-        if (lastDirection == Vector2.left) return leftWalk;
-        if (lastDirection == Vector2.right) return rightWalk;
+        if (lastDirection == Vector2.up)
+            return backWalk;
+
+        if (lastDirection == Vector2.left)
+            return leftWalk;
+
+        if (lastDirection == Vector2.right)
+            return rightWalk;
+
         return frontWalk;
     }
 
@@ -230,9 +255,17 @@ public class KaelTopDownController : MonoBehaviour
         if (other.CompareTag("Enemy"))
         {
             Debug.Log("ENTERED!");
+
             EnemyOverworld enemy = other.GetComponent<EnemyOverworld>();
+
             if (enemy != null)
+            {
                 enemy.startFight();
+            }
+            else
+            {
+                Debug.LogWarning("Enemy tag found, but EnemyOverworld script is missing.");
+            }
         }
     }
 }
