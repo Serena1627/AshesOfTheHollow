@@ -1,0 +1,37 @@
+{
+  "name": "Developed Plains - Open Grass Version",
+  "version": "2.0",
+  "cell_count": {
+    "columns": 32,
+    "rows": 32
+  },
+  "movement_design": "Grass and path are walkable. Path is a visual guide. Objects and structural cells block movement.",
+  "recommended_unity_tilemaps": [
+    "GroundTilemap",
+    "DecorationTilemap",
+    "BlockedObjectTilemap",
+    "EndPointTilemap"
+  ],
+  "legend": {
+    "G": "walkable grass / base meadow",
+    "L": "walkable flower grass / decorative meadow",
+    "P": "walkable dirt path / guidance route",
+    "E": "walkable enemy placement / encounter clearing",
+    "S": "walkable start zone near ruined cottage",
+    "X": "walkable end/scene-transition tile near forest endpoint",
+    "T": "blocked tree / forest boundary",
+    "C": "blocked cottage wreckage",
+    "R": "blocked ruined stone structure",
+    "B": "blocked barrel/crate/cart/barricade debris",
+    "W": "blocked stone wall / rock ledge",
+    "K": "blocked large rock/boulder",
+    "F": "blocked fence segment"
+  },
+  "start": "Lower-left ruined cottage area. Suggested player spawn around cell (8, 29) or near world position matching that cell.",
+  "end": "Top forest path, cells marked X. Use EndPointTilemap or trigger collider for next-scene transition.",
+  "notes": [
+    "This layout is a semantic planning guide, not an exact pixel-perfect extraction from the painted map.",
+    "Use the atlas to paint a real Unity Tilemap. Paint solid object cells into BlockedObjectTilemap.",
+    "Keep flowers, tiny grass, and low pebbles on DecorationTilemap if they should not block movement."
+  ]
+}

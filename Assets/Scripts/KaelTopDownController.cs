@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Tilemaps;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SpriteRenderer))]
@@ -7,6 +9,19 @@ public class KaelTopDownController : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 4f;
+
+    [Header("Tilemap Logic")]
+    [SerializeField] private Tilemap blockedObjectTilemap;
+    [SerializeField] private Tilemap endPointTilemap;
+
+    [Header("Collision Check")]
+    [SerializeField] private float collisionCheckRadius = 0.18f;
+
+    [Header("Scene Transition")]
+    [SerializeField] private string nextSceneName;
+    [SerializeField] private bool enemyMustBeDefeatedBeforeExit = true;
+
+    private bool enemyDefeated = false;
 
     [Header("Idle Sprites")]
     [SerializeField] private Sprite frontIdle;
@@ -36,18 +51,21 @@ public class KaelTopDownController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+
+        rb.gravityScale = 0f;
+        rb.freezeRotation = true;
     }
 
     private void Update()
     {
         ReadInput();
         AnimateSprite();
+        CheckEndPoint();
     }
 
     private void FixedUpdate()
     {
-        Vector2 movement = input.normalized * moveSpeed * Time.fixedDeltaTime;
-        rb.MovePosition(rb.position + movement);
+        MoveWithBlockedTileCheck();
     }
 
     private void ReadInput()
@@ -79,6 +97,98 @@ public class KaelTopDownController : MonoBehaviour
             else
                 lastDirection = input.y > 0 ? Vector2.up : Vector2.down;
         }
+    }
+
+    private void MoveWithBlockedTileCheck()
+    {
+        if (input.sqrMagnitude <= 0.01f)
+            return;
+
+        Vector2 currentPosition = rb.position;
+        Vector2 movement = input.normalized * moveSpeed * Time.fixedDeltaTime;
+        Vector2 nextPosition = currentPosition + movement;
+
+        // Try full movement first.
+        if (CanMoveTo(nextPosition))
+        {
+            rb.MovePosition(nextPosition);
+            return;
+        }
+
+        // If full movement is blocked, try sliding horizontally.
+        Vector2 xOnlyPosition = currentPosition + new Vector2(movement.x, 0f);
+        if (CanMoveTo(xOnlyPosition))
+        {
+            rb.MovePosition(xOnlyPosition);
+            return;
+        }
+
+        // If horizontal movement is blocked, try sliding vertically.
+        Vector2 yOnlyPosition = currentPosition + new Vector2(0f, movement.y);
+        if (CanMoveTo(yOnlyPosition))
+        {
+            rb.MovePosition(yOnlyPosition);
+        }
+    }
+
+    private bool CanMoveTo(Vector2 worldPosition)
+    {
+        Vector2[] checkPoints =
+        {
+            worldPosition,
+            worldPosition + Vector2.up * collisionCheckRadius,
+            worldPosition + Vector2.down * collisionCheckRadius,
+            worldPosition + Vector2.left * collisionCheckRadius,
+            worldPosition + Vector2.right * collisionCheckRadius
+        };
+
+        foreach (Vector2 point in checkPoints)
+        {
+            if (IsBlocked(point))
+                return false;
+        }
+
+        return true;
+    }
+
+    private bool IsBlocked(Vector2 worldPosition)
+    {
+        if (blockedObjectTilemap == null)
+            return false;
+
+        Vector3Int cellPosition = blockedObjectTilemap.WorldToCell(worldPosition);
+
+        return blockedObjectTilemap.HasTile(cellPosition);
+    }
+
+    private void CheckEndPoint()
+    {
+        if (endPointTilemap == null)
+            return;
+
+        Vector3Int cellPosition = endPointTilemap.WorldToCell(transform.position);
+
+        if (!endPointTilemap.HasTile(cellPosition))
+            return;
+
+        if (enemyMustBeDefeatedBeforeExit && !enemyDefeated)
+        {
+            Debug.Log("The path continues, but enemies remain.");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(nextSceneName))
+        {
+            Debug.LogWarning("Next Scene Name is empty. Add a scene name in the Inspector.");
+            return;
+        }
+
+        SceneManager.LoadScene(nextSceneName);
+    }
+
+    public void MarkEnemyDefeated()
+    {
+        enemyDefeated = true;
     }
 
     private void AnimateSprite()
@@ -140,12 +250,22 @@ public class KaelTopDownController : MonoBehaviour
         return frontWalk;
     }
 
-    void OnTriggerEnter2D(Collider2D other){
-        if(other.tag == "Enemy"){
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Enemy"))
+        {
             Debug.Log("ENTERED!");
-            other.GetComponent<EnemyOverworld>().startFight();
+
+            EnemyOverworld enemy = other.GetComponent<EnemyOverworld>();
+
+            if (enemy != null)
+            {
+                enemy.startFight();
+            }
+            else
+            {
+                Debug.LogWarning("Enemy tag found, but EnemyOverworld script is missing.");
+            }
         }
     }
-
-
 }
