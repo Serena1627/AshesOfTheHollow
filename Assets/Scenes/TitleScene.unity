@@ -584,6 +584,7 @@ GameObject:
   - component: {fileID: 1132116546}
   - component: {fileID: 1132116548}
   - component: {fileID: 1132116547}
+  - component: {fileID: 1132116549}
   m_Layer: 5
   m_Name: StartText
   m_TagString: Untagged
@@ -710,6 +711,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1132116545}
   m_CullTransparentMesh: 1
+--- !u!114 &1132116549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1132116545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f324cdb909487244b081a1e8331f49f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FadeTMPTextLoop
+  fadeSpeed: 0.5
+  minAlpha: 0.1
+  maxAlpha: 1
 --- !u!1 &1297788513
 GameObject:
   m_ObjectHideFlags: 0
@@ -754,6 +770,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 979257d5b5d661e43b6a4592352b69c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TitleScreenController
+  firstSceneName: IntroScene
 --- !u!1 &1301551297
 GameObject:
   m_ObjectHideFlags: 0
