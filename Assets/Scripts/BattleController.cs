@@ -2,12 +2,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using NUnit.Framework;
+using TMPro;
 using Unity.Collections;
 using Unity.VisualScripting;
 using UnityEditor;
+using UnityEditor.PackageManager;
+using UnityEditor.UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BattleController : MonoBehaviour
 {
@@ -20,15 +25,11 @@ public class BattleController : MonoBehaviour
     private bool actionDecided = false;
     private bool attackDecided = false;
     private bool itemDecided = false;
-    private actionChoices actionChoice = actionChoices.NONE;
+    private BattleUIController.actionChoices actionChoice = BattleUIController.actionChoices.NONE;
     private string attackChoice = "";
     private string itemChoice = "";
-    public enum actionChoices
-    {
-        NONE,
-        ATTACK,
-        ITEM
-    }
+
+    public bool waitingForChoice = false;
 
     public List <PlayerBattle> getPlayers()
     {
@@ -39,11 +40,13 @@ public class BattleController : MonoBehaviour
     {
         return enemies;
     }
+    List <BattleEntity> targets = new List<BattleEntity>();
 
 
 
     private void Awake()
     {
+        Instance = this;
         GameObject[] playerList = GameObject.FindGameObjectsWithTag("Player");
         GameObject[] enemyList = GameObject.FindGameObjectsWithTag("Enemy");
         foreach (GameObject obj in playerList)
@@ -80,9 +83,11 @@ public class BattleController : MonoBehaviour
     {
         int size = players.Count();
         int playersDead = 0;
+        //Debug.Log(size);
         foreach(PlayerBattle player in players)
         {
-            if (player.isDead)
+            //Debug.Log(player.entityName);
+            if (player.isEntityDead())
             {
                 playersDead++;
                 turnOrder.Remove(player);
@@ -107,7 +112,8 @@ public class BattleController : MonoBehaviour
             if (enemy.isDead)
             {
                 enemiesDead++;
-                turnOrder.Remove(enemy);
+                //turnOrder.Remove(enemy);
+                //Make a statement that skips dead enemies
                 enemies.Remove(enemy);
             }
         }
@@ -119,6 +125,7 @@ public class BattleController : MonoBehaviour
             return false;
         } 
     }
+
 
     void endBattle()
     {
@@ -133,52 +140,109 @@ public class BattleController : MonoBehaviour
         }
     }
 
-    IEnumerator ActionLoop(PlayerBattle player)
+    IEnumerator PlayerAttack(PlayerBattle player, Action action)
+    {
+        targets.Clear();
+        if (action.getTargeting() == "SINGLE")
+        {
+            //waitingForChoice = true;
+            yield return StartCoroutine(BattleUIController.Instance.targeting(enemies));
+            EnemyBattle target = BattleUIController.Instance.returnTarget();
+            targets.Add(target);
+        }
+        else if (action.getTargeting() == "SPREAD")
+        {
+            targets = player.getAllTargets();
+        }
+        action.doAction(targets);
+
+    }
+
+    IEnumerator AttackLoop(PlayerBattle player)
+    //public void AttackLoop(PlayerBattle player)
     {
         Debug.Log ("PICK ATTACK");
-        yield return new WaitUntil(() => attackDecided);
+        yield return StartCoroutine(BattleUIController.Instance.playerAttacks(player));
+        //yield return new WaitUntil(() => attackDecided);
 
         if (attackChoice == "BACK")
         {
             
-            Instance.StartCoroutine(Instance.MenuLoop(player));
+            //Instance.StartCoroutine(Instance.MenuLoop(player));
+            yield return StartCoroutine(MenuLoop(player));
+        }
+        else
+        {;
+            Action action = BattleUIController.Instance.getAttack();
+            //Instance.StartCoroutine(Instance.PlayerAttack(player, action));
+            yield return StartCoroutine(PlayerAttack(player, action));
+            //Action action = player.getActionList()[attackChoice];
+            //List <BattleEntity> targets = player.getTargets(player, action);
+            //action.doAction(targets);
+        }
+
+
+    }
+
+    IEnumerator ItemLoop(PlayerBattle player)
+    {
+        Debug.Log ("PICK ITEM");
+        yield return new WaitUntil(() => itemDecided);
+
+        if (itemChoice == "BACK")
+        {
+            
+            //Instance.StartCoroutine(MenuLoop(player));
+            MenuLoop(player);
         }
         else
         {
-            Action action = player.getActionList()[attackChoice];
-            List <BattleEntity> targets = player.getTargets(player, action);
-            action.doAction(targets);
+            //player.useItem(itemChoice);
         }
-
-
     }
 
     IEnumerator MenuLoop(PlayerBattle player)
+    //public void MenuLoop(PlayerBattle player)
     {
         Debug.Log ("ATTACK OR ITEM?");
-        Debug.Log("Waiting For Button");
+        Debug.Log("Waiting For Selection");
+        yield return StartCoroutine(BattleUIController.Instance.playerMenu());
+        BattleUIController.actionChoices actionChoice = BattleUIController.Instance.getAction();
 
-        yield return new WaitUntil(() => actionDecided);
 
-        if (actionChoice == actionChoices.ATTACK)
+        //yield return new WaitUntil(() => actionChoice != )
+
+        if (actionChoice == BattleUIController.actionChoices.ATTACK)
         {
-            Instance.StartCoroutine(Instance.ActionLoop(player));
+            //Instance.StartCoroutine(Instance.AttackLoop(player));
+            yield return StartCoroutine(AttackLoop(player));
+            //AttackLoop(player);
+        }
+        else if (actionChoice == BattleUIController.actionChoices.ITEM)
+        {
+            //Instance.StartCoroutine(Instance.ItemLoop(player));
+
         }
     }
 
-    public static void PlayerTurn(PlayerBattle player)
+    //public static void PlayerTurn(PlayerBattle player)
+    public IEnumerator PlayerTurn (PlayerBattle player)
     {
-        Instance.StartCoroutine(Instance.MenuLoop(player));
+        yield return StartCoroutine(MenuLoop(player));
+        //Instance.MenuLoop(player);
     }
 
-    void turn(BattleEntity currentBattleEntity)
+    //void Turn(BattleEntity currentBattleEntity)
+    IEnumerator Turn (BattleEntity currentBattleEntity)
     {
         Debug.Log($"{currentBattleEntity.entityName}'s Turn!");
-        currentBattleEntity.turn();
+        yield return StartCoroutine(currentBattleEntity.Turn());
     }
     
-    void battle()
+    IEnumerator Battle()
+    //void battle()
     {
+        Debug.Log("BATTLE START!");
         Boolean enemiesORPlayersDead = false;
         while (!enemiesORPlayersDead)
         {
@@ -188,7 +252,9 @@ public class BattleController : MonoBehaviour
                     enemiesORPlayersDead = true;
                     break;
                 }
-                turn(entity);
+                //yield return turn(entity);
+                yield return StartCoroutine(Turn(entity));
+                //turn(entity);
             }
         }
         endBattle();
@@ -199,7 +265,8 @@ public class BattleController : MonoBehaviour
     void Start()
     {
         findTurnOrder();
-        battle();
+        StartCoroutine(Battle());
+        //battle();
     }
 
 

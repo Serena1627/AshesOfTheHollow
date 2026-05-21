@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Action : MonoBehaviour
+public class Action
 {
     int damage;
     string actionName;
@@ -28,10 +28,16 @@ public class Action : MonoBehaviour
 
     public void doAction(List <BattleEntity> targets)
     {
+        Debug.Log(targets.Count);
         foreach (BattleEntity target in targets)
         {
             target.takeDamage(damage, actionType);
         }
+    }
+
+    public string getActionName()
+    {
+        return actionName;
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

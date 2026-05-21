@@ -35,17 +35,32 @@ public class PlayerBattle : BattleEntity
     [SerializeField] targetingTypes action2TargetingType;
     
     int numberOfActions = 2;
+    public BattleEntity singleTargetEnemy;
+    public BattleEntity target = new BattleEntity();
+    bool waitingForChoice = true;
 
+    public void targetButton(EnemyBattle enemy)
+    {
+        waitingForChoice = false;
+        target = enemy;
+    }
+
+    /*
+    IEnumerator selectTarget()
+    {
+        waitingForChoice = true;
+        battleController.generateTargets();
+        yield return new WaitUntil(() => waitingForChoice == false);
+        
+    }
+    
     public override BattleEntity pickTarget()
     {
-        bool targetPicked = false;
-        BattleEntity target = new BattleEntity();
-        while (!targetPicked)
-        {
-            
-        }
+        target = new BattleEntity();
+        StartCoroutine(selectTarget());
         return target;
     }
+    */
 
     public override List <BattleEntity> getAllTargets()
     {
@@ -78,15 +93,10 @@ public class PlayerBattle : BattleEntity
     }
 
 
-    public override void turn()
+    public override IEnumerator Turn()
     {
-        BattleController.PlayerTurn(this);
-    }
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
+        //BattleController.PlayerTurn(this);
+        yield return StartCoroutine(BattleController.Instance.PlayerTurn(this));
     }
 
     // Update is called once per frame

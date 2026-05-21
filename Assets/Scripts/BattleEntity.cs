@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class BattleEntity : MonoBehaviour
@@ -18,7 +19,11 @@ public class BattleEntity : MonoBehaviour
     public Boolean isDead = false;
     //public List <Action> actions = new List<Action>();
 
-    
+    public Boolean isEntityDead()
+    {
+        return isDead;
+    }
+
     Boolean isDefenderDead()
     {
         if (health <= 0)
@@ -40,18 +45,18 @@ public class BattleEntity : MonoBehaviour
         return targets;
     }
 
-    public List <BattleEntity> getTargets(BattleEntity player, Action action)
+    public List <BattleEntity> getTargets(BattleEntity battleEntity, Action action)
     {
         List <BattleEntity> targets = new List<BattleEntity>();
 
         if (action.getTargeting() == "SINGLE")
         {
-            BattleEntity target = player.pickTarget();
+            BattleEntity target = battleEntity.pickTarget();
             targets.Add(target);
         }
         else if (action.getTargeting() == "SPREAD")
         {
-            targets = player.getAllTargets();
+            targets = battleEntity.getAllTargets();
         }
         return targets;
     }
@@ -68,6 +73,8 @@ public class BattleEntity : MonoBehaviour
             defenceNumberUsed = spDef;
         }
         health -= (damage - defenceNumberUsed);
+        Debug.Log($"{entityName} took {damage - defenceNumberUsed} damage!");
+        Debug.Log($"Health: {health}");
         if (isDefenderDead()) {
             Debug.Log($"{entityName} died!");
         }
@@ -79,15 +86,17 @@ public class BattleEntity : MonoBehaviour
  
     }
 
-    public virtual void turn()
+    //public virtual void turn()
+    public virtual IEnumerator Turn()
     {
-        
+        yield return null;
     }
     
 
     void Start()
     {
         addActions();
+        //isDead = false;
     }
 
     // Update is called once per frame
