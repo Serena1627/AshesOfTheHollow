@@ -1003,6 +1003,12 @@ MonoBehaviour:
     dialogueText: The theory is going great! They said I am an unparelleled prodigy
       in the research department.
     portrait: {fileID: -5930123909296542379, guid: e5f803cd17759d34197088275e047d86, type: 3}
+  - speakerName: Ren (Kael's Brother)
+    dialogueText: So you can make a fireball?!
+    portrait: {fileID: 8740548040849596032, guid: 406b79999f1228a47bb43d7f2ac006c3, type: 3}
+  - speakerName: Mira
+    dialogueText: Not yet...
+    portrait: {fileID: 2097057510344534897, guid: aaa2b923e1b31e94599b30cc8c2cca5e, type: 3}
   lettersPerSecond: 35
 --- !u!1 &1816066595
 GameObject:
