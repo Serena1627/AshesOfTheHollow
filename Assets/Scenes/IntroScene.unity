@@ -1273,8 +1273,23 @@ MonoBehaviour:
   - speakerName: Fredrick (Mira's Dad)
     dialogueText: Everyone in the basement. Now!
     portrait: {fileID: -5510988980300963221, guid: 265276dc90681504ab56fc71b8a1763b, type: 3}
+  playOnStart: 1
   lettersPerSecond: 35
-  transitionAfterDialogue: {fileID: 393024269}
+  onDialogueFinished:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1906770502}
+        m_TargetAssemblyTypeName: BlackScreenDialogueSequence, Assembly-CSharp
+        m_MethodName: HandleDialogueFinished
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1816066595
 GameObject:
   m_ObjectHideFlags: 0
@@ -1356,7 +1371,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 600
   m_TargetDisplay: 0
 --- !u!224 &1816066599
 RectTransform:
@@ -1379,6 +1394,72 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1906770501
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1906770503}
+  - component: {fileID: 1906770502}
+  m_Layer: 0
+  m_Name: BlackscreenDialogueManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1906770502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906770501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a42fd68e305bfa345b7c55246c24b6b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BlackScreenDialogueSequence
+  blackScreenGroup: {fileID: 1377343384}
+  blackScreenObject: {fileID: 1377343380}
+  dialogueTypewriter: {fileID: 1670478963}
+  blackScreenLines:
+  - speakerName: 
+    dialogueText: BAM
+    portrait: {fileID: 0}
+  - speakerName: Cultist 1
+    dialogueText: Light it on fire, quick! Take the ones with good souls for the
+      ritual.
+    portrait: {fileID: 5471184021579675562, guid: 65ba323d6023e2840bb8221b2a574d42, type: 3}
+  - speakerName: Cultist 2
+    dialogueText: 'This house has souls of very good quality. '
+    portrait: {fileID: 141943291604226396, guid: ff31199e50d4ff34cb51100566382154, type: 3}
+  - speakerName: Kael
+    dialogueText: (What's happening... everything hurts.)
+    portrait: {fileID: 4237676072881026496, guid: 454d1fec3dbc81d4d844ac949f7fb6b6, type: 3}
+  - speakerName: Kael
+    dialogueText: (I just woke up and I'm in the basement.)
+    portrait: {fileID: 2034640904416277011, guid: ecd0716ae287d5b439e7acbfa289bda9, type: 3}
+  fadeDuration: 1.5
+  nextSceneName: BasementScene
+--- !u!4 &1906770503
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906770501}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -11.17547, y: 1.08621, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1950309429
 GameObject:
   m_ObjectHideFlags: 0
@@ -1680,3 +1761,4 @@ SceneRoots:
   - {fileID: 2049919836}
   - {fileID: 1638759704}
   - {fileID: 393024270}
+  - {fileID: 1906770503}
