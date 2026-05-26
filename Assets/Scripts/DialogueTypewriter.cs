@@ -31,6 +31,8 @@ public class DialogueTypewriter : MonoBehaviour
     private bool isTyping = false;
     private Coroutine typingCoroutine;
     private bool dialogueActive = false;
+    [Header("After Dialogue")]
+    public BlackScreenTransition transitionAfterDialogue;
 
     private void Start()
     {
@@ -141,7 +143,9 @@ public class DialogueTypewriter : MonoBehaviour
 
     private void EndDialogue()
     {
-        dialogueActive = false;
         dialogueBox.SetActive(false);
+
+        if (transitionAfterDialogue != null)
+            transitionAfterDialogue.StartTransition();
     }
 }
