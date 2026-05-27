@@ -11221,7 +11221,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PartyManager
   currentPartyPrefabs:
-  - {fileID: 4684052358575500304, guid: 5f86e35481e930f49a2772191f417058, type: 3}
+  - {fileID: 7509160197856985987, guid: 07ad3870dfbcfdd4db6dac8962ed3350, type: 3}
 --- !u!4 &2109879075
 Transform:
   m_ObjectHideFlags: 0
