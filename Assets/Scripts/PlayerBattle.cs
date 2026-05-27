@@ -57,7 +57,7 @@ public class PlayerBattle : BattleEntity
 
     public override List <BattleEntity> getAllTargets()
     {
-        List <EnemyBattle> enemyTargets = battleController.getEnemies();
+        List <EnemyBattle> enemyTargets = BattleController.Instance.getEnemies();
         List <BattleEntity> targets = new List<BattleEntity>();
         foreach (EnemyBattle enemy in enemyTargets)
         {
