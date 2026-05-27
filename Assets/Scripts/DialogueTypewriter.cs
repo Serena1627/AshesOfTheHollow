@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.Events;
 
 public class DialogueTypewriter : MonoBehaviour
 {
@@ -25,16 +26,23 @@ public class DialogueTypewriter : MonoBehaviour
     public DialogueLine[] lines;
 
     [Header("Typewriter Settings")]
+    public bool playOnStart = true;
     public float lettersPerSecond = 35f;
+
+    [Header("Events")]
+    public UnityEvent onDialogueFinished;
 
     private int currentLineIndex = 0;
     private bool isTyping = false;
-    private Coroutine typingCoroutine;
     private bool dialogueActive = false;
+    private Coroutine typingCoroutine;
 
     private void Start()
     {
-        StartDialogue();
+        if (playOnStart)
+            StartDialogue();
+        else if (dialogueBox != null)
+            dialogueBox.SetActive(false);
     }
 
     private void Update()
@@ -48,24 +56,22 @@ public class DialogueTypewriter : MonoBehaviour
         if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             if (isTyping)
-            {
                 RevealFullLine();
-            }
             else
-            {
                 ShowNextLine();
-            }
         }
     }
 
-    private void StartDialogue()
+    public void StartDialogue()
     {
         if (lines == null || lines.Length == 0)
             return;
 
         dialogueActive = true;
-        dialogueBox.SetActive(true);
         currentLineIndex = 0;
+
+        if (dialogueBox != null)
+            dialogueBox.SetActive(true);
 
         ShowLine(lines[currentLineIndex]);
     }
@@ -74,6 +80,7 @@ public class DialogueTypewriter : MonoBehaviour
     {
         nameText.text = line.speakerName;
         dialogueText.text = line.dialogueText;
+        dialogueText.maxVisibleCharacters = 0;
 
         if (portraitImage != null)
         {
@@ -142,6 +149,10 @@ public class DialogueTypewriter : MonoBehaviour
     private void EndDialogue()
     {
         dialogueActive = false;
-        dialogueBox.SetActive(false);
+
+        if (dialogueBox != null)
+            dialogueBox.SetActive(false);
+
+        onDialogueFinished?.Invoke();
     }
 }

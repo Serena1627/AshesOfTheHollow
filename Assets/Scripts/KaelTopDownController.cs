@@ -7,6 +7,22 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(SpriteRenderer))]
 public class KaelTopDownController : MonoBehaviour
 {
+    [System.Serializable]
+    public class SpriteSet
+    {
+        [Header("Idle Sprites")]
+        public Sprite frontIdle;
+        public Sprite backIdle;
+        public Sprite leftIdle;
+        public Sprite rightIdle;
+
+        [Header("Walk Sprites")]
+        public Sprite[] frontWalk;
+        public Sprite[] backWalk;
+        public Sprite[] leftWalk;
+        public Sprite[] rightWalk;
+    }
+
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 4f;
 
@@ -21,15 +37,18 @@ public class KaelTopDownController : MonoBehaviour
     [SerializeField] private string nextSceneName;
     [SerializeField] private bool enemyMustBeDefeatedBeforeExit = true;
 
-    private bool enemyDefeated = false;
+    [Header("Sprite Sets")]
+    [SerializeField] private bool useNoGearSpritesOnStart = false;
+    [SerializeField] private SpriteSet noGearSprites;
+    [SerializeField] private SpriteSet armoredSprites;
 
-    [Header("Idle Sprites")]
+    [Header("Current Idle Sprites")]
     [SerializeField] private Sprite frontIdle;
     [SerializeField] private Sprite backIdle;
     [SerializeField] private Sprite leftIdle;
     [SerializeField] private Sprite rightIdle;
 
-    [Header("Walk Sprites")]
+    [Header("Current Walk Sprites")]
     [SerializeField] private Sprite[] frontWalk;
     [SerializeField] private Sprite[] backWalk;
     [SerializeField] private Sprite[] leftWalk;
@@ -47,6 +66,8 @@ public class KaelTopDownController : MonoBehaviour
     private float animationTimer;
     private int frameIndex;
 
+    private bool enemyDefeated = false;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -54,6 +75,9 @@ public class KaelTopDownController : MonoBehaviour
 
         rb.gravityScale = 0f;
         rb.freezeRotation = true;
+
+        if (useNoGearSpritesOnStart)
+            SwitchToNoGearSprites();
     }
 
     private void Update()
@@ -73,7 +97,8 @@ public class KaelTopDownController : MonoBehaviour
         input = Vector2.zero;
 
         Keyboard keyboard = Keyboard.current;
-        if (keyboard == null) return;
+        if (keyboard == null)
+            return;
 
         if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed)
             input.x -= 1;
@@ -108,14 +133,12 @@ public class KaelTopDownController : MonoBehaviour
         Vector2 movement = input.normalized * moveSpeed * Time.fixedDeltaTime;
         Vector2 nextPosition = currentPosition + movement;
 
-        // Try full movement first.
         if (CanMoveTo(nextPosition))
         {
             rb.MovePosition(nextPosition);
             return;
         }
 
-        // If full movement is blocked, try sliding horizontally.
         Vector2 xOnlyPosition = currentPosition + new Vector2(movement.x, 0f);
         if (CanMoveTo(xOnlyPosition))
         {
@@ -123,7 +146,6 @@ public class KaelTopDownController : MonoBehaviour
             return;
         }
 
-        // If horizontal movement is blocked, try sliding vertically.
         Vector2 yOnlyPosition = currentPosition + new Vector2(0f, movement.y);
         if (CanMoveTo(yOnlyPosition))
         {
@@ -157,7 +179,6 @@ public class KaelTopDownController : MonoBehaviour
             return false;
 
         Vector3Int cellPosition = blockedObjectTilemap.WorldToCell(worldPosition);
-
         return blockedObjectTilemap.HasTile(cellPosition);
     }
 
@@ -248,6 +269,43 @@ public class KaelTopDownController : MonoBehaviour
             return rightWalk;
 
         return frontWalk;
+    }
+
+    public void ApplySpriteSet(SpriteSet spriteSet)
+    {
+        if (spriteSet == null)
+        {
+            Debug.LogWarning("Tried to apply a null SpriteSet.");
+            return;
+        }
+
+        frontIdle = spriteSet.frontIdle;
+        backIdle = spriteSet.backIdle;
+        leftIdle = spriteSet.leftIdle;
+        rightIdle = spriteSet.rightIdle;
+
+        frontWalk = spriteSet.frontWalk;
+        backWalk = spriteSet.backWalk;
+        leftWalk = spriteSet.leftWalk;
+        rightWalk = spriteSet.rightWalk;
+
+        frameIndex = 0;
+        animationTimer = 0f;
+
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponent<SpriteRenderer>();
+
+        spriteRenderer.sprite = GetIdleSprite();
+    }
+
+    public void SwitchToNoGearSprites()
+    {
+        ApplySpriteSet(noGearSprites);
+    }
+
+    public void SwitchToArmoredSprites()
+    {
+        ApplySpriteSet(armoredSprites);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
