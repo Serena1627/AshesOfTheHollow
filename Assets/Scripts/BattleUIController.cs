@@ -21,13 +21,23 @@ public class BattleUIController : MonoBehaviour
     public static BattleUIController Instance;
 
     List<Button> attackOptions = new List<Button>();
+    [Header("Attacks")]
     [SerializeField] private Button attackButton;
     [SerializeField] private Transform attackButtonContainer;
     [SerializeField] private GameObject attackOptionsMenu;
+    [Header("Targets")]
     [SerializeField] private Button targetButton;
     [SerializeField] private Transform targetButtonContainer;
     [SerializeField] private GameObject targetOptionsMenu;
+    
+    [Header("Items")]
+    [SerializeField] private Transform itemButtonContainer;
+    [SerializeField] private GameObject itemOptionsMenu;
+    [SerializeField] private Button itemButton;
     EnemyBattle target = new EnemyBattle();
+
+    Item chosenItem;
+    List<Button> itemOptions = new List<Button>();
 
     private Action chosenAttack;
    public void attackButtonAction()
@@ -97,6 +107,38 @@ public class BattleUIController : MonoBehaviour
         attackOptionsMenu.SetActive(false);
     }
 
+    public Item getItem()
+    {
+        return chosenItem;
+    }
+
+    public void selectItem(Item item)
+    {
+        chosenItem = item;
+    }
+
+    public void generateItems()
+    {
+        foreach (Item item in BattleController.Instance.getItems()) {
+            Button selectItemButton = Instantiate(itemButton, itemButtonContainer);
+            TMP_Text text = selectItemButton.GetComponentInChildren<TMP_Text>();
+            text.text = item.getName();
+            Debug.Log(text.text);
+            selectItemButton.onClick.AddListener(() => selectItem(item));
+            itemOptions.Add(selectItemButton);
+        }
+    }
+
+    public IEnumerator playerItems()
+    {
+        itemOptionsMenu.SetActive(true);
+        generateItems();
+        chosenItem = null;
+        yield return new WaitUntil(() => chosenItem != null);
+        removeButtons(itemOptions);
+        itemOptionsMenu.SetActive(false);
+    }
+
     public IEnumerator playerMenu()
     {
         action = actionChoices.NONE;
@@ -158,6 +200,7 @@ public class BattleUIController : MonoBehaviour
         actionOptions.SetActive(false);
         attackOptionsMenu.SetActive(false);
         targetOptionsMenu.SetActive(false);
+        itemOptionsMenu.SetActive(false);
 
     }
 

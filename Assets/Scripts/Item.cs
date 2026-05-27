@@ -5,38 +5,34 @@ public class Item
 {
     string itemName;
     string itemType;
-    int statAlterAmount;
 
     public enum itemTypes
     {
-        HEAL,
-        BUFF
+        SINGLE,
+        PARTY
     }
-    public void Init(string _name, string _type, int _statAlterAmount)
+    public virtual void Init(string _name, string _itemType)
     {
         itemName = _name;
-        itemType = _type;
-        statAlterAmount = _statAlterAmount;
+        itemType = _itemType;
     }
 
-    public void heal(BattleEntity entity)
+    public string getName()
     {
-        
+        return itemName;
+    }
+
+    public string getType()
+    {
+        return itemType;
     }
 
 
 
-    public void useItem(List <BattleEntity> targets)
+
+
+    public virtual void useItem(List <BattleEntity> targets)
     {
-        if (itemType == itemTypes.HEAL.ToString())
-        {
-            foreach (BattleEntity target in targets)
-            {
-                target.heal(statAlterAmount);
-            }
-        } else if (itemType == itemTypes.HEAL.ToString())
-        {
-            
-        }
+  
     }
 }

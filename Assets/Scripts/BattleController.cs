@@ -27,7 +27,7 @@ public class BattleController : MonoBehaviour
     private bool itemDecided = false;
     private BattleUIController.actionChoices actionChoice = BattleUIController.actionChoices.NONE;
     private string attackChoice = "";
-    private string itemChoice = "";
+    private Item itemChoice = null;
 
     public bool waitingForChoice = false;
 
@@ -41,6 +41,8 @@ public class BattleController : MonoBehaviour
         return enemies;
     }
     List <BattleEntity> targets = new List<BattleEntity>();
+
+    public List<Item> items = new List<Item>();
 
 
 
@@ -98,6 +100,18 @@ public class BattleController : MonoBehaviour
         {
             return false;
         } 
+    }
+
+    public List<Item> getItems()
+    {
+        return items;
+    }
+
+    void setItems()
+    {
+        HealItem item = new HealItem();
+        item.Init("TESTPOTION", Item.itemTypes.SINGLE.ToString(), 2);
+        items.Add(item);
     }
 
     Boolean areEnemiesWiped()
@@ -184,13 +198,30 @@ public class BattleController : MonoBehaviour
 
     }
 
+    public List<BattleEntity> getItemTargets(Item item, PlayerBattle player)
+    {
+        List<BattleEntity> itemTargets = new List<BattleEntity>();
+        if (item.getType() == Item.itemTypes.SINGLE.ToString())
+        {
+            itemTargets.Add(player);
+        } else if (item.getType() == Item.itemTypes.PARTY.ToString())
+        {
+            foreach (PlayerBattle entity in players)
+            {
+                itemTargets.Add(entity);
+            }
+        }
+        return itemTargets;
+    }
+
     IEnumerator ItemLoop(PlayerBattle player)
     {
         Debug.Log ("PICK ITEM");
-        //yield return StartCoroutine(BattleUIController.Instance.playerItems(player));
+        yield return StartCoroutine(BattleUIController.Instance.playerItems());
+        itemChoice = BattleUIController.Instance.getItem();
         //yield return new WaitUntil(() => itemDecided);
 
-        if (itemChoice == "BACK")
+        if (itemChoice == null)
         {
             
             //Instance.StartCoroutine(MenuLoop(player));
@@ -198,6 +229,10 @@ public class BattleController : MonoBehaviour
         }
         else
         {
+            targets = getItemTargets(itemChoice, player);
+            Debug.Log($"{player.entityName} used {itemChoice.getName()}!");
+            itemChoice.useItem(targets);
+            items.Remove(itemChoice);
             //yield return StartCoroutine();
             //player.useItem(itemChoice);
         }
@@ -277,6 +312,7 @@ public class BattleController : MonoBehaviour
     void Start()
     {
         findTurnOrder();
+        setItems();
         StartCoroutine(Battle());
         //battle();
     }

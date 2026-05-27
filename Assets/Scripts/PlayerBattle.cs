@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class PlayerBattle : BattleEntity
 {
-
  
     Dictionary<string, Action> playerActions = new Dictionary <string, Action>();
 
@@ -91,6 +90,10 @@ public class PlayerBattle : BattleEntity
         yield return StartCoroutine(BattleController.Instance.PlayerTurn(this));
     }
 
+    public void addItems()
+    {
+        
+    }
     // Update is called once per frame
     void Update()
     {
