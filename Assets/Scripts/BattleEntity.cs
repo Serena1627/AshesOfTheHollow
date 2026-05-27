@@ -12,10 +12,6 @@ public class BattleEntity : MonoBehaviour
     [SerializeField] public int physDef;
     [SerializeField] public int spDef;
     [SerializeField] public BattleController battleController;
-
-
-
-
     public Boolean isDead = false;
     //public List <Action> actions = new List<Action>();
 
@@ -33,10 +29,14 @@ public class BattleEntity : MonoBehaviour
         return isDead;
     }
 
-    public virtual BattleEntity pickTarget()
+    public virtual IEnumerator pickTarget()
     {
-        BattleEntity battleEntity = new BattleEntity();
-        return battleEntity;
+        yield return null;
+    }
+
+    public virtual BattleEntity getTarget()
+    {
+        return new BattleEntity();
     }
 
     public virtual List <BattleEntity> getAllTargets()
@@ -45,20 +45,21 @@ public class BattleEntity : MonoBehaviour
         return targets;
     }
 
-    public List <BattleEntity> getTargets(BattleEntity battleEntity, Action action)
+    public IEnumerator Attack(Action action)
     {
         List <BattleEntity> targets = new List<BattleEntity>();
-
         if (action.getTargeting() == "SINGLE")
         {
-            BattleEntity target = battleEntity.pickTarget();
+            yield return StartCoroutine(pickTarget());
+            BattleEntity target = getTarget();
             targets.Add(target);
         }
         else if (action.getTargeting() == "SPREAD")
         {
-            targets = battleEntity.getAllTargets();
+            targets = getAllTargets();
         }
-        return targets;
+        Debug.Log($"{entityName} used {action.getActionName()}!");
+        action.doAction(targets);
     }
 
     public void takeDamage(int damage, string attackType)
@@ -74,11 +75,16 @@ public class BattleEntity : MonoBehaviour
         }
         health -= (damage - defenceNumberUsed);
         Debug.Log($"{entityName} took {damage - defenceNumberUsed} damage!");
-        Debug.Log($"Health: {health}");
+        Debug.Log($"{entityName} Health: {health}");
         if (isDefenderDead()) {
             Debug.Log($"{entityName} died!");
         }
 
+    }
+
+    public void heal(int healAmount)
+    {
+        health += healAmount;
     }
 
     public virtual void addActions()

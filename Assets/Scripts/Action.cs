@@ -5,6 +5,17 @@ using UnityEngine.InputSystem;
 
 public class Action
 {
+    public enum actionTypes
+    {
+        PHYS,
+        MAG
+    }
+
+    public enum targetingTypes
+    {
+        SINGLE,
+        SPREAD
+    }
     int damage;
     string actionName;
     string actionType;

@@ -6,33 +6,22 @@ using UnityEngine;
 
 public class PlayerBattle : BattleEntity
 {
-    public enum actionTypes
-    {
-        PHYS,
-        MAG
-    }
 
-    public enum targetingTypes
-    {
-        SINGLE,
-        SPREAD
-    }
  
-    [Header("ACTIONS")]
     Dictionary<string, Action> playerActions = new Dictionary <string, Action>();
 
     [Header("Action #1")]
     [SerializeField] int action1Damage;
     [SerializeField] string action1Name;
-    [SerializeField] actionTypes action1Type;
-    [SerializeField] targetingTypes action1TargetingType;
+    [SerializeField] Action.actionTypes action1Type;
+    [SerializeField] Action.targetingTypes action1TargetingType;
 
 
     [Header("Action #2")]
     [SerializeField] int action2Damage;
     [SerializeField] string action2Name;
-    [SerializeField] actionTypes action2Type;
-    [SerializeField] targetingTypes action2TargetingType;
+    [SerializeField] Action.actionTypes action2Type;
+    [SerializeField] Action.targetingTypes action2TargetingType;
     
     int numberOfActions = 2;
     public BattleEntity singleTargetEnemy;
@@ -53,14 +42,18 @@ public class PlayerBattle : BattleEntity
         yield return new WaitUntil(() => waitingForChoice == false);
         
     }
-    
-    public override BattleEntity pickTarget()
-    {
-        target = new BattleEntity();
-        StartCoroutine(selectTarget());
-        return target;
-    }
     */
+    public override BattleEntity getTarget()
+    {
+        return BattleUIController.Instance.returnTarget();
+    }
+
+    public override IEnumerator pickTarget()
+    {
+        target = null;
+        yield return StartCoroutine(BattleUIController.Instance.targeting(BattleController.Instance.getEnemies()));
+    }
+    
 
     public override List <BattleEntity> getAllTargets()
     {
@@ -95,7 +88,6 @@ public class PlayerBattle : BattleEntity
 
     public override IEnumerator Turn()
     {
-        //BattleController.PlayerTurn(this);
         yield return StartCoroutine(BattleController.Instance.PlayerTurn(this));
     }
 

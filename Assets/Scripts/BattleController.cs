@@ -69,20 +69,12 @@ public class BattleController : MonoBehaviour
     void findTurnOrder()
     {
         turnOrder = battleEntities.OrderByDescending(entity => entity.speed).ToList();
-        /*
-        int order = 0;
-        foreach (BattleEntity entity in turnOrder)
-        {
-            order++;
-            Debug.Log($"Move {order}: {entity.entityName}");
-        }
-        */
     }
-
     Boolean arePlayersWiped()
     {
         int size = players.Count();
         int playersDead = 0;
+        List <PlayerBattle> playersToRemove = new List<PlayerBattle>();
         //Debug.Log(size);
         foreach(PlayerBattle player in players)
         {
@@ -90,9 +82,14 @@ public class BattleController : MonoBehaviour
             if (player.isEntityDead())
             {
                 playersDead++;
-                turnOrder.Remove(player);
-                players.Remove(player);
+                //turnOrder.Remove(player);
+                //players.Remove(player);
+                playersToRemove.Add(player);
             }
+        }
+        foreach (PlayerBattle player in playersToRemove)
+        {
+            players.Remove(player);
         }
         if (playersDead == size) {
             return true;
@@ -107,15 +104,20 @@ public class BattleController : MonoBehaviour
     {
         int size = enemies.Count();
         int enemiesDead = 0;
+        List <EnemyBattle> enemiesToRemove = new List<EnemyBattle>();
         foreach(EnemyBattle enemy in enemies)
         {
-            if (enemy.isDead)
+            if (enemy.isEntityDead())
             {
                 enemiesDead++;
                 //turnOrder.Remove(enemy);
-                //Make a statement that skips dead enemies
-                enemies.Remove(enemy);
+                //enemies.Remove(enemy);
+                enemiesToRemove.Add(enemy);
             }
+        }
+        foreach (EnemyBattle enemy in enemiesToRemove)
+        {
+            enemies.Remove(enemy);
         }
         if (enemiesDead == size) {
             return true;
@@ -140,6 +142,7 @@ public class BattleController : MonoBehaviour
         }
     }
 
+    /*
     IEnumerator PlayerAttack(PlayerBattle player, Action action)
     {
         targets.Clear();
@@ -155,8 +158,8 @@ public class BattleController : MonoBehaviour
             targets = player.getAllTargets();
         }
         action.doAction(targets);
-
     }
+    */
 
     IEnumerator AttackLoop(PlayerBattle player)
     //public void AttackLoop(PlayerBattle player)
@@ -172,13 +175,10 @@ public class BattleController : MonoBehaviour
             yield return StartCoroutine(MenuLoop(player));
         }
         else
-        {;
+        {
             Action action = BattleUIController.Instance.getAttack();
-            //Instance.StartCoroutine(Instance.PlayerAttack(player, action));
-            yield return StartCoroutine(PlayerAttack(player, action));
-            //Action action = player.getActionList()[attackChoice];
-            //List <BattleEntity> targets = player.getTargets(player, action);
-            //action.doAction(targets);
+            //yield return StartCoroutine(PlayerAttack(player, action));
+            yield return StartCoroutine(player.Attack(action));
         }
 
 
@@ -187,16 +187,18 @@ public class BattleController : MonoBehaviour
     IEnumerator ItemLoop(PlayerBattle player)
     {
         Debug.Log ("PICK ITEM");
-        yield return new WaitUntil(() => itemDecided);
+        //yield return StartCoroutine(BattleUIController.Instance.playerItems(player));
+        //yield return new WaitUntil(() => itemDecided);
 
         if (itemChoice == "BACK")
         {
             
             //Instance.StartCoroutine(MenuLoop(player));
-            MenuLoop(player);
+            yield return StartCoroutine(MenuLoop(player));
         }
         else
         {
+            //yield return StartCoroutine();
             //player.useItem(itemChoice);
         }
     }
@@ -220,7 +222,7 @@ public class BattleController : MonoBehaviour
         }
         else if (actionChoice == BattleUIController.actionChoices.ITEM)
         {
-            //Instance.StartCoroutine(Instance.ItemLoop(player));
+            yield return StartCoroutine(ItemLoop(player));
 
         }
     }
@@ -230,6 +232,13 @@ public class BattleController : MonoBehaviour
     {
         yield return StartCoroutine(MenuLoop(player));
         //Instance.MenuLoop(player);
+    }
+
+    public IEnumerator EnemyTurn (EnemyBattle enemy)
+    {
+        Action action = enemy.chosenAttack();
+        //Debug.Log($"{enemy.entityName} used {action.getActionName()}!");
+        yield return StartCoroutine(enemy.Attack(action));
     }
 
     //void Turn(BattleEntity currentBattleEntity)
@@ -248,9 +257,12 @@ public class BattleController : MonoBehaviour
         {
             foreach (BattleEntity entity in turnOrder) {
                 if (arePlayersWiped() || areEnemiesWiped())
+                //if (isSideWiped(players) || isSideWiped(enemies))
                 {
                     enemiesORPlayersDead = true;
                     break;
+                } else if (entity.isDead){
+                    continue;
                 }
                 //yield return turn(entity);
                 yield return StartCoroutine(Turn(entity));
