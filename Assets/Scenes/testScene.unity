@@ -1010,6 +1010,23 @@ MonoBehaviour:
   spDef: 0
   battleController: {fileID: 0}
   isDead: 0
+  AI: 0
+  action1Damage: 0
+  action1Name: 
+  action1Type: 0
+  action1TargetingType: 0
+  action2Damage: 0
+  action2Name: 
+  action2Type: 0
+  action2TargetingType: 0
+  action3Damage: 0
+  action3Name: 
+  action3Type: 0
+  action3TargetingType: 0
+  action4Damage: 0
+  action4Name: 
+  action4Type: 0
+  action4TargetingType: 0
 --- !u!1 &1708419855
 GameObject:
   m_ObjectHideFlags: 0

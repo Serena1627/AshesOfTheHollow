@@ -25,7 +25,7 @@ public class PlayerBattle : BattleEntity
     
     int numberOfActions = 2;
     public BattleEntity singleTargetEnemy;
-    public BattleEntity target = new BattleEntity();
+    public BattleEntity target;
     bool waitingForChoice = true;
 
     public void targetButton(EnemyBattle enemy)
