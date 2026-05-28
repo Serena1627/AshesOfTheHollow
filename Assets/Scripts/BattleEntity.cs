@@ -8,6 +8,7 @@ public class BattleEntity : MonoBehaviour
 {
 
     [SerializeField] public int health;
+    int maxHealth;
     [SerializeField] public int speed;
     [SerializeField] public string entityName;
     [SerializeField] public int physDef;
@@ -89,7 +90,15 @@ public class BattleEntity : MonoBehaviour
 
     public void heal(int healAmount)
     {
-        health += healAmount;
+        if (health + healAmount > maxHealth)
+        {
+            health = maxHealth;
+        }
+        else
+        {
+            health += healAmount;
+        }
+        
     }
 
     public virtual void addActions()
@@ -107,6 +116,7 @@ public class BattleEntity : MonoBehaviour
     void Start()
     {
         addActions();
+        maxHealth = health;
         //isDead = false;
     }
 
