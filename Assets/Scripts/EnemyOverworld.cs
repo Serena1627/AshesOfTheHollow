@@ -9,7 +9,13 @@ public class EnemyOverworld : MonoBehaviour
 
     public void startFight()
     {
-        LevelLoader.loadBattle(enemyType);
+        //LevelLoader.loadBattle(enemyType);
+        StartCoroutine(LevelLoader.LoadBattle(this));
+    }
+
+    public string getType()
+    {
+        return enemyType;
     }
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created

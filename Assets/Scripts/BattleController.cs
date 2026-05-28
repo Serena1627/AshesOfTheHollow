@@ -53,17 +53,21 @@ public class BattleController : MonoBehaviour
         GameObject[] enemyList = GameObject.FindGameObjectsWithTag("Enemy");
         foreach (GameObject obj in playerList)
         {
-            PlayerBattle player = obj.GetComponent<PlayerBattle>();
-            players.Add(player);
-            battleEntities.Add(player);
-            //Debug.Log($"Added {player.entityName}");
+            if (obj != null) {
+                PlayerBattle player = obj.GetComponent<PlayerBattle>();
+                players.Add(player);
+                battleEntities.Add(player);
+                //Debug.Log($"Added {player.entityName}");
+            }
         }
         foreach (GameObject obj in enemyList)
         {
-            EnemyBattle enemy = obj.GetComponent<EnemyBattle>();
-            enemies.Add(enemy);
-            battleEntities.Add(enemy);
-            //Debug.Log($"Added {enemy.entityName}");
+            if (obj != null) {
+                EnemyBattle enemy = obj.GetComponent<EnemyBattle>();
+                enemies.Add(enemy);
+                battleEntities.Add(enemy);
+                //Debug.Log($"Added {enemy.entityName}");
+            }
         }
     }
 
@@ -152,7 +156,7 @@ public class BattleController : MonoBehaviour
         else if (enemies.Count() == 0)
         {
             Debug.Log("YOU WIN!");
-            LevelLoader.unloadBattle();
+            StartCoroutine(LevelLoader.unloadBattle());
         }
     }
 
