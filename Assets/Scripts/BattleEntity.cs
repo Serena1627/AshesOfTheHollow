@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
+using Unity.VisualScripting;
 
 public class BattleEntity : MonoBehaviour
 {
@@ -52,6 +53,10 @@ public class BattleEntity : MonoBehaviour
         {
             yield return StartCoroutine(pickTarget());
             BattleEntity target = getTarget();
+            if (target == null)
+            {
+                yield break;
+            }
             targets.Add(target);
         }
         else if (action.getTargeting() == "SPREAD")

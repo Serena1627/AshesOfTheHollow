@@ -81,7 +81,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 4
   m_MaskInteraction: 0
   m_Sprite: {fileID: -5111717903506588929, guid: cfdcd0c1cbc19604080fadf6ea879a4b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -133,6 +133,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::KaelTopDownController
   moveSpeed: 4
+  blockedObjectTilemap: {fileID: 0}
+  endPointTilemap: {fileID: 0}
+  collisionCheckRadius: 0.18
+  nextSceneName: 
+  enemyMustBeDefeatedBeforeExit: 1
+  useNoGearSpritesOnStart: 0
+  noGearSprites:
+    frontIdle: {fileID: 0}
+    backIdle: {fileID: 0}
+    leftIdle: {fileID: 0}
+    rightIdle: {fileID: 0}
+    frontWalk: []
+    backWalk: []
+    leftWalk: []
+    rightWalk: []
+  armoredSprites:
+    frontIdle: {fileID: 0}
+    backIdle: {fileID: 0}
+    leftIdle: {fileID: 0}
+    rightIdle: {fileID: 0}
+    frontWalk: []
+    backWalk: []
+    leftWalk: []
+    rightWalk: []
   frontIdle: {fileID: -5111717903506588929, guid: cfdcd0c1cbc19604080fadf6ea879a4b, type: 3}
   backIdle: {fileID: 1737309028838317790, guid: cfdcd0c1cbc19604080fadf6ea879a4b, type: 3}
   leftIdle: {fileID: -5661642198066606233, guid: cfdcd0c1cbc19604080fadf6ea879a4b, type: 3}

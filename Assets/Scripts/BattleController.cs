@@ -179,27 +179,24 @@ public class BattleController : MonoBehaviour
     }
     */
 
-    IEnumerator AttackLoop(PlayerBattle player)
+    public IEnumerator AttackLoop(PlayerBattle player)
     //public void AttackLoop(PlayerBattle player)
     {
         Debug.Log ("PICK ATTACK");
         yield return StartCoroutine(BattleUIController.Instance.playerAttacks(player));
-        //yield return new WaitUntil(() => attackDecided);
-
-        if (attackChoice == "BACK")
+        Action action = BattleUIController.Instance.getAttack();
+        if (action == null)
         {
-            
-            //Instance.StartCoroutine(Instance.MenuLoop(player));
             yield return StartCoroutine(MenuLoop(player));
         }
         else
         {
-            Action action = BattleUIController.Instance.getAttack();
-            //yield return StartCoroutine(PlayerAttack(player, action));
             yield return StartCoroutine(player.Attack(action));
+            if (player.getTarget() == null)
+            {
+                yield return StartCoroutine(AttackLoop(player));
+            }
         }
-
-
     }
 
     public List<BattleEntity> getItemTargets(Item item, PlayerBattle player)

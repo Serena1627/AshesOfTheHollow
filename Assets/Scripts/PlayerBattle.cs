@@ -51,6 +51,12 @@ public class PlayerBattle : BattleEntity
     {
         target = null;
         yield return StartCoroutine(BattleUIController.Instance.targeting(BattleController.Instance.getEnemies()));
+        if (BattleUIController.Instance.returnTarget() == null)
+        {
+            //yield return StartCoroutine(BattleController.Instance.AttackLoop(this));
+            target = null;
+            yield break;
+        }
     }
     
 

@@ -25,18 +25,21 @@ public class BattleUIController : MonoBehaviour
     [SerializeField] private Button attackButton;
     [SerializeField] private Transform attackButtonContainer;
     [SerializeField] private GameObject attackOptionsMenu;
+
     [Header("Targets")]
     [SerializeField] private Button targetButton;
     [SerializeField] private Transform targetButtonContainer;
     [SerializeField] private GameObject targetOptionsMenu;
-    
     [Header("Items")]
     [SerializeField] private Transform itemButtonContainer;
     [SerializeField] private GameObject itemOptionsMenu;
     [SerializeField] private Button itemButton;
     EnemyBattle target = new EnemyBattle();
+    [Header("Back")]
+    [SerializeField] private Button backMenuButton;
 
     Item chosenItem;
+    bool backPressed = false;
     List<Button> itemOptions = new List<Button>();
 
     private Action chosenAttack;
@@ -56,6 +59,11 @@ public class BattleUIController : MonoBehaviour
         return action;
     }
 
+    public void instantiateBack()
+    {
+        backPressed = true;
+    }
+
     public void selectAction (Action attack)
     {
         chosenAttack = attack;
@@ -71,6 +79,9 @@ public class BattleUIController : MonoBehaviour
             attackActionButton.onClick.AddListener(() => selectAction(attack));
             attackOptions.Add(attackActionButton);
         }
+        Button backToMenuButton = Instantiate(backMenuButton, attackButtonContainer);
+        backToMenuButton.onClick.AddListener(() => instantiateBack());
+        attackOptions.Add(backToMenuButton);
     }
 
     public void removeButtons(List<Button> buttonList)
@@ -81,17 +92,6 @@ public class BattleUIController : MonoBehaviour
         }
         buttonList.Clear();
     }
-
-    /*
-    public void removeAttacks()
-    {
-        foreach (Button attackButton in attackOptions)
-        {
-            Destroy(attackButton.gameObject);
-        }
-        attackOptions.Clear();
-    }
-    */
     public Action getAttack()
     {
         return chosenAttack;
@@ -101,8 +101,9 @@ public class BattleUIController : MonoBehaviour
     {
         attackOptionsMenu.SetActive(true);
         chosenAttack = null;
+        backPressed = false;
         generateAttacks(player);
-        yield return new WaitUntil(() => chosenAttack != null);
+        yield return new WaitUntil(() => chosenAttack != null || backPressed != false);
         removeButtons(attackOptions);
         attackOptionsMenu.SetActive(false);
     }
@@ -127,6 +128,9 @@ public class BattleUIController : MonoBehaviour
             selectItemButton.onClick.AddListener(() => selectItem(item));
             itemOptions.Add(selectItemButton);
         }
+        Button backToMenuButton = Instantiate(backMenuButton, itemButtonContainer);
+        backToMenuButton.onClick.AddListener(() => instantiateBack());
+        itemOptions.Add(backToMenuButton);
     }
 
     public IEnumerator playerItems()
@@ -134,7 +138,8 @@ public class BattleUIController : MonoBehaviour
         itemOptionsMenu.SetActive(true);
         generateItems();
         chosenItem = null;
-        yield return new WaitUntil(() => chosenItem != null);
+        backPressed = false;
+        yield return new WaitUntil(() => chosenItem != null || backPressed != false);
         removeButtons(itemOptions);
         itemOptionsMenu.SetActive(false);
     }
@@ -146,16 +151,6 @@ public class BattleUIController : MonoBehaviour
         yield return new WaitUntil(() => action is not actionChoices.NONE);
         actionOptions.SetActive(false);
     }
-
-    /*
-    public void deleteTargets(List <Button> enemyTargets)
-    {
-        foreach (Button enemyTargetButton in enemyTargets) {
-            Destroy(enemyTargetButton.gameObject);
-        }
-        enemyTargets.Clear();
-    }
-    */
 
     public EnemyBattle returnTarget()
     {
@@ -171,9 +166,10 @@ public class BattleUIController : MonoBehaviour
     {
         List <Button> enemyTargets = new List<Button>();
         target = null;
+        backPressed = false;
         targetOptionsMenu.SetActive(true);
         generateTargets(enemies, enemyTargets);
-        yield return new WaitUntil(() => target != null);
+        yield return new WaitUntil(() => target != null || backPressed != false);
         removeButtons(enemyTargets);
         targetOptionsMenu.SetActive(false);
     }
@@ -187,6 +183,9 @@ public class BattleUIController : MonoBehaviour
             enemyButton.onClick.AddListener(() => selectTarget(enemy));
             enemyTargets.Add(enemyButton);
         }
+        Button backToMenuButton = Instantiate(backMenuButton, targetButtonContainer);
+        backToMenuButton.onClick.AddListener(() => instantiateBack());
+        enemyTargets.Add(backToMenuButton);
     }
    
    void Awake()

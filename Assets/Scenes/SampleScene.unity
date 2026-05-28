@@ -11295,6 +11295,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 1205183182}
     m_Modifications:
     - target: {fileID: 1949279440533568348, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
+      propertyPath: moveSpeed
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1949279440533568348, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
       propertyPath: groundTilemap
       value: 
       objectReference: {fileID: 0}
@@ -11313,10 +11317,6 @@ PrefabInstance:
     - target: {fileID: 4482188340101228447, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 4666153728420993231, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
-      propertyPath: m_SortingOrder
-      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 6414700448965936945, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
       propertyPath: m_LocalPosition.x
