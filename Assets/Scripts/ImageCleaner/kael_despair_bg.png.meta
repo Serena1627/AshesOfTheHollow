@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 2e3d88af7c1ec9e4d8997640976e4913
+guid: a2a306005cc5b69439544231085aeb71
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4520027531496729048
-    second: damaged_house_0
+      213: -4768543181562508143
+    second: kael_despair_bg_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -51,7 +51,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 45
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -126,7 +126,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: damaged_house_0
+      name: kael_despair_bg_0
       rect:
         serializedVersion: 2
         x: 0
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 8d929dd771d5abe30800000000000000
-      internalID: 4520027531496729048
+      spriteID: 19c0bdebd3bb2ddb0800000000000000
+      internalID: -4768543181562508143
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      damaged_house_0: 4520027531496729048
+      kael_despair_bg_0: -4768543181562508143
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
