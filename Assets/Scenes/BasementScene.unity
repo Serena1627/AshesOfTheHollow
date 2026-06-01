@@ -1662,6 +1662,7 @@ MonoBehaviour:
   flashOutDuration: 0.45
   playerController: {fileID: 1980686513}
   basementDialogueSequence: {fileID: 1724305601}
+  opened: 0
 --- !u!1 &1392173361
 GameObject:
   m_ObjectHideFlags: 0
@@ -1812,6 +1813,100 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1514868212}
   m_CullTransparentMesh: 1
+--- !u!1 &1546239789
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1546239791}
+  - component: {fileID: 1546239790}
+  - component: {fileID: 1546239792}
+  m_Layer: 0
+  m_Name: StairExitTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!61 &1546239790
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1546239789}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
+--- !u!4 &1546239791
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1546239789}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -12.8, y: 15.2, z: 0}
+  m_LocalScale: {x: 4.36, y: 3.66, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1546239792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1546239789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e21d0374b52a894787e10a3ecbce6ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StairSceneExit
+  nextSceneName: DamagedHouseScene
+  requireHolySword: 1
+  holyChest: {fileID: 1390707124}
 --- !u!1 &1624910648
 GameObject:
   m_ObjectHideFlags: 0
@@ -2003,24 +2098,24 @@ MonoBehaviour:
   openingDialogue:
   - speakerName: Kael
     dialogueText: (What happened... we're in the basement)
-    portrait: {fileID: 0}
+    portrait: {fileID: 4237676072881026496, guid: 454d1fec3dbc81d4d844ac949f7fb6b6, type: 3}
   - speakerName: Kael
     dialogueText: I need to check on Mira, but first, let me check out what's in
       that chest.
-    portrait: {fileID: 0}
+    portrait: {fileID: 2034640904416277011, guid: ecd0716ae287d5b439e7acbfa289bda9, type: 3}
   - speakerName: Kael
     dialogueText: My father used to never let us touch it, but something is shining
       inside.
-    portrait: {fileID: 0}
+    portrait: {fileID: 2034640904416277011, guid: ecd0716ae287d5b439e7acbfa289bda9, type: 3}
   openingDialogueDelay: 0.75
   afterChestDialogue:
   - speakerName: Kael
-    dialogueText: What's this...
-    portrait: {fileID: 0}
+    dialogueText: What's this!?
+    portrait: {fileID: 8859943044834607501, guid: 5740df5ceb0432741999c0000f641d68, type: 3}
   - speakerName: Kael
     dialogueText: I got a sword and some armor even though I didn't even put anything
       on. This isn't a normal sword.
-    portrait: {fileID: 0}
+    portrait: {fileID: 2034640904416277011, guid: ecd0716ae287d5b439e7acbfa289bda9, type: 3}
   afterChestDialogueDelay: 0.35
 --- !u!4 &1724305602
 Transform:
@@ -2220,22 +2315,22 @@ MonoBehaviour:
   miraLines:
   - speakerName: Kael
     dialogueText: Mira, wake up...
-    portrait: {fileID: 0}
+    portrait: {fileID: 4237676072881026496, guid: 454d1fec3dbc81d4d844ac949f7fb6b6, type: 3}
   - speakerName: Mira
     dialogueText: ugh
-    portrait: {fileID: 0}
+    portrait: {fileID: 228634936585421020, guid: 6bfd52b4d3277b4478a97338eea14399, type: 3}
   - speakerName: Mira
     dialogueText: Kael... everything hurts and I can't move.
-    portrait: {fileID: 0}
+    portrait: {fileID: 228634936585421020, guid: 6bfd52b4d3277b4478a97338eea14399, type: 3}
   - speakerName: Mira
     dialogueText: 'Please help me by getting me a [Heath Potion]'
-    portrait: {fileID: 0}
+    portrait: {fileID: 228634936585421020, guid: 6bfd52b4d3277b4478a97338eea14399, type: 3}
   - speakerName: Kael
     dialogueText: Ok, I'll be back
-    portrait: {fileID: 0}
+    portrait: {fileID: 2034640904416277011, guid: ecd0716ae287d5b439e7acbfa289bda9, type: 3}
   - speakerName: Kael
     dialogueText: (I have to go upstairs...)
-    portrait: {fileID: 0}
+    portrait: {fileID: 2034640904416277011, guid: ecd0716ae287d5b439e7acbfa289bda9, type: 3}
 --- !u!1 &1980686512 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7771222801521980519, guid: a1fbc7db82592b541ba1767bb10fde1f, type: 3}
@@ -2487,3 +2582,4 @@ SceneRoots:
   - {fileID: 79042019}
   - {fileID: 1994553958}
   - {fileID: 1724305602}
+  - {fileID: 1546239791}

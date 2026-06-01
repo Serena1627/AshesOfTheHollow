@@ -1,8 +1,8 @@
 from PIL import Image
 from collections import deque
 
-input_file = "paladin_neutral_angry_bg.png"
-output_file = "paladin_neutral_angry.png"
+input_file = "kael_surprised_bg.png"
+output_file = "kael_surprised.png"
 
 img = Image.open(input_file).convert("RGBA")
 pixels = img.load()

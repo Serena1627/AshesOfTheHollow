@@ -28,7 +28,7 @@ public class BasementHolyChest : MonoBehaviour
     [SerializeField] private BasementDialogueSequence basementDialogueSequence;
 
     private bool playerInRange;
-    private bool opened;
+    public bool opened;
     private bool sequenceRunning;
 
     private void Start()
