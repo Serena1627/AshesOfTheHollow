@@ -10717,6 +10717,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1557610161}
   m_CullTransparentMesh: 1
+--- !u!1 &1660730085 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7163929020962351376, guid: 333c917e32719364da65aa51da571e8f, type: 3}
+  m_PrefabInstance: {fileID: 6896410728107357705}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1720519663
 GameObject:
   m_ObjectHideFlags: 0
@@ -11300,6 +11305,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Hound
       objectReference: {fileID: 0}
+    - target: {fileID: 7809453741832085742, guid: 333c917e32719364da65aa51da571e8f, type: 3}
+      propertyPath: encounterId
+      value: Village_Hound_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 7809453741832085742, guid: 333c917e32719364da65aa51da571e8f, type: 3}
+      propertyPath: encounterRoot
+      value: 
+      objectReference: {fileID: 1660730085}
     - target: {fileID: 7809453741832085742, guid: 333c917e32719364da65aa51da571e8f, type: 3}
       propertyPath: enemyPrefabs.Array.size
       value: 1

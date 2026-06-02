@@ -1,44 +1,84 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BattleController : MonoBehaviour
 {
-    public static BattleController Instance;
-    public List <PlayerBattle> players = new List<PlayerBattle>();
-    public List <EnemyBattle> enemies = new List<EnemyBattle>();
-    public List <BattleEntity> battleEntities = new List <BattleEntity>();
-    public List <BattleEntity> turnOrder = new List <BattleEntity>();
+    public static BattleController Instance { get; private set; }
 
-    private bool actionDecided = false;
-    private bool attackDecided = false;
-    private bool itemDecided = false;
-    private BattleUIController.actionChoices actionChoice = BattleUIController.actionChoices.NONE;
-    private string attackChoice = "";
-    private Item itemChoice = null;
+    [Header("Runtime Battle Participants")]
+    [SerializeField] private List<PlayerBattle> players = new List<PlayerBattle>();
+    [SerializeField] private List<EnemyBattle> enemies = new List<EnemyBattle>();
+    [SerializeField] private List<BattleEntity> battleEntities = new List<BattleEntity>();
+    [SerializeField] private List<BattleEntity> turnOrder = new List<BattleEntity>();
 
-    public bool waitingForChoice = false;
+    [Header("Items")]
+    [SerializeField] private List<Item> items = new List<Item>();
 
-    public List <PlayerBattle> getPlayers()
+    private bool battleEnded;
+
+    public List<PlayerBattle> getPlayers()
     {
         return players;
     }
 
-    public List <EnemyBattle> getEnemies()
+    public List<EnemyBattle> getEnemies()
     {
         return enemies;
     }
-    List <BattleEntity> targets = new List<BattleEntity>();
 
-    public List<Item> items = new List<Item>();
-
-
+    public List<Item> getItems()
+    {
+        return items;
+    }
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
+    }
+
+    private void Start()
+    {
+        FindBattleParticipants();
+
+        if (players.Count == 0)
+        {
+            Debug.LogError(
+                "Battle cannot begin: no PlayerBattle objects were found. " +
+                "Check spawned party prefab tags and components."
+            );
+            return;
+        }
+
+        if (enemies.Count == 0)
+        {
+            Debug.LogError(
+                "Battle cannot begin: no EnemyBattle objects were found. " +
+                "Check spawned enemy prefab tags and components."
+            );
+            return;
+        }
+
+        if (BattleUIController.Instance == null)
+        {
+            Debug.LogError(
+                "Battle cannot begin: no BattleUIController exists in BattleScene."
+            );
+            return;
+        }
+
+        BuildTurnOrder();
+        SetStartingItems();
+
+        StartCoroutine(BattleLoop());
     }
 
     private void FindBattleParticipants()
@@ -51,14 +91,15 @@ public class BattleController : MonoBehaviour
         GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
         GameObject[] enemyObjects = GameObject.FindGameObjectsWithTag("Enemy");
 
-        foreach (GameObject obj in playerObjects)
+        foreach (GameObject playerObject in playerObjects)
         {
-            PlayerBattle player = obj.GetComponent<PlayerBattle>();
+            PlayerBattle player = playerObject.GetComponent<PlayerBattle>();
 
             if (player == null)
             {
                 Debug.LogWarning(
-                    obj.name + " has the Player tag but does not have PlayerBattle."
+                    playerObject.name +
+                    " is tagged Player but does not have PlayerBattle."
                 );
                 continue;
             }
@@ -66,17 +107,18 @@ public class BattleController : MonoBehaviour
             players.Add(player);
             battleEntities.Add(player);
 
-            Debug.Log("Registered player battle entity: " + player.entityName);
+            Debug.Log("Registered player: " + player.entityName);
         }
 
-        foreach (GameObject obj in enemyObjects)
+        foreach (GameObject enemyObject in enemyObjects)
         {
-            EnemyBattle enemy = obj.GetComponent<EnemyBattle>();
+            EnemyBattle enemy = enemyObject.GetComponent<EnemyBattle>();
 
             if (enemy == null)
             {
                 Debug.LogWarning(
-                    obj.name + " has the Enemy tag but does not have EnemyBattle."
+                    enemyObject.name +
+                    " is tagged Enemy but does not have EnemyBattle."
                 );
                 continue;
             }
@@ -84,293 +126,294 @@ public class BattleController : MonoBehaviour
             enemies.Add(enemy);
             battleEntities.Add(enemy);
 
-            Debug.Log("Registered enemy battle entity: " + enemy.entityName);
+            Debug.Log("Registered enemy: " + enemy.entityName);
         }
     }
-    
-    void findTurnOrder()
+
+    private void BuildTurnOrder()
     {
-        turnOrder = battleEntities.OrderByDescending(entity => entity.speed).ToList();
+        turnOrder = battleEntities
+            .OrderByDescending(entity => entity.speed)
+            .ToList();
+
+        Debug.Log("Turn order created with " + turnOrder.Count + " entities.");
     }
-    Boolean arePlayersWiped()
+
+    private void SetStartingItems()
     {
-        int size = players.Count();
-        int playersDead = 0;
-        List <PlayerBattle> playersToRemove = new List<PlayerBattle>();
-        //Debug.Log(size);
-        foreach(PlayerBattle player in players)
+        items.Clear();
+
+        HealItem testPotion = new HealItem();
+        testPotion.Init("TEST POTION", Item.itemTypes.SINGLE.ToString(), 2);
+
+        items.Add(testPotion);
+    }
+
+    private IEnumerator BattleLoop()
+    {
+        Debug.Log("BATTLE START!");
+
+        while (!battleEnded)
         {
-            //Debug.Log(player.entityName);
-            if (player.isEntityDead())
+            foreach (BattleEntity entity in turnOrder)
             {
-                playersDead++;
-                //turnOrder.Remove(player);
-                //players.Remove(player);
-                playersToRemove.Add(player);
+                if (CheckBattleEnd())
+                {
+                    EndBattle();
+                    yield break;
+                }
+
+                if (entity == null || entity.isEntityDead())
+                {
+                    continue;
+                }
+
+                Debug.Log(entity.entityName + "'s Turn!");
+
+                yield return StartCoroutine(entity.Turn());
+
+                if (CheckBattleEnd())
+                {
+                    EndBattle();
+                    yield break;
+                }
             }
         }
-        foreach (PlayerBattle player in playersToRemove)
-        {
-            players.Remove(player);
-        }
-        if (playersDead == size) {
-            return true;
-        }
-        else
-        {
-            return false;
-        } 
     }
 
-    public List<Item> getItems()
+    private bool CheckBattleEnd()
     {
-        return items;
+        bool allPlayersDead = players.Count == 0 ||
+            players.All(player => player == null || player.isEntityDead());
+
+        bool allEnemiesDead = enemies.Count == 0 ||
+            enemies.All(enemy => enemy == null || enemy.isEntityDead());
+
+        return allPlayersDead || allEnemiesDead;
     }
 
-    void setItems()
+    private void EndBattle()
     {
-        HealItem item = new HealItem();
-        item.Init("TESTPOTION", Item.itemTypes.SINGLE.ToString(), 2);
-        items.Add(item);
-    }
-
-    Boolean areEnemiesWiped()
-    {
-        int size = enemies.Count();
-        int enemiesDead = 0;
-        List <EnemyBattle> enemiesToRemove = new List<EnemyBattle>();
-        foreach(EnemyBattle enemy in enemies)
+        if (battleEnded)
         {
-            if (enemy.isEntityDead())
-            {
-                enemiesDead++;
-                //turnOrder.Remove(enemy);
-                //enemies.Remove(enemy);
-                enemiesToRemove.Add(enemy);
-            }
+            return;
         }
-        foreach (EnemyBattle enemy in enemiesToRemove)
-        {
-            enemies.Remove(enemy);
-        }
-        if (enemiesDead == size) {
-            return true;
-        }
-        else
-        {
-            return false;
-        } 
-    }
 
+        battleEnded = true;
 
-    void endBattle()
-    {
-        if (players.Count() == 0)
+        bool allPlayersDead = players.Count == 0 ||
+            players.All(player => player == null || player.isEntityDead());
+
+        bool allEnemiesDead = enemies.Count == 0 ||
+            enemies.All(enemy => enemy == null || enemy.isEntityDead());
+
+        if (allPlayersDead)
         {
             Debug.Log("YOU LOSE");
-        } 
-        else if (enemies.Count() == 0)
+            return;
+        }
+
+        if (allEnemiesDead)
         {
             Debug.Log("YOU WIN!");
-            StartCoroutine(LevelLoader.unloadBattle());
+
+            StartCoroutine(ReturnToOverworldAfterVictory());
         }
     }
+    // -------------------------------------------------------------------------
+    // Player Turns
+    // -------------------------------------------------------------------------
 
-    /*
-    IEnumerator PlayerAttack(PlayerBattle player, Action action)
+    private IEnumerator ReturnToOverworldAfterVictory()
     {
-        targets.Clear();
-        if (action.getTargeting() == "SINGLE")
+        BattleData.MarkCurrentEncounterDefeated();
+
+        string returnSceneName = BattleData.previousSceneName;
+
+        if (string.IsNullOrWhiteSpace(returnSceneName))
         {
-            //waitingForChoice = true;
-            yield return StartCoroutine(BattleUIController.Instance.targeting(enemies));
-            EnemyBattle target = BattleUIController.Instance.returnTarget();
-            targets.Add(target);
+            Debug.LogError(
+                "Battle was won, but BattleData.previousSceneName is empty."
+            );
+
+            yield break;
         }
-        else if (action.getTargeting() == "SPREAD")
-        {
-            targets = player.getAllTargets();
-        }
-        action.doAction(targets);
+
+        yield return new WaitForSecondsRealtime(0.5f);
+
+        Time.timeScale = 1f;
+
+        BattleData.ClearCurrentBattleSetup();
+
+        Debug.Log("Returning to overworld scene: " + returnSceneName);
+
+        SceneManager.LoadScene(returnSceneName, LoadSceneMode.Single);
     }
-    */
 
-    public IEnumerator AttackLoop(PlayerBattle player)
-    //public void AttackLoop(PlayerBattle player)
+    public IEnumerator PlayerTurn(PlayerBattle player)
     {
-        Debug.Log ("PICK ATTACK");
-        yield return StartCoroutine(BattleUIController.Instance.playerAttacks(player));
-        Action action = BattleUIController.Instance.getAttack();
-        if (action == null)
+        if (player == null || player.isEntityDead())
         {
-            yield return StartCoroutine(MenuLoop(player));
+            yield break;
         }
-        else
+
+        bool turnComplete = false;
+
+        while (!turnComplete)
         {
-            yield return StartCoroutine(player.Attack(action));
-            if (player.getTarget() == null)
+            yield return StartCoroutine(BattleUIController.Instance.PlayerMenu());
+
+            BattleUIController.ActionChoice selectedAction =
+                BattleUIController.Instance.GetAction();
+
+            switch (selectedAction)
             {
-                yield return StartCoroutine(AttackLoop(player));
+                case BattleUIController.ActionChoice.Attack:
+                    turnComplete = false;
+                    yield return StartCoroutine(
+                        RunPlayerAttackSelection(player, result =>
+                        {
+                            turnComplete = result;
+                        })
+                    );
+                    break;
+
+                case BattleUIController.ActionChoice.Item:
+                    turnComplete = false;
+                    yield return StartCoroutine(
+                        RunPlayerItemSelection(player, result =>
+                        {
+                            turnComplete = result;
+                        })
+                    );
+                    break;
+
+                default:
+                    Debug.LogWarning("Player selected an unsupported battle action.");
+                    break;
             }
         }
     }
 
-    public List<BattleEntity> getItemTargets(Item item, PlayerBattle player)
+    private IEnumerator RunPlayerAttackSelection(
+        PlayerBattle player,
+        System.Action<bool> onFinished
+    )
+    {
+        Debug.Log("PICK ATTACK");
+
+        yield return StartCoroutine(
+            BattleUIController.Instance.PlayerAttacks(player)
+        );
+
+        Action selectedAttack = BattleUIController.Instance.GetAttack();
+
+        if (selectedAttack == null)
+        {
+            Debug.Log("Attack selection cancelled. Returning to action menu.");
+            onFinished(false);
+            yield break;
+        }
+
+        Debug.Log("Executing attack: " + selectedAttack.getActionName());
+
+        yield return StartCoroutine(player.Attack(selectedAttack));
+
+        /*
+         * Your PlayerBattle.Attack method is expected to set its target
+         * after the target menu is completed. If the target is null,
+         * selection was cancelled and the player should return to the menu.
+         */
+        if (player.getTarget() == null)
+        {
+            Debug.Log("Target selection cancelled. Returning to action menu.");
+            onFinished(false);
+            yield break;
+        }
+
+        onFinished(true);
+    }
+
+    private IEnumerator RunPlayerItemSelection(
+        PlayerBattle player,
+        System.Action<bool> onFinished
+    )
+    {
+        Debug.Log("PICK ITEM");
+
+        yield return StartCoroutine(
+            BattleUIController.Instance.PlayerItems()
+        );
+
+        Item selectedItem = BattleUIController.Instance.GetItem();
+
+        if (selectedItem == null)
+        {
+            Debug.Log("Item selection cancelled. Returning to action menu.");
+            onFinished(false);
+            yield break;
+        }
+
+        List<BattleEntity> itemTargets = GetItemTargets(selectedItem, player);
+
+        Debug.Log(player.entityName + " used " + selectedItem.getName() + "!");
+
+        selectedItem.useItem(itemTargets);
+        items.Remove(selectedItem);
+
+        onFinished(true);
+    }
+
+    private List<BattleEntity> GetItemTargets(Item item, PlayerBattle player)
     {
         List<BattleEntity> itemTargets = new List<BattleEntity>();
+
+        if (item == null)
+        {
+            return itemTargets;
+        }
+
         if (item.getType() == Item.itemTypes.SINGLE.ToString())
         {
             itemTargets.Add(player);
-        } else if (item.getType() == Item.itemTypes.PARTY.ToString())
+        }
+        else if (item.getType() == Item.itemTypes.PARTY.ToString())
         {
-            foreach (PlayerBattle entity in players)
+            foreach (PlayerBattle partyMember in players)
             {
-                itemTargets.Add(entity);
+                if (partyMember != null && !partyMember.isEntityDead())
+                {
+                    itemTargets.Add(partyMember);
+                }
             }
         }
+
         return itemTargets;
     }
 
-    IEnumerator ItemLoop(PlayerBattle player)
-    {
-        Debug.Log ("PICK ITEM");
-        yield return StartCoroutine(BattleUIController.Instance.playerItems());
-        itemChoice = BattleUIController.Instance.getItem();
-        //yield return new WaitUntil(() => itemDecided);
-
-        if (itemChoice == null)
-        {
-            
-            //Instance.StartCoroutine(MenuLoop(player));
-            yield return StartCoroutine(MenuLoop(player));
-        }
-        else
-        {
-            targets = getItemTargets(itemChoice, player);
-            Debug.Log($"{player.entityName} used {itemChoice.getName()}!");
-            itemChoice.useItem(targets);
-            items.Remove(itemChoice);
-            //yield return StartCoroutine();
-            //player.useItem(itemChoice);
-        }
-    }
-
-    IEnumerator MenuLoop(PlayerBattle player)
-    //public void MenuLoop(PlayerBattle player)
-    {
-        Debug.Log ("ATTACK OR ITEM?");
-        Debug.Log("Waiting For Selection");
-        yield return StartCoroutine(BattleUIController.Instance.playerMenu());
-        BattleUIController.actionChoices actionChoice = BattleUIController.Instance.getAction();
-
-
-        //yield return new WaitUntil(() => actionChoice != )
-
-        if (actionChoice == BattleUIController.actionChoices.ATTACK)
-        {
-            //Instance.StartCoroutine(Instance.AttackLoop(player));
-            yield return StartCoroutine(AttackLoop(player));
-            //AttackLoop(player);
-        }
-        else if (actionChoice == BattleUIController.actionChoices.ITEM)
-        {
-            yield return StartCoroutine(ItemLoop(player));
-
-        }
-    }
-
-    //public static void PlayerTurn(PlayerBattle player)
-    public IEnumerator PlayerTurn (PlayerBattle player)
-    {
-        yield return StartCoroutine(MenuLoop(player));
-        //Instance.MenuLoop(player);
-    }
+    // -------------------------------------------------------------------------
+    // Enemy Turns
+    // -------------------------------------------------------------------------
 
     public IEnumerator EnemyTurn(EnemyBattle enemy)
     {
-        if (enemy == null)
+        if (enemy == null || enemy.isEntityDead())
         {
-            Debug.LogWarning("Enemy turn was called for a missing enemy.");
             yield break;
         }
 
-        Action action = enemy.chosenAttack();
+        Action selectedAttack = enemy.chosenAttack();
 
-        if (action == null)
+        if (selectedAttack == null)
         {
-            Debug.LogWarning(enemy.entityName + " has no valid attack and skips its turn.");
+            Debug.LogWarning(
+                enemy.entityName +
+                " has no valid configured attack and skips its turn."
+            );
+
             yield break;
         }
 
-        yield return StartCoroutine(enemy.Attack(action));
-    }
-
-    //void Turn(BattleEntity currentBattleEntity)
-    IEnumerator Turn (BattleEntity currentBattleEntity)
-    {
-        Debug.Log($"{currentBattleEntity.entityName}'s Turn!");
-        yield return StartCoroutine(currentBattleEntity.Turn());
-    }
-    
-    IEnumerator Battle()
-    //void battle()
-    {
-        Debug.Log("BATTLE START!");
-        Boolean enemiesORPlayersDead = false;
-        while (!enemiesORPlayersDead)
-        {
-            foreach (BattleEntity entity in turnOrder) {
-                if (arePlayersWiped() || areEnemiesWiped())
-                //if (isSideWiped(players) || isSideWiped(enemies))
-                {
-                    enemiesORPlayersDead = true;
-                    break;
-                } else if (entity.isDead){
-                    continue;
-                }
-                //yield return turn(entity);
-                yield return StartCoroutine(Turn(entity));
-                //turn(entity);
-            }
-        }
-        endBattle();
-    }
-    
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    private void Start()
-    {
-        FindBattleParticipants();
-
-        if (players.Count == 0)
-        {
-            Debug.LogError(
-                "Battle cannot begin because no PlayerBattle objects were found. " +
-                "Check BattleSceneManager spawning and Player prefab tags."
-            );
-            return;
-        }
-
-        if (enemies.Count == 0)
-        {
-            Debug.LogError(
-                "Battle cannot begin because no EnemyBattle objects were found. " +
-                "Check BattleEncounterTrigger enemy prefabs or test enemy prefabs."
-            );
-            return;
-        }
-
-        findTurnOrder();
-        setItems();
-
-        StartCoroutine(Battle());
-    }
-
-
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        yield return StartCoroutine(enemy.Attack(selectedAttack));
     }
 }

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 888628500927400605}
   - component: {fileID: 1949279440533568348}
   - component: {fileID: 4757706947359059407}
+  - component: {fileID: -7260842850171711075}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -221,3 +222,15 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.96875, y: 4.5}
   m_EdgeRadius: 0
+--- !u!114 &-7260842850171711075
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4482188340101228447}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cfcc8e35ec521d4cb90d8fcaf09514c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerBattleReturnPosition

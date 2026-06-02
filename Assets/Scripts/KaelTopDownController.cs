@@ -320,23 +320,4 @@ public class KaelTopDownController : MonoBehaviour
 
         return spawnPosition;
     }
-    
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Enemy"))
-        {
-            Debug.Log("ENTERED!");
-
-            EnemyOverworld enemy = other.GetComponent<EnemyOverworld>();
-
-            if (enemy != null)
-            {
-                enemy.startFight();
-            }
-            else
-            {
-                Debug.LogWarning("Enemy tag found, but EnemyOverworld script is missing.");
-            }
-        }
-    }
 }
