@@ -384,7 +384,11 @@ public class BattleUIController : MonoBehaviour
 
             if (buttonText != null)
             {
-                buttonText.text = capturedItem.getName();
+                int quantity = InventoryManager.Instance != null
+                    ? InventoryManager.Instance.GetItemQuantity(capturedItem.getName())
+                    : 0;
+
+                buttonText.text = capturedItem.getName() + "  x" + quantity;
             }
 
             generatedItemButtons.Add(generatedButton);

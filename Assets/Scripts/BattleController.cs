@@ -76,7 +76,7 @@ public class BattleController : MonoBehaviour
         }
 
         BuildTurnOrder();
-        SetStartingItems();
+        LoadItemsFromInventory();
 
         StartCoroutine(BattleLoop());
     }
@@ -139,14 +139,22 @@ public class BattleController : MonoBehaviour
         Debug.Log("Turn order created with " + turnOrder.Count + " entities.");
     }
 
-    private void SetStartingItems()
+    private void LoadItemsFromInventory()
     {
         items.Clear();
 
-        HealItem testPotion = new HealItem();
-        testPotion.Init("TEST POTION", Item.itemTypes.SINGLE.ToString(), 2);
+        if (InventoryManager.Instance == null)
+        {
+            Debug.LogWarning(
+                "InventoryManager was not found. No battle items will be available."
+            );
 
-        items.Add(testPotion);
+            return;
+        }
+
+        items = InventoryManager.Instance.CreateBattleItems();
+
+        Debug.Log("Loaded " + items.Count + " inventory item type(s) into battle.");
     }
 
     private IEnumerator BattleLoop()
@@ -359,7 +367,13 @@ public class BattleController : MonoBehaviour
         Debug.Log(player.entityName + " used " + selectedItem.getName() + "!");
 
         selectedItem.useItem(itemTargets);
-        items.Remove(selectedItem);
+        
+        if (InventoryManager.Instance != null)
+        {
+            InventoryManager.Instance.ConsumeItem(selectedItem.getName());
+        }
+
+        LoadItemsFromInventory();
 
         onFinished(true);
     }
