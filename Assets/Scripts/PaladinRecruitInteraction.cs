@@ -13,18 +13,18 @@ public class PaladinRecruitInteraction : MonoBehaviour
     [SerializeField] private string joinMessage = "Paladin has joined your party.";
 
     [Header("NPC Interaction")]
-    [Tooltip("Assign the trigger collider on this RecruitTrigger object.")]
+    [Tooltip("Assign the BoxCollider2D on the RecruitTrigger object.")]
     [SerializeField] private Collider2D interactionTrigger;
 
-    [Tooltip("Assign the stationary PaladinNPC parent object shown before recruitment.")]
+    [Tooltip("Assign the stationary PaladinNPC scene object.")]
     [SerializeField] private GameObject paladinNpcVisual;
 
     [Header("Optional Overworld Follower")]
-    [Tooltip("Assign the top-down Paladin follower prefab, not PaladinBattle.")]
+    [Tooltip("Assign the top-down walking Paladin prefab, not PaladinBattle.")]
     [SerializeField] private GameObject paladinFollowerPrefab;
 
-    [Tooltip("Place this beside or behind Kael/Paladin where the follower should appear.")]
-    [SerializeField] private Transform followerSpawnPoint;
+    [Tooltip("How far behind Kael the follower appears after recruitment.")]
+    [SerializeField] private float followerSpawnDistance = 1.1f;
 
     [SerializeField] private bool spawnFollowerAfterRecruitment = true;
 
@@ -33,8 +33,6 @@ public class PaladinRecruitInteraction : MonoBehaviour
 
     private void Start()
     {
-        // If Paladin was already recruited earlier in this play session,
-        // remove the recruitable NPC version from the village.
         if (PartyManager.Instance != null && PartyManager.Instance.PaladinRecruited)
         {
             HideRecruitableNpc();
@@ -77,11 +75,9 @@ public class PaladinRecruitInteraction : MonoBehaviour
             yield break;
         }
 
-        // Start Paladin recruitment dialogue.
         dialogueTypewriter.lines = recruitmentDialogue;
         dialogueTypewriter.StartDialogue();
 
-        // Wait until the player has advanced through all dialogue lines.
         yield return new WaitUntil(() => !dialogueTypewriter.IsDialogueActive);
 
         if (PartyManager.Instance == null)
@@ -91,13 +87,11 @@ public class PaladinRecruitInteraction : MonoBehaviour
             yield break;
         }
 
-        // Adds PaladinBattle prefab to the current party and records recruitment.
         PartyManager.Instance.RecruitPaladin();
 
-        // Only continue visually if recruitment succeeded.
         if (!PartyManager.Instance.PaladinRecruited)
         {
-            Debug.LogWarning("Paladin recruitment did not complete. Check the Paladin Battle Prefab field on PartyManager.");
+            Debug.LogWarning("Paladin recruitment did not complete. Check PartyManager setup.");
             sequenceRunning = false;
             yield break;
         }
@@ -110,7 +104,7 @@ public class PaladinRecruitInteraction : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("PartyJoinAnnouncement is not assigned. Recruitment will continue without the black-screen message.");
+            Debug.LogWarning("PartyJoinAnnouncement is not assigned.");
         }
 
         HideRecruitableNpc();
@@ -137,14 +131,16 @@ public class PaladinRecruitInteraction : MonoBehaviour
             return;
         }
 
-        SpriteRenderer npcRenderer = paladinNpcVisual.GetComponent<SpriteRenderer>();
+        SpriteRenderer npcRenderer =
+            paladinNpcVisual.GetComponent<SpriteRenderer>();
 
         if (npcRenderer != null)
         {
             npcRenderer.enabled = false;
         }
 
-        Collider2D npcCollider = paladinNpcVisual.GetComponent<Collider2D>();
+        Collider2D npcCollider =
+            paladinNpcVisual.GetComponent<Collider2D>();
 
         if (npcCollider != null)
         {
@@ -160,9 +156,25 @@ public class PaladinRecruitInteraction : MonoBehaviour
             return;
         }
 
-        Vector3 spawnPosition = followerSpawnPoint != null
-            ? followerSpawnPoint.position
-            : transform.position;
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+
+        if (playerObject == null)
+        {
+            Debug.LogWarning("Cannot spawn Paladin follower because no object tagged Player was found.");
+            return;
+        }
+
+        KaelTopDownController kaelController =
+            playerObject.GetComponent<KaelTopDownController>();
+
+        if (kaelController == null)
+        {
+            Debug.LogWarning("The Player object does not contain KaelTopDownController.");
+            return;
+        }
+
+        Vector3 spawnPosition =
+            kaelController.GetFollowerSpawnPosition(followerSpawnDistance);
 
         GameObject follower = Instantiate(
             paladinFollowerPrefab,
@@ -170,23 +182,19 @@ public class PaladinRecruitInteraction : MonoBehaviour
             Quaternion.identity
         );
 
-        PaladinFollowPlayer followScript = follower.GetComponent<PaladinFollowPlayer>();
+        PaladinFollowPlayer followScript =
+            follower.GetComponent<PaladinFollowPlayer>();
 
         if (followScript == null)
         {
             Debug.LogWarning("The Paladin follower prefab does not contain PaladinFollowPlayer.");
-            return;
-        }
-
-        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
-
-        if (playerObject == null)
-        {
-            Debug.LogWarning("Paladin follower could not find an object tagged Player.");
+            Destroy(follower);
             return;
         }
 
         followScript.SetPlayer(playerObject.transform);
+
+        Debug.Log("Paladin follower spawned behind Kael.");
     }
 
     private void OnTriggerEnter2D(Collider2D other)

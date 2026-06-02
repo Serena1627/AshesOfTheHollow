@@ -308,6 +308,19 @@ public class KaelTopDownController : MonoBehaviour
         ApplySpriteSet(armoredSprites);
     }
 
+    public Vector3 GetFollowerSpawnPosition(float distanceBehindPlayer)
+    {
+        Vector2 behindDirection = -lastDirection.normalized;
+
+        Vector3 spawnPosition = transform.position + new Vector3(
+            behindDirection.x * distanceBehindPlayer,
+            behindDirection.y * distanceBehindPlayer,
+            0f
+        );
+
+        return spawnPosition;
+    }
+    
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Enemy"))

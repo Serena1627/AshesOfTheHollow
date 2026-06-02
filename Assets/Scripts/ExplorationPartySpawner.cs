@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ExplorationPartySpawner : MonoBehaviour
 {
-    [Header("Paladin")]
+    [Header("Paladin Follower")]
     [SerializeField] private GameObject paladinFollowerPrefab;
     [SerializeField] private Transform paladinSpawnPoint;
 
@@ -21,14 +21,23 @@ public class ExplorationPartySpawner : MonoBehaviour
 
         if (paladinFollowerPrefab == null || paladinSpawnPoint == null)
         {
-            Debug.LogWarning("Paladin follower prefab or spawn point is not assigned.");
+            Debug.LogWarning("Paladin follower prefab or spawn point is missing.");
             return;
         }
 
-        Instantiate(
+        GameObject follower = Instantiate(
             paladinFollowerPrefab,
             paladinSpawnPoint.position,
             Quaternion.identity
         );
+
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        PaladinFollowPlayer followScript =
+            follower.GetComponent<PaladinFollowPlayer>();
+
+        if (playerObject != null && followScript != null)
+        {
+            followScript.SetPlayer(playerObject.transform);
+        }
     }
 }

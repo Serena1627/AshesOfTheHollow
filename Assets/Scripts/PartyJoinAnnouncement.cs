@@ -13,53 +13,93 @@ public class PartyJoinAnnouncement : MonoBehaviour
     [SerializeField] private float holdDuration = 1.5f;
     [SerializeField] private float fadeOutDuration = 0.35f;
 
-    private void Start()
+    private Coroutine activeAnnouncement;
+
+    private void Awake()
     {
-        if (blackPanelGroup != null)
+        if (blackPanelGroup == null)
         {
-            blackPanelGroup.alpha = 0f;
-            blackPanelGroup.blocksRaycasts = false;
-            blackPanelGroup.interactable = false;
+            Debug.LogWarning("PartyJoinAnnouncement is missing the Black Panel Group reference.");
+            return;
         }
+
+        blackPanelGroup.gameObject.SetActive(true);
+        blackPanelGroup.alpha = 0f;
+        blackPanelGroup.blocksRaycasts = false;
+        blackPanelGroup.interactable = false;
     }
 
     public IEnumerator ShowAnnouncement(string message)
     {
-        if (blackPanelGroup == null || announcementText == null)
+        Debug.Log("Starting party announcement: " + message);
+
+        if (blackPanelGroup == null)
         {
-            Debug.LogWarning("PartyJoinAnnouncement is missing UI references.");
+            Debug.LogWarning("Cannot show announcement: Black Panel Group is not assigned.");
             yield break;
         }
 
+        if (announcementText == null)
+        {
+            Debug.LogWarning("Cannot show announcement: Announcement Text is not assigned.");
+            yield break;
+        }
+
+        blackPanelGroup.gameObject.SetActive(true);
+        announcementText.gameObject.SetActive(true);
         announcementText.text = message;
 
         blackPanelGroup.blocksRaycasts = true;
         blackPanelGroup.interactable = true;
 
-        float timer = 0f;
+        yield return FadeCanvasGroup(0f, 1f, fadeInDuration);
 
-        while (timer < fadeInDuration)
-        {
-            timer += Time.deltaTime;
-            blackPanelGroup.alpha = Mathf.Clamp01(timer / fadeInDuration);
-            yield return null;
-        }
+        Debug.Log("Party announcement visible.");
 
-        blackPanelGroup.alpha = 1f;
+        yield return new WaitForSecondsRealtime(holdDuration);
 
-        yield return new WaitForSeconds(holdDuration);
-
-        timer = 0f;
-
-        while (timer < fadeOutDuration)
-        {
-            timer += Time.deltaTime;
-            blackPanelGroup.alpha = 1f - Mathf.Clamp01(timer / fadeOutDuration);
-            yield return null;
-        }
+        yield return FadeCanvasGroup(1f, 0f, fadeOutDuration);
 
         blackPanelGroup.alpha = 0f;
         blackPanelGroup.blocksRaycasts = false;
         blackPanelGroup.interactable = false;
+
+        Debug.Log("Party announcement finished.");
+    }
+
+    private IEnumerator FadeCanvasGroup(float startAlpha, float endAlpha, float duration)
+    {
+        if (duration <= 0f)
+        {
+            blackPanelGroup.alpha = endAlpha;
+            yield break;
+        }
+
+        float timer = 0f;
+        blackPanelGroup.alpha = startAlpha;
+
+        while (timer < duration)
+        {
+            timer += Time.unscaledDeltaTime;
+
+            float t = Mathf.Clamp01(timer / duration);
+            blackPanelGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, t);
+
+            yield return null;
+        }
+
+        blackPanelGroup.alpha = endAlpha;
+    }
+
+    public void TestAnnouncement()
+    {
+        if (activeAnnouncement != null)
+        {
+            StopCoroutine(activeAnnouncement);
+        }
+
+        activeAnnouncement = StartCoroutine(
+            ShowAnnouncement("Paladin has joined your party.")
+        );
     }
 }

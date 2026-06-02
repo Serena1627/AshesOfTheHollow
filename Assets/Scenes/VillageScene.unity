@@ -119,6 +119,55 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &113144026
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 113144028}
+  - component: {fileID: 113144027}
+  m_Layer: 0
+  m_Name: PartyAnnounce
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &113144027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 113144026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48759e8227675744e9993cfa3114184d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PartyJoinAnnouncement
+  blackPanelGroup: {fileID: 267434693}
+  announcementText: {fileID: 970060017}
+  fadeInDuration: 0.35
+  holdDuration: 1.5
+  fadeOutDuration: 0.35
+--- !u!4 &113144028
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 113144026}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.97676, y: 0.04181, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &129074047
 GameObject:
   m_ObjectHideFlags: 0
@@ -442,7 +491,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 267434691}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
@@ -496,6 +545,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 4666153728420993231, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4666153728420993231, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 190590007
+      objectReference: {fileID: 0}
     - target: {fileID: 6414700448965936945, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
       propertyPath: m_LocalPosition.x
       value: -17.36
@@ -539,7 +596,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4482188340101228447, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 280957283}
   m_SourcePrefab: {fileID: 100100000, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
 --- !u!4 &280957277 stripped
 Transform:
@@ -551,6 +611,21 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4482188340101228447, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
   m_PrefabInstance: {fileID: 280957276}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &280957283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 280957278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfbaf21ceef0c3e4f923da6285910820, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownDynamicSorting
+  sortingOffset: 0
+  sortingPrecision: 100
+  feetPoint: {fileID: 0}
 --- !u!1 &373113912
 GameObject:
   m_ObjectHideFlags: 0
@@ -878,12 +953,12 @@ MonoBehaviour:
   - speakerName: Paladin
     dialogueText: Quick, walk upwards, I'll come with you. We don't have much time.
     portrait: {fileID: 0}
-  partyJoinAnnouncement: {fileID: 0}
+  partyJoinAnnouncement: {fileID: 113144027}
   joinMessage: Paladin has joined your party.
-  interactionTrigger: {fileID: 0}
-  paladinNpcVisual: {fileID: 0}
-  paladinFollowerPrefab: {fileID: 0}
-  followerSpawnPoint: {fileID: 0}
+  interactionTrigger: {fileID: 667416791}
+  paladinNpcVisual: {fileID: 237661098}
+  paladinFollowerPrefab: {fileID: 8162663909719026417, guid: 5c91643223aee234384968e5b30cb0cf, type: 3}
+  followerSpawnDistance: 1.1
   spawnFollowerAfterRecruitment: 1
 --- !u!1 &697145700
 GameObject:
@@ -1264,10 +1339,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 267434692}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -278, y: -187.62498}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: -0.0000038146973}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &970060017
 MonoBehaviour:
@@ -1289,10 +1364,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Text: Paladin has joined your party.'
+  m_text: Paladin has joined your party.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 87c9be75bcdaac04baaa25ad059add66, type: 2}
+  m_sharedMaterial: {fileID: 8818470361386265323, guid: 87c9be75bcdaac04baaa25ad059add66, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1493,7 +1568,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
@@ -1636,7 +1711,6 @@ GameObject:
   - component: {fileID: 1477483746}
   - component: {fileID: 1477483745}
   - component: {fileID: 1477483744}
-  - component: {fileID: 1477483748}
   m_Layer: 5
   m_Name: RecruitmentCanvas
   m_TagString: Untagged
@@ -1706,7 +1780,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 999
   m_TargetDisplay: 0
 --- !u!224 &1477483747
 RectTransform:
@@ -1728,23 +1802,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &1477483748
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1477483743}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48759e8227675744e9993cfa3114184d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PartyJoinAnnouncement
-  blackPanelGroup: {fileID: 267434693}
-  announcementText: {fileID: 970060017}
-  fadeInDuration: 0.35
-  holdDuration: 1.5
-  fadeOutDuration: 0.35
 --- !u!1 &1533827300
 GameObject:
   m_ObjectHideFlags: 0
@@ -2159,3 +2216,4 @@ SceneRoots:
   - {fileID: 2118862471}
   - {fileID: 1477483747}
   - {fileID: 697145701}
+  - {fileID: 113144028}
