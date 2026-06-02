@@ -6,7 +6,9 @@ public class BattleEncounterTrigger : MonoBehaviour
 {
     [Header("Battle Settings")]
     [SerializeField] private BattleBackgroundType battleBackground;
-    [SerializeField] private List<GameObject> enemyPrefabs;
+
+    [Tooltip("Assign battle prefabs such as HoundBattle or CultistBattle, not overworld sprites.")]
+    [SerializeField] private List<GameObject> enemyPrefabs = new List<GameObject>();
 
     [Header("Scene")]
     [SerializeField] private string battleSceneName = "BattleScene";
@@ -15,16 +17,48 @@ public class BattleEncounterTrigger : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (triggered) return;
-        if (!other.CompareTag("Player")) return;
+        if (triggered || !other.CompareTag("Player"))
+        {
+            return;
+        }
+
+        if (PartyManager.Instance == null)
+        {
+            Debug.LogError("Cannot start battle: PartyManager does not exist.");
+            return;
+        }
+
+        if (enemyPrefabs == null || enemyPrefabs.Count == 0)
+        {
+            Debug.LogError("Cannot start battle: no enemy battle prefabs are assigned on this encounter.");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(battleSceneName))
+        {
+            Debug.LogError("Cannot start battle: Battle Scene Name is empty.");
+            return;
+        }
+
+        List<GameObject> partyPrefabs = PartyManager.Instance.GetCurrentPartyPrefabs();
+
+        if (partyPrefabs == null || partyPrefabs.Count == 0)
+        {
+            Debug.LogError("Cannot start battle: PartyManager has no party battle prefabs.");
+            return;
+        }
 
         triggered = true;
 
         BattleData.previousSceneName = SceneManager.GetActiveScene().name;
         BattleData.backgroundType = battleBackground;
-        BattleData.enemyPrefabs = enemyPrefabs;
+        BattleData.enemyPrefabs = new List<GameObject>(enemyPrefabs);
+        BattleData.partyPrefabs = new List<GameObject>(partyPrefabs);
 
-        BattleData.partyPrefabs = PartyManager.Instance.GetCurrentPartyPrefabs();
+        Debug.Log(
+            $"Starting battle with {BattleData.partyPrefabs.Count} party member(s) " +
+            $"against {BattleData.enemyPrefabs.Count} enemy/enemies."
+        );
 
         SceneManager.LoadScene(battleSceneName);
     }

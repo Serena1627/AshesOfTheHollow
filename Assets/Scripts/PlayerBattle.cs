@@ -1,7 +1,5 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using UnityEngine;
 
 public class PlayerBattle : BattleEntity
@@ -26,6 +24,11 @@ public class PlayerBattle : BattleEntity
     public BattleEntity singleTargetEnemy;
     public BattleEntity target;
     bool waitingForChoice = true;
+
+    private void Awake()
+    {
+        addActions();
+    }
 
     public void targetButton(EnemyBattle enemy)
     {
@@ -74,15 +77,25 @@ public class PlayerBattle : BattleEntity
     
     public override void addActions()
     {
-        string action1Label = "Action1";
-        string action2Label = "Action2";
+        playerActions.Clear();
+        
         Action action1 = new Action();
-        action1.Init(action1Damage, action1Name, action1TargetingType.ToString(), action1Type.ToString());
-        playerActions.Add(action1Label, action1);
+        action1.Init(
+            action1Damage,
+            action1Name,
+            action1TargetingType.ToString(),
+            action1Type.ToString()
+        );
+        playerActions.Add("Action1", action1);
 
         Action action2 = new Action();
-        action2.Init(action2Damage, action2Name, action2TargetingType.ToString(), action2Type.ToString());
-        playerActions.Add(action2Label, action2);
+        action2.Init(
+            action2Damage,
+            action2Name,
+            action2TargetingType.ToString(),
+            action2Type.ToString()
+        );
+        playerActions.Add("Action2", action2);
     }
 
     public Dictionary<string, Action> getActionList()

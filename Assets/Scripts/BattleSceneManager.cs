@@ -14,7 +14,18 @@ public class BattleSceneManager : MonoBehaviour
     [SerializeField] private Transform[] partySpawnPoints;
     [SerializeField] private Transform[] enemySpawnPoints;
 
-    private void Start()
+    [Header("Optional Runtime Parents")]
+    [SerializeField] private Transform battlePartyParent;
+    [SerializeField] private Transform battleEnemiesParent;
+
+    [Header("Direct BattleScene Testing Only")]
+    [Tooltip("Used only when pressing Play directly inside BattleScene.")]
+    [SerializeField] private List<GameObject> testPartyPrefabs = new List<GameObject>();
+
+    [Tooltip("Used only when pressing Play directly inside BattleScene.")]
+    [SerializeField] private List<GameObject> testEnemyPrefabs = new List<GameObject>();
+
+    private void Awake()
     {
         SetBackground();
         SpawnParty();
@@ -23,49 +34,138 @@ public class BattleSceneManager : MonoBehaviour
 
     private void SetBackground()
     {
-        plainsBackground.SetActive(false);
-        forestBackground.SetActive(false);
-        ruinsBackground.SetActive(false);
-        dungeonBackground.SetActive(false);
-        houseBackground.SetActive(false);
+        SetBackgroundActive(plainsBackground, false);
+        SetBackgroundActive(forestBackground, false);
+        SetBackgroundActive(ruinsBackground, false);
+        SetBackgroundActive(dungeonBackground, false);
+        SetBackgroundActive(houseBackground, false);
 
         switch (BattleData.backgroundType)
         {
             case BattleBackgroundType.Plains:
-                plainsBackground.SetActive(true);
+                SetBackgroundActive(plainsBackground, true);
                 break;
+
             case BattleBackgroundType.Forest:
-                forestBackground.SetActive(true);
+                SetBackgroundActive(forestBackground, true);
                 break;
+
             case BattleBackgroundType.Ruins:
-                ruinsBackground.SetActive(true);
+                SetBackgroundActive(ruinsBackground, true);
                 break;
+
             case BattleBackgroundType.Dungeon:
-                dungeonBackground.SetActive(true);
+                SetBackgroundActive(dungeonBackground, true);
                 break;
+
             case BattleBackgroundType.House:
-                houseBackground.SetActive(true);
+                SetBackgroundActive(houseBackground, true);
                 break;
+
+            default:
+                SetBackgroundActive(plainsBackground, true);
+                break;
+        }
+    }
+
+    private void SetBackgroundActive(GameObject background, bool active)
+    {
+        if (background != null)
+        {
+            background.SetActive(active);
         }
     }
 
     private void SpawnParty()
     {
-        SpawnList(BattleData.partyPrefabs, partySpawnPoints);
+        List<GameObject> prefabsToSpawn = BattleData.partyPrefabs;
+
+        if (prefabsToSpawn == null || prefabsToSpawn.Count == 0)
+        {
+            prefabsToSpawn = testPartyPrefabs;
+            Debug.Log("Using test party prefabs because no BattleData party was supplied.");
+        }
+
+        SpawnList(
+            prefabsToSpawn,
+            partySpawnPoints,
+            battlePartyParent,
+            "party member"
+        );
     }
 
     private void SpawnEnemies()
     {
-        SpawnList(BattleData.enemyPrefabs, enemySpawnPoints);
+        List<GameObject> prefabsToSpawn = BattleData.enemyPrefabs;
+
+        if (prefabsToSpawn == null || prefabsToSpawn.Count == 0)
+        {
+            prefabsToSpawn = testEnemyPrefabs;
+            Debug.Log("Using test enemy prefabs because no BattleData enemies were supplied.");
+        }
+
+        SpawnList(
+            prefabsToSpawn,
+            enemySpawnPoints,
+            battleEnemiesParent,
+            "enemy"
+        );
     }
 
-    private void SpawnList(List<GameObject> prefabs, Transform[] spawnPoints)
+    private void SpawnList(
+        List<GameObject> prefabs,
+        Transform[] spawnPoints,
+        Transform parent,
+        string participantType
+    )
     {
+        if (prefabs == null || prefabs.Count == 0)
+        {
+            Debug.LogError("No " + participantType + " prefabs were available to spawn.");
+            return;
+        }
+
+        if (spawnPoints == null || spawnPoints.Length == 0)
+        {
+            Debug.LogError("No spawn points assigned for " + participantType + "s.");
+            return;
+        }
+
         int count = Mathf.Min(prefabs.Count, spawnPoints.Length);
 
         for (int i = 0; i < count; i++)
         {
-            Instantiate(prefabs[i], spawnPoints[i].position, Quaternion.identity);
+            GameObject prefab = prefabs[i];
+            Transform spawnPoint = spawnPoints[i];
+
+            if (prefab == null)
+            {
+                Debug.LogWarning("Missing " + participantType + " prefab at index " + i + ".");
+                continue;
+            }
+
+            if (spawnPoint == null)
+            {
+                Debug.LogWarning("Missing " + participantType + " spawn point at index " + i + ".");
+                continue;
+            }
+
+            GameObject spawnedObject = Instantiate(
+                prefab,
+                spawnPoint.position,
+                spawnPoint.rotation,
+                parent
+            );
+
+            Debug.Log("Spawned " + participantType + ": " + spawnedObject.name);
+        }
+
+        if (prefabs.Count > spawnPoints.Length)
+        {
+            Debug.LogWarning(
+                "There are more " + participantType +
+                " prefabs than spawn points. Some units were not spawned."
+            );
         }
     }
 }

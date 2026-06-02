@@ -2,17 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using JetBrains.Annotations;
-using NUnit.Framework;
-using TMPro;
-using Unity.Collections;
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEditor.PackageManager;
-using UnityEditor.UI;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class BattleController : MonoBehaviour
 {
@@ -49,28 +39,54 @@ public class BattleController : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        GameObject[] playerList = GameObject.FindGameObjectsWithTag("Player");
-        GameObject[] enemyList = GameObject.FindGameObjectsWithTag("Enemy");
-        foreach (GameObject obj in playerList)
-        {
-            if (obj != null) {
-                PlayerBattle player = obj.GetComponent<PlayerBattle>();
-                players.Add(player);
-                battleEntities.Add(player);
-                //Debug.Log($"Added {player.entityName}");
-            }
-        }
-        foreach (GameObject obj in enemyList)
-        {
-            if (obj != null) {
-                EnemyBattle enemy = obj.GetComponent<EnemyBattle>();
-                enemies.Add(enemy);
-                battleEntities.Add(enemy);
-                //Debug.Log($"Added {enemy.entityName}");
-            }
-        }
     }
 
+    private void FindBattleParticipants()
+    {
+        players.Clear();
+        enemies.Clear();
+        battleEntities.Clear();
+        turnOrder.Clear();
+
+        GameObject[] playerObjects = GameObject.FindGameObjectsWithTag("Player");
+        GameObject[] enemyObjects = GameObject.FindGameObjectsWithTag("Enemy");
+
+        foreach (GameObject obj in playerObjects)
+        {
+            PlayerBattle player = obj.GetComponent<PlayerBattle>();
+
+            if (player == null)
+            {
+                Debug.LogWarning(
+                    obj.name + " has the Player tag but does not have PlayerBattle."
+                );
+                continue;
+            }
+
+            players.Add(player);
+            battleEntities.Add(player);
+
+            Debug.Log("Registered player battle entity: " + player.entityName);
+        }
+
+        foreach (GameObject obj in enemyObjects)
+        {
+            EnemyBattle enemy = obj.GetComponent<EnemyBattle>();
+
+            if (enemy == null)
+            {
+                Debug.LogWarning(
+                    obj.name + " has the Enemy tag but does not have EnemyBattle."
+                );
+                continue;
+            }
+
+            enemies.Add(enemy);
+            battleEntities.Add(enemy);
+
+            Debug.Log("Registered enemy battle entity: " + enemy.entityName);
+        }
+    }
     
     void findTurnOrder()
     {
@@ -270,10 +286,22 @@ public class BattleController : MonoBehaviour
         //Instance.MenuLoop(player);
     }
 
-    public IEnumerator EnemyTurn (EnemyBattle enemy)
+    public IEnumerator EnemyTurn(EnemyBattle enemy)
     {
+        if (enemy == null)
+        {
+            Debug.LogWarning("Enemy turn was called for a missing enemy.");
+            yield break;
+        }
+
         Action action = enemy.chosenAttack();
-        //Debug.Log($"{enemy.entityName} used {action.getActionName()}!");
+
+        if (action == null)
+        {
+            Debug.LogWarning(enemy.entityName + " has no valid attack and skips its turn.");
+            yield break;
+        }
+
         yield return StartCoroutine(enemy.Attack(action));
     }
 
@@ -310,12 +338,32 @@ public class BattleController : MonoBehaviour
     
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Start()
     {
+        FindBattleParticipants();
+
+        if (players.Count == 0)
+        {
+            Debug.LogError(
+                "Battle cannot begin because no PlayerBattle objects were found. " +
+                "Check BattleSceneManager spawning and Player prefab tags."
+            );
+            return;
+        }
+
+        if (enemies.Count == 0)
+        {
+            Debug.LogError(
+                "Battle cannot begin because no EnemyBattle objects were found. " +
+                "Check BattleEncounterTrigger enemy prefabs or test enemy prefabs."
+            );
+            return;
+        }
+
         findTurnOrder();
         setItems();
+
         StartCoroutine(Battle());
-        //battle();
     }
 
 
