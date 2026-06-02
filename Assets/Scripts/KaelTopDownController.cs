@@ -56,6 +56,7 @@ public class KaelTopDownController : MonoBehaviour
 
     [Header("Animation")]
     [SerializeField] private float animationFPS = 8f;
+    [SerializeField] private bool faceBackOnSceneStart = true;
 
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
@@ -80,6 +81,14 @@ public class KaelTopDownController : MonoBehaviour
             SwitchToNoGearSprites();
     }
 
+    private void Start()
+    {
+        if (faceBackOnSceneStart)
+        {
+            FaceBack();
+        }
+    }
+
     private void Update()
     {
         ReadInput();
@@ -90,6 +99,20 @@ public class KaelTopDownController : MonoBehaviour
     private void FixedUpdate()
     {
         MoveWithBlockedTileCheck();
+    }
+
+    public void FaceBack()
+    {
+        input = Vector2.zero;
+        lastDirection = Vector2.up;
+
+        frameIndex = 0;
+        animationTimer = 0f;
+
+        if (spriteRenderer != null && backIdle != null)
+        {
+            spriteRenderer.sprite = backIdle;
+        }
     }
 
     private void ReadInput()

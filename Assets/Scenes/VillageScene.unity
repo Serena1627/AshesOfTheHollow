@@ -933,26 +933,29 @@ MonoBehaviour:
   recruitmentDialogue:
   - speakerName: Paladin
     dialogueText: Oh, there's a survivor still here.
-    portrait: {fileID: 0}
+    portrait: {fileID: 4907242074090915066, guid: 0fc49aca0aa58be459d3df532d47cdfa, type: 3}
   - speakerName: Paladin
     dialogueText: Wait... that sword... that armor...
-    portrait: {fileID: 0}
+    portrait: {fileID: -6226177044132118711, guid: c2f8b7f7382e1d14882a29e8ab0e366d, type: 3}
   - speakerName: Paladin
     dialogueText: Are you the son of Erynd?
-    portrait: {fileID: 0}
+    portrait: {fileID: 4907242074090915066, guid: 0fc49aca0aa58be459d3df532d47cdfa, type: 3}
   - speakerName: Kael
     dialogueText: You know who my father is?
-    portrait: {fileID: 0}
+    portrait: {fileID: 8859943044834607501, guid: 5740df5ceb0432741999c0000f641d68, type: 3}
   - speakerName: Paladin
     dialogueText: On another note, there are still cultists close by, we need to
       get to them and defeat them.
-    portrait: {fileID: 0}
+    portrait: {fileID: 4907242074090915066, guid: 0fc49aca0aa58be459d3df532d47cdfa, type: 3}
   - speakerName: Kael
     dialogueText: 'Cultists? What''s going on? '
-    portrait: {fileID: 0}
+    portrait: {fileID: 4237676072881026496, guid: 454d1fec3dbc81d4d844ac949f7fb6b6, type: 3}
   - speakerName: Paladin
-    dialogueText: Quick, walk upwards, I'll come with you. We don't have much time.
-    portrait: {fileID: 0}
+    dialogueText: I'll explain later but we don't have much time.
+    portrait: {fileID: 4907242074090915066, guid: 0fc49aca0aa58be459d3df532d47cdfa, type: 3}
+  - speakerName: Paladin
+    dialogueText: Quick, head upwards. I'll come with you.
+    portrait: {fileID: 4907242074090915066, guid: 0fc49aca0aa58be459d3df532d47cdfa, type: 3}
   partyJoinAnnouncement: {fileID: 113144027}
   joinMessage: Paladin has joined your party.
   interactionTrigger: {fileID: 667416791}
@@ -1444,6 +1447,99 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 970060015}
   m_CullTransparentMesh: 1
+--- !u!1 &1071379805
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1071379807}
+  - component: {fileID: 1071379806}
+  - component: {fileID: 1071379808}
+  m_Layer: 0
+  m_Name: VillageToCultistExitTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!61 &1071379806
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1071379805}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
+--- !u!4 &1071379807
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1071379805}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.3, y: 13.1, z: 0}
+  m_LocalScale: {x: 4.59, y: 3.4216, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1071379808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1071379805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6059d9e0f4678074c8911c1975e7c5fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VillageToCultistExit
+  cultistSceneName: CultistScene
+  requirePaladinRecruited: 1
 --- !u!1 &1143018519
 GameObject:
   m_ObjectHideFlags: 0
@@ -2217,3 +2313,4 @@ SceneRoots:
   - {fileID: 1477483747}
   - {fileID: 697145701}
   - {fileID: 113144028}
+  - {fileID: 1071379807}
