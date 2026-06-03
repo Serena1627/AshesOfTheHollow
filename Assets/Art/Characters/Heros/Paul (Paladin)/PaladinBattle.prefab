@@ -10,9 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 6731631374705802742}
   - component: {fileID: 1853249173296969414}
+  - component: {fileID: 1601037443935715336}
   m_Layer: 0
   m_Name: PaladinBattle
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -91,3 +92,32 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1601037443935715336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4684052358575500304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11f03762cc24c43c2bb4f3f8133251f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerBattle
+  health: 30
+  speed: 2
+  entityName: Paladin
+  physDef: 2
+  spDef: 2
+  battleController: {fileID: 0}
+  isDead: 0
+  action1Damage: 5
+  action1Name: Shield Bash
+  action1Type: 0
+  action1TargetingType: 0
+  action2Damage: 7
+  action2Name: Holy Slash
+  action2Type: 1
+  action2TargetingType: 0
+  singleTargetEnemy: {fileID: 0}
+  target: {fileID: 0}

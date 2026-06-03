@@ -4,98 +4,80 @@ using UnityEngine;
 
 public class PlayerBattle : BattleEntity
 {
- 
-    Dictionary<string, Action> playerActions = new Dictionary <string, Action>();
+    private readonly Dictionary<string, Action> playerActions =
+        new Dictionary<string, Action>();
 
     [Header("Action #1")]
-    [SerializeField] int action1Damage;
-    [SerializeField] string action1Name;
-    [SerializeField] Action.actionTypes action1Type;
-    [SerializeField] Action.targetingTypes action1TargetingType;
-
+    [SerializeField] private int action1Damage;
+    [SerializeField] private string action1Name;
+    [SerializeField] private Action.actionTypes action1Type;
+    [SerializeField] private Action.targetingTypes action1TargetingType;
 
     [Header("Action #2")]
-    [SerializeField] int action2Damage;
-    [SerializeField] string action2Name;
-    [SerializeField] Action.actionTypes action2Type;
-    [SerializeField] Action.targetingTypes action2TargetingType;
-    
-    int numberOfActions = 2;
-    public BattleEntity singleTargetEnemy;
-    public BattleEntity target;
-    bool waitingForChoice = true;
+    [SerializeField] private int action2Damage;
+    [SerializeField] private string action2Name;
+    [SerializeField] private Action.actionTypes action2Type;
+    [SerializeField] private Action.targetingTypes action2TargetingType;
 
-    private void Awake()
+    private BattleEntity target;
+
+    protected override void Awake()
     {
+        base.Awake();
         addActions();
     }
 
-    public void targetButton(EnemyBattle enemy)
-    {
-        waitingForChoice = false;
-        target = enemy;
-    }
-
-    /*
-    IEnumerator selectTarget()
-    {
-        waitingForChoice = true;
-        battleController.generateTargets();
-        yield return new WaitUntil(() => waitingForChoice == false);
-        
-    }
-    */
-    public override BattleEntity getTarget()
-    {
-        return BattleUIController.Instance.returnTarget();
-    }
-
-    public override IEnumerator pickTarget()
-    {
-        target = null;
-        yield return StartCoroutine(BattleUIController.Instance.targeting(BattleController.Instance.getEnemies()));
-        if (BattleUIController.Instance.returnTarget() == null)
-        {
-            //yield return StartCoroutine(BattleController.Instance.AttackLoop(this));
-            target = null;
-            yield break;
-        }
-    }
-    
-
-    public override List <BattleEntity> getAllTargets()
-    {
-        List <EnemyBattle> enemyTargets = BattleController.Instance.getEnemies();
-        List <BattleEntity> targets = new List<BattleEntity>();
-        foreach (EnemyBattle enemy in enemyTargets)
-        {
-            targets.Add(enemy);
-        }
-        return targets;
-    }
-
-    
     public override void addActions()
     {
         playerActions.Clear();
-        
-        Action action1 = new Action();
-        action1.Init(
+
+        AddActionIfAssigned(
+            "Action1",
             action1Damage,
             action1Name,
-            action1TargetingType.ToString(),
-            action1Type.ToString()
+            action1TargetingType,
+            action1Type
         );
-        playerActions.Add("Action1", action1);
 
-        Action action2 = new Action();
-        action2.Init(
+        AddActionIfAssigned(
+            "Action2",
             action2Damage,
             action2Name,
-            action2TargetingType.ToString(),
-            action2Type.ToString()
+            action2TargetingType,
+            action2Type
         );
-        playerActions.Add("Action2", action2);
+
+        Debug.Log(
+            entityName +
+            " initialized " +
+            playerActions.Count +
+            " action(s)."
+        );
+    }
+
+    private void AddActionIfAssigned(
+        string label,
+        int damage,
+        string actionName,
+        Action.targetingTypes targetingType,
+        Action.actionTypes actionType
+    )
+    {
+        if (string.IsNullOrWhiteSpace(actionName))
+        {
+            return;
+        }
+
+        Action action = new Action();
+
+        action.Init(
+            damage,
+            actionName,
+            targetingType.ToString(),
+            actionType.ToString()
+        );
+
+        playerActions.Add(label, action);
     }
 
     public Dictionary<string, Action> getActionList()
@@ -103,19 +85,67 @@ public class PlayerBattle : BattleEntity
         return playerActions;
     }
 
+    public override BattleEntity getTarget()
+    {
+        return target;
+    }
+
+    public override IEnumerator pickTarget()
+    {
+        target = null;
+
+        if (BattleUIController.Instance == null ||
+            BattleController.Instance == null)
+        {
+            Debug.LogError(
+                entityName +
+                " cannot choose a target because battle UI/controller is missing."
+            );
+
+            yield break;
+        }
+
+        yield return StartCoroutine(
+            BattleUIController.Instance.Targeting(
+                BattleController.Instance.getEnemies()
+            )
+        );
+
+        target = BattleUIController.Instance.ReturnTarget();
+    }
+
+    public override List<BattleEntity> getAllTargets()
+    {
+        List<BattleEntity> validTargets = new List<BattleEntity>();
+
+        if (BattleController.Instance == null)
+        {
+            return validTargets;
+        }
+
+        foreach (EnemyBattle enemy in BattleController.Instance.getEnemies())
+        {
+            if (enemy != null && !enemy.isEntityDead())
+            {
+                validTargets.Add(enemy);
+            }
+        }
+
+        return validTargets;
+    }
 
     public override IEnumerator Turn()
     {
-        yield return StartCoroutine(BattleController.Instance.PlayerTurn(this));
-    }
+        Debug.Log(entityName + " PlayerBattle.Turn() reached.");
 
-    public void addItems()
-    {
-        
-    }
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (BattleController.Instance == null)
+        {
+            Debug.LogError("BattleController.Instance is missing.");
+            yield break;
+        }
+
+        yield return StartCoroutine(
+            BattleController.Instance.PlayerTurn(this)
+        );
     }
 }

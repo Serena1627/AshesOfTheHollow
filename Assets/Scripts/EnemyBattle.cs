@@ -43,8 +43,9 @@ public class EnemyBattle : BattleEntity
 
     private BattleEntity target;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         addActions();
     }
 
@@ -84,7 +85,12 @@ public class EnemyBattle : BattleEntity
             action4Type
         );
 
-        Debug.Log(entityName + " initialized " + enemyActions.Count + " action(s).");
+        Debug.Log(
+            entityName +
+            " initialized " +
+            enemyActions.Count +
+            " action(s)."
+        );
     }
 
     private void AddActionIfAssigned(
@@ -101,6 +107,7 @@ public class EnemyBattle : BattleEntity
         }
 
         Action action = new Action();
+
         action.Init(
             damage,
             actionName,
@@ -113,22 +120,22 @@ public class EnemyBattle : BattleEntity
 
     public override List<BattleEntity> getAllTargets()
     {
-        List<BattleEntity> targets = new List<BattleEntity>();
+        List<BattleEntity> validTargets = new List<BattleEntity>();
 
         if (BattleController.Instance == null)
         {
-            return targets;
+            return validTargets;
         }
 
         foreach (PlayerBattle player in BattleController.Instance.getPlayers())
         {
             if (player != null && !player.isEntityDead())
             {
-                targets.Add(player);
+                validTargets.Add(player);
             }
         }
 
-        return targets;
+        return validTargets;
     }
 
     public override BattleEntity getTarget()
@@ -142,7 +149,6 @@ public class EnemyBattle : BattleEntity
 
         if (BattleController.Instance == null)
         {
-            Debug.LogWarning(entityName + " cannot choose a target because BattleController is missing.");
             yield break;
         }
 
@@ -153,48 +159,47 @@ public class EnemyBattle : BattleEntity
 
         if (availablePlayers.Count == 0)
         {
-            Debug.LogWarning(entityName + " has no valid player targets.");
             yield break;
         }
 
-        if (AI == aiTypes.RAND)
-        {
-            int targetIndex = Random.Range(0, availablePlayers.Count);
-            target = availablePlayers[targetIndex];
-        }
+        target = availablePlayers[
+            Random.Range(0, availablePlayers.Count)
+        ];
 
         yield return null;
     }
 
-    private Action RandomAttack()
+    public Action chosenAttack()
     {
-        if (enemyActions.Count == 0)
+        if (AI != aiTypes.RAND)
         {
-            Debug.LogError(
-                entityName +
-                " has no attacks configured. Assign at least Action #1 on its battle prefab."
+            Debug.LogWarning(
+                "Boss AI is not implemented for " + entityName + "."
             );
 
             return null;
         }
 
-        int actionIndex = Random.Range(0, enemyActions.Count);
-        return enemyActions.ElementAt(actionIndex).Value;
-    }
-
-    public Action chosenAttack()
-    {
-        if (AI == aiTypes.RAND)
+        if (enemyActions.Count == 0)
         {
-            return RandomAttack();
+            Debug.LogError(entityName + " has no configured attacks.");
+            return null;
         }
 
-        Debug.LogWarning("Boss AI is not implemented yet for " + entityName + ".");
-        return null;
+        return enemyActions.ElementAt(
+            Random.Range(0, enemyActions.Count)
+        ).Value;
     }
 
     public override IEnumerator Turn()
     {
-        yield return BattleController.Instance.EnemyTurn(this);
+        if (BattleController.Instance == null)
+        {
+            yield break;
+        }
+
+        yield return StartCoroutine(
+            BattleController.Instance.EnemyTurn(this)
+        );
     }
 }

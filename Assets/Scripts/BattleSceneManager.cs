@@ -15,101 +15,104 @@ public class BattleSceneManager : MonoBehaviour
     [SerializeField] private Transform[] enemySpawnPoints;
 
     [Header("Optional Runtime Parents")]
-    [SerializeField] private Transform battlePartyParent;
-    [SerializeField] private Transform battleEnemiesParent;
+    [SerializeField] private Transform partyParent;
+    [SerializeField] private Transform enemyParent;
 
     [Header("Direct BattleScene Testing Only")]
-    [Tooltip("Used only when pressing Play directly inside BattleScene.")]
-    [SerializeField] private List<GameObject> testPartyPrefabs = new List<GameObject>();
+    [Tooltip("Used only when pressing Play directly in BattleScene.")]
+    [SerializeField] private List<GameObject> testPartyPrefabs =
+        new List<GameObject>();
 
-    [Tooltip("Used only when pressing Play directly inside BattleScene.")]
-    [SerializeField] private List<GameObject> testEnemyPrefabs = new List<GameObject>();
+    [Tooltip("Used only when pressing Play directly in BattleScene.")]
+    [SerializeField] private List<GameObject> testEnemyPrefabs =
+        new List<GameObject>();
 
     private void Awake()
     {
         SetBackground();
-        SpawnParty();
-        SpawnEnemies();
+
+        List<GameObject> partyToSpawn = GetPartyPrefabs();
+        List<GameObject> enemiesToSpawn = GetEnemyPrefabs();
+
+        SpawnList(
+            partyToSpawn,
+            partySpawnPoints,
+            partyParent,
+            "party member"
+        );
+
+        SpawnList(
+            enemiesToSpawn,
+            enemySpawnPoints,
+            enemyParent,
+            "enemy"
+        );
+    }
+
+    private List<GameObject> GetPartyPrefabs()
+    {
+        if (BattleData.partyPrefabs != null &&
+            BattleData.partyPrefabs.Count > 0)
+        {
+            return new List<GameObject>(BattleData.partyPrefabs);
+        }
+
+        return new List<GameObject>(testPartyPrefabs);
+    }
+
+    private List<GameObject> GetEnemyPrefabs()
+    {
+        if (BattleData.enemyPrefabs != null &&
+            BattleData.enemyPrefabs.Count > 0)
+        {
+            return new List<GameObject>(BattleData.enemyPrefabs);
+        }
+
+        return new List<GameObject>(testEnemyPrefabs);
     }
 
     private void SetBackground()
     {
-        SetBackgroundActive(plainsBackground, false);
-        SetBackgroundActive(forestBackground, false);
-        SetBackgroundActive(ruinsBackground, false);
-        SetBackgroundActive(dungeonBackground, false);
-        SetBackgroundActive(houseBackground, false);
+        SetActive(plainsBackground, false);
+        SetActive(forestBackground, false);
+        SetActive(ruinsBackground, false);
+        SetActive(dungeonBackground, false);
+        SetActive(houseBackground, false);
 
         switch (BattleData.backgroundType)
         {
             case BattleBackgroundType.Plains:
-                SetBackgroundActive(plainsBackground, true);
+                SetActive(plainsBackground, true);
                 break;
 
             case BattleBackgroundType.Forest:
-                SetBackgroundActive(forestBackground, true);
+                SetActive(forestBackground, true);
                 break;
 
             case BattleBackgroundType.Ruins:
-                SetBackgroundActive(ruinsBackground, true);
+                SetActive(ruinsBackground, true);
                 break;
 
             case BattleBackgroundType.Dungeon:
-                SetBackgroundActive(dungeonBackground, true);
+                SetActive(dungeonBackground, true);
                 break;
 
             case BattleBackgroundType.House:
-                SetBackgroundActive(houseBackground, true);
+                SetActive(houseBackground, true);
                 break;
 
             default:
-                SetBackgroundActive(plainsBackground, true);
+                SetActive(plainsBackground, true);
                 break;
         }
     }
 
-    private void SetBackgroundActive(GameObject background, bool active)
+    private void SetActive(GameObject obj, bool active)
     {
-        if (background != null)
+        if (obj != null)
         {
-            background.SetActive(active);
+            obj.SetActive(active);
         }
-    }
-
-    private void SpawnParty()
-    {
-        List<GameObject> prefabsToSpawn = BattleData.partyPrefabs;
-
-        if (prefabsToSpawn == null || prefabsToSpawn.Count == 0)
-        {
-            prefabsToSpawn = testPartyPrefabs;
-            Debug.Log("Using test party prefabs because no BattleData party was supplied.");
-        }
-
-        SpawnList(
-            prefabsToSpawn,
-            partySpawnPoints,
-            battlePartyParent,
-            "party member"
-        );
-    }
-
-    private void SpawnEnemies()
-    {
-        List<GameObject> prefabsToSpawn = BattleData.enemyPrefabs;
-
-        if (prefabsToSpawn == null || prefabsToSpawn.Count == 0)
-        {
-            prefabsToSpawn = testEnemyPrefabs;
-            Debug.Log("Using test enemy prefabs because no BattleData enemies were supplied.");
-        }
-
-        SpawnList(
-            prefabsToSpawn,
-            enemySpawnPoints,
-            battleEnemiesParent,
-            "enemy"
-        );
     }
 
     private void SpawnList(
@@ -121,13 +124,19 @@ public class BattleSceneManager : MonoBehaviour
     {
         if (prefabs == null || prefabs.Count == 0)
         {
-            Debug.LogError("No " + participantType + " prefabs were available to spawn.");
+            Debug.LogError(
+                "No " + participantType + " prefabs were supplied to BattleScene."
+            );
+
             return;
         }
 
         if (spawnPoints == null || spawnPoints.Length == 0)
         {
-            Debug.LogError("No spawn points assigned for " + participantType + "s.");
+            Debug.LogError(
+                "No " + participantType + " spawn points are assigned."
+            );
+
             return;
         }
 
@@ -135,36 +144,40 @@ public class BattleSceneManager : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            GameObject prefab = prefabs[i];
-            Transform spawnPoint = spawnPoints[i];
-
-            if (prefab == null)
+            if (prefabs[i] == null || spawnPoints[i] == null)
             {
-                Debug.LogWarning("Missing " + participantType + " prefab at index " + i + ".");
+                Debug.LogWarning(
+                    "Missing " +
+                    participantType +
+                    " prefab or spawn point at index " +
+                    i +
+                    "."
+                );
+
                 continue;
             }
 
-            if (spawnPoint == null)
-            {
-                Debug.LogWarning("Missing " + participantType + " spawn point at index " + i + ".");
-                continue;
-            }
-
-            GameObject spawnedObject = Instantiate(
-                prefab,
-                spawnPoint.position,
-                spawnPoint.rotation,
+            GameObject spawned = Instantiate(
+                prefabs[i],
+                spawnPoints[i].position,
+                spawnPoints[i].rotation,
                 parent
             );
 
-            Debug.Log("Spawned " + participantType + ": " + spawnedObject.name);
+            Debug.Log(
+                "Spawned " +
+                participantType +
+                ": " +
+                spawned.name
+            );
         }
 
         if (prefabs.Count > spawnPoints.Length)
         {
             Debug.LogWarning(
-                "There are more " + participantType +
-                " prefabs than spawn points. Some units were not spawned."
+                "More " +
+                participantType +
+                " prefabs were supplied than there are spawn points."
             );
         }
     }
