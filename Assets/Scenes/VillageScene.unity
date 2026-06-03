@@ -1008,7 +1008,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PartyManager
   currentPartyPrefabs:
-  - {fileID: 280957278}
+  - {fileID: 4684052358575500304, guid: 5f86e35481e930f49a2772191f417058, type: 3}
   paladinBattlePrefab: {fileID: 4684052358575500304, guid: 27e9b99e71747174e8ac1c726ad3ac77, type: 3}
   paladinRecruited: 0
 --- !u!1 &721971817
