@@ -11196,8 +11196,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PartyManager
   currentPartyPrefabs:
   - {fileID: 7509160197856985987, guid: 07ad3870dfbcfdd4db6dac8962ed3350, type: 3}
-  paladinBattlePrefab: {fileID: 0}
-  paladinRecruited: 0
 --- !u!4 &2109879075
 Transform:
   m_ObjectHideFlags: 0
@@ -11231,7 +11229,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1949279440533568348, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
       propertyPath: nextSceneName
-      value: IntroScene
+      value: ForestLevel
       objectReference: {fileID: 0}
     - target: {fileID: 1949279440533568348, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
       propertyPath: endPointTilemap
