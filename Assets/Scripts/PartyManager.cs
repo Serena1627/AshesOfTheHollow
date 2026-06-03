@@ -16,7 +16,21 @@ public class PartyManager : MonoBehaviour
     [Header("Recruitment State")]
     [SerializeField] private bool paladinRecruited;
 
+
     public bool PaladinRecruited => paladinRecruited;
+
+    [System.Serializable]
+    public class PartyMemberHealthState
+    {
+        public string memberId;
+        public int currentHealth;
+        public int maxHealth;
+    }
+
+    [Header("Persistent Party Health")]
+    [SerializeField]
+    private List<PartyMemberHealthState> partyHealthStates =
+        new List<PartyMemberHealthState>();
 
     private void Awake()
     {
@@ -28,6 +42,11 @@ public class PartyManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        foreach (GameObject partyMemberPrefab in currentPartyPrefabs)
+        {
+            RegisterInitialHealthFromPrefab(partyMemberPrefab);
+        }
 
         // Keeps the party list consistent when testing with recruited flags enabled.
         SyncRecruitedMembersToParty();
@@ -49,17 +68,15 @@ public class PartyManager : MonoBehaviour
     {
         if (partyMemberPrefab == null)
         {
-            Debug.LogWarning("Cannot add a null party member prefab.");
             return;
         }
 
-        if (currentPartyPrefabs.Contains(partyMemberPrefab))
+        if (!currentPartyPrefabs.Contains(partyMemberPrefab))
         {
-            return;
+            currentPartyPrefabs.Add(partyMemberPrefab);
         }
 
-        currentPartyPrefabs.Add(partyMemberPrefab);
-        Debug.Log(partyMemberPrefab.name + " added to the current party.");
+        RegisterInitialHealthFromPrefab(partyMemberPrefab);
     }
 
     /// <summary>
@@ -121,5 +138,151 @@ public class PartyManager : MonoBehaviour
         {
             AddPartyMember(paladinBattlePrefab);
         }
+    }
+    public void RegisterInitialHealthFromPrefab(GameObject partyMemberPrefab)
+    {
+        if (partyMemberPrefab == null)
+        {
+            return;
+        }
+
+        PlayerBattle battleMember = partyMemberPrefab.GetComponent<PlayerBattle>();
+
+        if (battleMember == null)
+        {
+            Debug.LogWarning(
+                partyMemberPrefab.name +
+                " does not contain PlayerBattle, so its health could not be registered."
+            );
+
+            return;
+        }
+
+        PartyMemberHealthState existingState =
+            GetHealthState(battleMember.entityName);
+
+        if (existingState != null)
+        {
+            return;
+        }
+
+        PartyMemberHealthState newState = new PartyMemberHealthState
+        {
+            memberId = battleMember.entityName,
+            currentHealth = battleMember.health,
+            maxHealth = battleMember.health
+        };
+
+        partyHealthStates.Add(newState);
+
+        Debug.Log(
+            "Registered initial HP for " +
+            newState.memberId +
+            ": " +
+            newState.currentHealth +
+            " / " +
+            newState.maxHealth
+        );
+    }
+
+    public void SaveBattleHealth(PlayerBattle battleMember)
+    {
+        if (battleMember == null)
+        {
+            return;
+        }
+
+        PartyMemberHealthState state =
+            GetHealthState(battleMember.entityName);
+
+        if (state == null)
+        {
+            state = new PartyMemberHealthState
+            {
+                memberId = battleMember.entityName
+            };
+
+            partyHealthStates.Add(state);
+        }
+
+        state.currentHealth = battleMember.CurrentHealth;
+        state.maxHealth = battleMember.MaxHealth;
+
+        Debug.Log(
+            "Saved party HP for " +
+            state.memberId +
+            ": " +
+            state.currentHealth +
+            " / " +
+            state.maxHealth
+        );
+    }
+
+    public void ApplyStoredHealth(PlayerBattle battleMember)
+    {
+        if (battleMember == null)
+        {
+            return;
+        }
+
+        PartyMemberHealthState state =
+            GetHealthState(battleMember.entityName);
+
+        if (state == null)
+        {
+            state = new PartyMemberHealthState
+            {
+                memberId = battleMember.entityName,
+                currentHealth = battleMember.CurrentHealth,
+                maxHealth = battleMember.MaxHealth
+            };
+
+            partyHealthStates.Add(state);
+
+            return;
+        }
+
+        battleMember.RestoreHealthFromPartyState(
+            state.currentHealth,
+            state.maxHealth
+        );
+    }
+
+    public bool TryGetPartyHealth(
+        string memberId,
+        out int currentHealth,
+        out int maxHealth
+    )
+    {
+        currentHealth = 0;
+        maxHealth = 0;
+
+        PartyMemberHealthState state = GetHealthState(memberId);
+
+        if (state == null)
+        {
+            return false;
+        }
+
+        currentHealth = state.currentHealth;
+        maxHealth = state.maxHealth;
+
+        return true;
+    }
+
+    private PartyMemberHealthState GetHealthState(string memberId)
+    {
+        if (string.IsNullOrWhiteSpace(memberId))
+        {
+            return null;
+        }
+
+        return partyHealthStates.Find(
+            state => string.Equals(
+                state.memberId,
+                memberId,
+                System.StringComparison.OrdinalIgnoreCase
+            )
+        );
     }
 }

@@ -24,9 +24,30 @@ public class BattleController : MonoBehaviour
         Instance = this;
     }
 
+    private void RestorePartyHealthFromManager()
+    {
+        if (PartyManager.Instance == null)
+        {
+            Debug.LogWarning(
+                "PartyManager was not found. Battle party will use prefab health values."
+            );
+
+            return;
+        }
+
+        foreach (PlayerBattle player in players)
+        {
+            if (player != null)
+            {
+                PartyManager.Instance.ApplyStoredHealth(player);
+            }
+        }
+    }
+
     private void Start()
     {
         FindBattleParticipants();
+        RestorePartyHealthFromManager();
 
         if (players.Count == 0 || enemies.Count == 0)
         {
@@ -197,6 +218,26 @@ public class BattleController : MonoBehaviour
         return partyDefeated || enemiesDefeated;
     }
 
+    private void SavePartyHealthToManager()
+    {
+        if (PartyManager.Instance == null)
+        {
+            Debug.LogWarning(
+                "PartyManager was not found. Battle HP could not be saved."
+            );
+
+            return;
+        }
+
+        foreach (PlayerBattle player in players)
+        {
+            if (player != null)
+            {
+                PartyManager.Instance.SaveBattleHealth(player);
+            }
+        }
+    }
+
     private void EndBattle()
     {
         if (battleEnded)
@@ -206,19 +247,26 @@ public class BattleController : MonoBehaviour
 
         battleEnded = true;
 
-        bool partyDefeated =
-            players.Count == 0 ||
+        bool allPlayersDead = players.Count == 0 ||
             players.All(player => player == null || player.isEntityDead());
 
-        if (partyDefeated)
+        bool allEnemiesDead = enemies.Count == 0 ||
+            enemies.All(enemy => enemy == null || enemy.isEntityDead());
+
+        SavePartyHealthToManager();
+
+        if (allPlayersDead)
         {
             Debug.Log("YOU LOSE");
             return;
         }
 
-        Debug.Log("YOU WIN!");
+        if (allEnemiesDead)
+        {
+            Debug.Log("YOU WIN!");
 
-        StartCoroutine(ReturnToOverworldAfterVictory());
+            StartCoroutine(ReturnToOverworldAfterVictory());
+        }
     }
 
     private IEnumerator ReturnToOverworldAfterVictory()
@@ -272,79 +320,79 @@ public class BattleController : MonoBehaviour
             switch (BattleUIController.Instance.GetAction())
             {
                 case BattleUIController.ActionChoice.Attack:
-                {
-                    yield return StartCoroutine(
-                        BattleUIController.Instance.PlayerAttacks(player)
-                    );
-
-                    Action selectedAttack =
-                        BattleUIController.Instance.GetAttack();
-
-                    if (selectedAttack == null)
                     {
-                        Debug.Log(
-                            "No attack selected. Returning to the main action menu."
+                        yield return StartCoroutine(
+                            BattleUIController.Instance.PlayerAttacks(player)
                         );
+
+                        Action selectedAttack =
+                            BattleUIController.Instance.GetAttack();
+
+                        if (selectedAttack == null)
+                        {
+                            Debug.Log(
+                                "No attack selected. Returning to the main action menu."
+                            );
+
+                            break;
+                        }
+
+                        yield return StartCoroutine(
+                            player.Attack(selectedAttack)
+                        );
+
+                        if (player.getTarget() != null)
+                        {
+                            turnComplete = true;
+                        }
 
                         break;
                     }
-
-                    yield return StartCoroutine(
-                        player.Attack(selectedAttack)
-                    );
-
-                    if (player.getTarget() != null)
-                    {
-                        turnComplete = true;
-                    }
-
-                    break;
-                }
 
                 case BattleUIController.ActionChoice.Item:
-                {
-                    if (items.Count == 0)
                     {
-                        Debug.Log("No usable items available.");
-                        break;
-                    }
+                        if (items.Count == 0)
+                        {
+                            Debug.Log("No usable items available.");
+                            break;
+                        }
 
-                    yield return StartCoroutine(
-                        BattleUIController.Instance.PlayerItems()
-                    );
-
-                    Item selectedItem =
-                        BattleUIController.Instance.GetItem();
-
-                    if (selectedItem == null)
-                    {
-                        Debug.Log(
-                            "No item selected. Returning to the main action menu."
+                        yield return StartCoroutine(
+                            BattleUIController.Instance.PlayerItems()
                         );
 
-                        break;
-                    }
+                        Item selectedItem =
+                            BattleUIController.Instance.GetItem();
 
-                    selectedItem.useItem(
-                        GetItemTargets(selectedItem, player)
-                    );
+                        if (selectedItem == null)
+                        {
+                            Debug.Log(
+                                "No item selected. Returning to the main action menu."
+                            );
 
-                    if (InventoryManager.Instance != null)
-                    {
-                        InventoryManager.Instance.ConsumeItem(
-                            selectedItem.getName()
+                            break;
+                        }
+
+                        selectedItem.useItem(
+                            GetItemTargets(selectedItem, player)
                         );
 
-                        LoadItemsFromInventory();
-                    }
-                    else
-                    {
-                        items.Remove(selectedItem);
-                    }
+                        if (InventoryManager.Instance != null)
+                        {
+                            InventoryManager.Instance.ConsumeItem(
+                                selectedItem.getName()
+                            );
 
-                    turnComplete = true;
-                    break;
-                }
+                            LoadItemsFromInventory();
+                        }
+                        else
+                        {
+                            items.Remove(selectedItem);
+                        }
+
+                        turnComplete = true;
+                        break;
+                    }
             }
         }
     }

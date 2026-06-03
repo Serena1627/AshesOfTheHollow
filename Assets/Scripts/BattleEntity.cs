@@ -14,6 +14,30 @@ public class BattleEntity : MonoBehaviour
     [HideInInspector] public bool isDead;
 
     private int maxHealth;
+    public int CurrentHealth => health;
+    public int MaxHealth => maxHealth;
+
+    public void RestoreHealthFromPartyState(int savedHealth, int savedMaxHealth)
+    {
+        maxHealth = Mathf.Max(1, savedMaxHealth);
+        health = Mathf.Clamp(savedHealth, 0, maxHealth);
+        isDead = health <= 0;
+
+        SpriteRenderer renderer = GetComponent<SpriteRenderer>();
+
+        if (renderer != null)
+        {
+            renderer.enabled = !isDead;
+        }
+
+        Debug.Log(
+            entityName +
+            " restored from PartyManager. HP: " +
+            health +
+            " / " +
+            maxHealth
+        );
+    }
 
     protected virtual void Awake()
     {
