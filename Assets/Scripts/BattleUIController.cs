@@ -1,211 +1,443 @@
-using System;
 using System.Collections;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
-using UnityEngine.SceneManagement;
-using System.Collections.Generic;
 
 public class BattleUIController : MonoBehaviour
 {
-   [SerializeField] GameObject actionOptions;
-   //[SerializeField] Button attackMenuButton;
-   //[SerializeField] Button itemMenuButton;
-    public enum actionChoices
-    {
-        NONE,
-        ATTACK,
-        ITEM
-    }
-    private actionChoices action = actionChoices.NONE;
-    public static BattleUIController Instance;
+    public static BattleUIController Instance { get; private set; }
 
-    List<Button> attackOptions = new List<Button>();
-    [Header("Attacks")]
-    [SerializeField] private Button attackButton;
-    [SerializeField] private Transform attackButtonContainer;
+    public enum ActionChoice
+    {
+        None,
+        Attack,
+        Item
+    }
+
+    [Header("Main Action Menu")]
+    [SerializeField] private GameObject actionOptions;
+
+    [Header("Attack Menu")]
     [SerializeField] private GameObject attackOptionsMenu;
+    [SerializeField] private Transform attackButtonContainer;
+    [SerializeField] private Button attackButtonTemplate;
 
-    [Header("Targets")]
-    [SerializeField] private Button targetButton;
-    [SerializeField] private Transform targetButtonContainer;
+    [Header("Target Menu")]
     [SerializeField] private GameObject targetOptionsMenu;
-    [Header("Items")]
-    [SerializeField] private Transform itemButtonContainer;
+    [SerializeField] private Transform targetButtonContainer;
+    [SerializeField] private Button targetButtonTemplate;
+
+    [Header("Item Menu")]
     [SerializeField] private GameObject itemOptionsMenu;
-    [SerializeField] private Button itemButton;
-    EnemyBattle target = new EnemyBattle();
-    [Header("Back")]
-    [SerializeField] private Button backMenuButton;
+    [SerializeField] private Transform itemButtonContainer;
+    [SerializeField] private Button itemButtonTemplate;
 
-    Item chosenItem;
-    bool backPressed = false;
-    List<Button> itemOptions = new List<Button>();
+    [Header("Shared Back Button Template")]
+    [SerializeField] private Button backButtonTemplate;
 
+    private readonly List<Button> generatedAttackButtons = new List<Button>();
+    private readonly List<Button> generatedTargetButtons = new List<Button>();
+    private readonly List<Button> generatedItemButtons = new List<Button>();
+
+    private ActionChoice selectedMenuAction = ActionChoice.None;
     private Action chosenAttack;
-   public void attackButtonAction()
-    {
-        action = actionChoices.ATTACK;
-        //BattleController.attackLoop();
-    }
+    private Item chosenItem;
+    private EnemyBattle chosenTarget;
+    private bool backPressed;
 
-    public void itemButtonAction()
+    private void Awake()
     {
-        action = actionChoices.ITEM;
-    }
-
-    public actionChoices getAction()
-    {
-        return action;
-    }
-
-    public void instantiateBack()
-    {
-        backPressed = true;
-    }
-
-    public void selectAction (Action attack)
-    {
-        chosenAttack = attack;
-    }
-
-    public void generateAttacks(PlayerBattle player)
-    {
-        foreach (Action attack in player.getActionList().Values) {
-            Button attackActionButton = Instantiate(attackButton, attackButtonContainer);
-            TMP_Text text = attackActionButton.GetComponentInChildren<TMP_Text>();
-            text.text = attack.getActionName();
-            Debug.Log(text.text);
-            attackActionButton.onClick.AddListener(() => selectAction(attack));
-            attackOptions.Add(attackActionButton);
-        }
-        Button backToMenuButton = Instantiate(backMenuButton, attackButtonContainer);
-        backToMenuButton.onClick.AddListener(() => instantiateBack());
-        attackOptions.Add(backToMenuButton);
-    }
-
-    public void removeButtons(List<Button> buttonList)
-    {
-        foreach (Button button in buttonList)
+        if (Instance != null && Instance != this)
         {
-            DestroyImmediate(button.gameObject, true);
+            Destroy(gameObject);
+            return;
         }
-        buttonList.Clear();
+
+        Instance = this;
+
+        // Hide menus before BattleController.Start() can begin the first turn.
+        SetMenuActive(actionOptions, false);
+        SetMenuActive(attackOptionsMenu, false);
+        SetMenuActive(targetOptionsMenu, false);
+        SetMenuActive(itemOptionsMenu, false);
+
+        Debug.Log("BattleUIController ready and menus initialized.");
     }
-    public Action getAttack()
+
+    // -------------------------------------------------------------------------
+    // Main Action Menu
+    // -------------------------------------------------------------------------
+
+    public IEnumerator PlayerMenu()
+    {
+        if (actionOptions == null)
+        {
+            Debug.LogError(
+                "BattleUIController: Action Options is missing. Assign BattleBox."
+            );
+
+            yield break;
+        }
+
+        selectedMenuAction = ActionChoice.None;
+
+        SetMenuActive(actionOptions, true);
+
+        Debug.Log("BattleBox opened: " + actionOptions.activeInHierarchy);
+
+        yield return new WaitUntil(
+            () => selectedMenuAction != ActionChoice.None
+        );
+
+        SetMenuActive(actionOptions, false);
+    }
+
+    public void AttackButtonAction()
+    {
+        selectedMenuAction = ActionChoice.Attack;
+        Debug.Log("ATTACK selected.");
+    }
+
+    public void ItemButtonAction()
+    {
+        selectedMenuAction = ActionChoice.Item;
+        Debug.Log("ITEM selected.");
+    }
+
+    public ActionChoice GetAction()
+    {
+        return selectedMenuAction;
+    }
+
+    // -------------------------------------------------------------------------
+    // Attack Menu
+    // -------------------------------------------------------------------------
+
+    public IEnumerator PlayerAttacks(PlayerBattle player)
+    {
+        if (player == null)
+        {
+            Debug.LogWarning("Cannot open attack menu because PlayerBattle is null.");
+            yield break;
+        }
+
+        chosenAttack = null;
+        backPressed = false;
+
+        RemoveButtons(generatedAttackButtons);
+        GenerateAttacks(player);
+
+        if (generatedAttackButtons.Count == 0)
+        {
+            Debug.LogWarning(player.entityName + " has no available attack buttons.");
+            yield break;
+        }
+
+        SetMenuActive(attackOptionsMenu, true);
+
+        yield return new WaitUntil(
+            () => chosenAttack != null || backPressed
+        );
+
+        SetMenuActive(attackOptionsMenu, false);
+        RemoveButtons(generatedAttackButtons);
+    }
+
+    public Action GetAttack()
     {
         return chosenAttack;
     }
 
-    public IEnumerator playerAttacks(PlayerBattle player)
+    private void GenerateAttacks(PlayerBattle player)
     {
-        attackOptionsMenu.SetActive(true);
-        chosenAttack = null;
-        backPressed = false;
-        generateAttacks(player);
-        yield return new WaitUntil(() => chosenAttack != null || backPressed != false);
-        removeButtons(attackOptions);
-        attackOptionsMenu.SetActive(false);
+        if (attackOptionsMenu == null ||
+            attackButtonContainer == null ||
+            attackButtonTemplate == null)
+        {
+            Debug.LogError("Attack menu references are missing on BattleUIController.");
+            return;
+        }
+
+        foreach (Action attack in player.getActionList().Values)
+        {
+            if (attack == null)
+            {
+                continue;
+            }
+
+            Action capturedAttack = attack;
+
+            Button button = Instantiate(
+                attackButtonTemplate,
+                attackButtonContainer
+            );
+
+            button.gameObject.SetActive(true);
+            button.interactable = true;
+
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(() =>
+            {
+                chosenAttack = capturedAttack;
+                Debug.Log("Attack chosen: " + capturedAttack.getActionName());
+            });
+
+            TMP_Text label = button.GetComponentInChildren<TMP_Text>();
+
+            if (label != null)
+            {
+                label.text = capturedAttack.getActionName();
+            }
+
+            generatedAttackButtons.Add(button);
+        }
+
+        GenerateBackButton(attackButtonContainer, generatedAttackButtons);
     }
 
-    public Item getItem()
+    // -------------------------------------------------------------------------
+    // Target Menu
+    // -------------------------------------------------------------------------
+
+    public IEnumerator Targeting(List<EnemyBattle> enemies)
+    {
+        chosenTarget = null;
+        backPressed = false;
+
+        RemoveButtons(generatedTargetButtons);
+        GenerateTargets(enemies);
+
+        if (generatedTargetButtons.Count == 0)
+        {
+            Debug.LogWarning("No available target buttons were generated.");
+            yield break;
+        }
+
+        SetMenuActive(targetOptionsMenu, true);
+
+        yield return new WaitUntil(
+            () => chosenTarget != null || backPressed
+        );
+
+        SetMenuActive(targetOptionsMenu, false);
+        RemoveButtons(generatedTargetButtons);
+    }
+
+    public EnemyBattle ReturnTarget()
+    {
+        return chosenTarget;
+    }
+
+    private void GenerateTargets(List<EnemyBattle> enemies)
+    {
+        if (targetOptionsMenu == null ||
+            targetButtonContainer == null ||
+            targetButtonTemplate == null)
+        {
+            Debug.LogError("Target menu references are missing on BattleUIController.");
+            return;
+        }
+
+        if (enemies == null)
+        {
+            return;
+        }
+
+        foreach (EnemyBattle enemy in enemies)
+        {
+            if (enemy == null || enemy.isEntityDead())
+            {
+                continue;
+            }
+
+            EnemyBattle capturedEnemy = enemy;
+
+            Button button = Instantiate(
+                targetButtonTemplate,
+                targetButtonContainer
+            );
+
+            button.gameObject.SetActive(true);
+            button.interactable = true;
+
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(() =>
+            {
+                chosenTarget = capturedEnemy;
+                Debug.Log("Target chosen: " + capturedEnemy.entityName);
+            });
+
+            TMP_Text label = button.GetComponentInChildren<TMP_Text>();
+
+            if (label != null)
+            {
+                label.text = capturedEnemy.entityName;
+            }
+
+            generatedTargetButtons.Add(button);
+        }
+
+        GenerateBackButton(targetButtonContainer, generatedTargetButtons);
+    }
+
+    // -------------------------------------------------------------------------
+    // Item Menu
+    // -------------------------------------------------------------------------
+
+    public IEnumerator PlayerItems()
+    {
+        chosenItem = null;
+        backPressed = false;
+
+        if (itemOptionsMenu == null ||
+            itemButtonContainer == null ||
+            itemButtonTemplate == null)
+        {
+            Debug.LogWarning(
+                "Item menu is not configured. Returning to the action menu."
+            );
+
+            yield break;
+        }
+
+        RemoveButtons(generatedItemButtons);
+        GenerateItems();
+
+        if (generatedItemButtons.Count == 0)
+        {
+            Debug.Log("There are no battle items available.");
+            yield break;
+        }
+
+        SetMenuActive(itemOptionsMenu, true);
+
+        yield return new WaitUntil(
+            () => chosenItem != null || backPressed
+        );
+
+        SetMenuActive(itemOptionsMenu, false);
+        RemoveButtons(generatedItemButtons);
+    }
+
+    public Item GetItem()
     {
         return chosenItem;
     }
 
-    public void selectItem(Item item)
+    private void GenerateItems()
     {
-        chosenItem = item;
-    }
-
-    public void generateItems()
-    {
-        foreach (Item item in BattleController.Instance.getItems()) {
-            Button selectItemButton = Instantiate(itemButton, itemButtonContainer);
-            TMP_Text text = selectItemButton.GetComponentInChildren<TMP_Text>();
-            text.text = item.getName();
-            Debug.Log(text.text);
-            selectItemButton.onClick.AddListener(() => selectItem(item));
-            itemOptions.Add(selectItemButton);
+        if (BattleController.Instance == null)
+        {
+            Debug.LogWarning("BattleController is missing. Items cannot be generated.");
+            return;
         }
-        Button backToMenuButton = Instantiate(backMenuButton, itemButtonContainer);
-        backToMenuButton.onClick.AddListener(() => instantiateBack());
-        itemOptions.Add(backToMenuButton);
-    }
 
-    public IEnumerator playerItems()
-    {
-        itemOptionsMenu.SetActive(true);
-        generateItems();
-        chosenItem = null;
-        backPressed = false;
-        yield return new WaitUntil(() => chosenItem != null || backPressed != false);
-        removeButtons(itemOptions);
-        itemOptionsMenu.SetActive(false);
-    }
+        foreach (Item item in BattleController.Instance.getItems())
+        {
+            if (item == null)
+            {
+                continue;
+            }
 
-    public IEnumerator playerMenu()
-    {
-        action = actionChoices.NONE;
-        actionOptions.SetActive(true);
-        yield return new WaitUntil(() => action is not actionChoices.NONE);
-        actionOptions.SetActive(false);
-    }
+            Item capturedItem = item;
 
-    public EnemyBattle returnTarget()
-    {
-        return target;
-    }
+            Button button = Instantiate(
+                itemButtonTemplate,
+                itemButtonContainer
+            );
 
-    public void selectTarget(EnemyBattle enemy)
-    {
-        target = enemy;
-    }
+            button.gameObject.SetActive(true);
+            button.interactable = true;
 
-    public IEnumerator targeting(List<EnemyBattle> enemies)
-    {
-        List <Button> enemyTargets = new List<Button>();
-        target = null;
-        backPressed = false;
-        targetOptionsMenu.SetActive(true);
-        generateTargets(enemies, enemyTargets);
-        yield return new WaitUntil(() => target != null || backPressed != false);
-        removeButtons(enemyTargets);
-        targetOptionsMenu.SetActive(false);
-    }
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(() =>
+            {
+                chosenItem = capturedItem;
+                Debug.Log("Item chosen: " + capturedItem.getName());
+            });
 
-    public void generateTargets(List<EnemyBattle> enemies, List <Button> enemyTargets)
-    {
-        foreach (EnemyBattle enemy in enemies) {
-            Button enemyButton = Instantiate(targetButton, targetButtonContainer);
-            TMP_Text text = enemyButton.GetComponentInChildren<TMP_Text>();
-            text.text = enemy.entityName;
-            enemyButton.onClick.AddListener(() => selectTarget(enemy));
-            enemyTargets.Add(enemyButton);
+            TMP_Text label = button.GetComponentInChildren<TMP_Text>();
+
+            if (label != null)
+            {
+                int quantity = InventoryManager.Instance != null
+                    ? InventoryManager.Instance.GetItemQuantity(capturedItem.getName())
+                    : 1;
+
+                label.text = capturedItem.getName() + "  x" + quantity;
+            }
+
+            generatedItemButtons.Add(button);
         }
-        Button backToMenuButton = Instantiate(backMenuButton, targetButtonContainer);
-        backToMenuButton.onClick.AddListener(() => instantiateBack());
-        enemyTargets.Add(backToMenuButton);
-    }
-   
-   void Awake()
-    {
-        Instance = this;
-    }
-   
-   // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        actionOptions.SetActive(false);
-        attackOptionsMenu.SetActive(false);
-        targetOptionsMenu.SetActive(false);
-        itemOptionsMenu.SetActive(false);
 
+        GenerateBackButton(itemButtonContainer, generatedItemButtons);
     }
 
-    // Update is called once per frame
-    void Update()
+    // -------------------------------------------------------------------------
+    // Back Button / Cleanup
+    // -------------------------------------------------------------------------
+
+    public void BackButtonAction()
     {
-        
+        backPressed = true;
+        Debug.Log("Back selected.");
     }
+
+    private void GenerateBackButton(
+        Transform container,
+        List<Button> buttonList
+    )
+    {
+        if (backButtonTemplate == null || container == null)
+        {
+            return;
+        }
+
+        Button button = Instantiate(
+            backButtonTemplate,
+            container
+        );
+
+        button.gameObject.SetActive(true);
+        button.interactable = true;
+
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(BackButtonAction);
+
+        buttonList.Add(button);
+    }
+
+    private void RemoveButtons(List<Button> buttons)
+    {
+        foreach (Button button in buttons)
+        {
+            if (button != null)
+            {
+                Destroy(button.gameObject);
+            }
+        }
+
+        buttons.Clear();
+    }
+
+    private void SetMenuActive(GameObject menu, bool active)
+    {
+        if (menu != null)
+        {
+            menu.SetActive(active);
+        }
+    }
+
+    // Compatibility with existing Inspector button events and older code.
+    public void attackButtonAction() => AttackButtonAction();
+    public void itemButtonAction() => ItemButtonAction();
+    public IEnumerator playerMenu() => PlayerMenu();
+    public IEnumerator playerAttacks(PlayerBattle player) => PlayerAttacks(player);
+    public IEnumerator targeting(List<EnemyBattle> enemies) => Targeting(enemies);
+    public IEnumerator playerItems() => PlayerItems();
+    public ActionChoice getAction() => GetAction();
+    public Action getAttack() => GetAttack();
+    public EnemyBattle returnTarget() => ReturnTarget();
+    public Item getItem() => GetItem();
 }

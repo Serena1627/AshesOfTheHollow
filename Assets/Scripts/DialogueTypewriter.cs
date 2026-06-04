@@ -1,9 +1,9 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.InputSystem;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class DialogueTypewriter : MonoBehaviour
 {
@@ -11,7 +11,10 @@ public class DialogueTypewriter : MonoBehaviour
     public class DialogueLine
     {
         public string speakerName;
-        [TextArea(2, 4)] public string dialogueText;
+
+        [TextArea(2, 4)]
+        public string dialogueText;
+
         public Sprite portrait;
     }
 
@@ -32,55 +35,84 @@ public class DialogueTypewriter : MonoBehaviour
     [Header("Events")]
     public UnityEvent onDialogueFinished;
 
-    private int currentLineIndex = 0;
-    private bool isTyping = false;
-    private bool dialogueActive = false;
+    private int currentLineIndex;
+    private bool isTyping;
+    private bool dialogueActive;
     private Coroutine typingCoroutine;
+
+    // Other scripts use this to wait until dialogue is finished.
+    public bool IsDialogueActive => dialogueActive;
 
     private void Start()
     {
         if (playOnStart)
+        {
             StartDialogue();
+        }
         else if (dialogueBox != null)
+        {
             dialogueBox.SetActive(false);
+        }
     }
 
     private void Update()
     {
-        if (!dialogueActive)
+        if (!dialogueActive || Keyboard.current == null)
+        {
             return;
-
-        if (Keyboard.current == null)
-            return;
+        }
 
         if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             if (isTyping)
+            {
                 RevealFullLine();
+            }
             else
+            {
                 ShowNextLine();
+            }
         }
     }
 
     public void StartDialogue()
     {
         if (lines == null || lines.Length == 0)
+        {
+            Debug.LogWarning("DialogueTypewriter has no dialogue lines assigned.");
             return;
+        }
+
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+            typingCoroutine = null;
+        }
 
         dialogueActive = true;
+        isTyping = false;
         currentLineIndex = 0;
 
         if (dialogueBox != null)
+        {
             dialogueBox.SetActive(true);
+        }
 
         ShowLine(lines[currentLineIndex]);
     }
 
     private void ShowLine(DialogueLine line)
     {
-        nameText.text = line.speakerName;
-        dialogueText.text = line.dialogueText;
-        dialogueText.maxVisibleCharacters = 0;
+        if (nameText != null)
+        {
+            nameText.text = line.speakerName;
+        }
+
+        if (dialogueText != null)
+        {
+            dialogueText.text = line.dialogueText;
+            dialogueText.maxVisibleCharacters = 0;
+        }
 
         if (portraitImage != null)
         {
@@ -89,23 +121,34 @@ public class DialogueTypewriter : MonoBehaviour
         }
 
         if (continueArrow != null)
+        {
             continueArrow.SetActive(false);
+        }
 
         if (typingCoroutine != null)
+        {
             StopCoroutine(typingCoroutine);
+        }
 
         typingCoroutine = StartCoroutine(TypeLine());
     }
 
     private IEnumerator TypeLine()
     {
+        if (dialogueText == null)
+        {
+            isTyping = false;
+            yield break;
+        }
+
         isTyping = true;
 
         dialogueText.ForceMeshUpdate();
         int totalCharacters = dialogueText.textInfo.characterCount;
         dialogueText.maxVisibleCharacters = 0;
 
-        float delay = 1f / lettersPerSecond;
+        float safeLettersPerSecond = Mathf.Max(1f, lettersPerSecond);
+        float delay = 1f / safeLettersPerSecond;
 
         for (int i = 0; i <= totalCharacters; i++)
         {
@@ -113,24 +156,35 @@ public class DialogueTypewriter : MonoBehaviour
             yield return new WaitForSeconds(delay);
         }
 
+        typingCoroutine = null;
         isTyping = false;
 
         if (continueArrow != null)
+        {
             continueArrow.SetActive(true);
+        }
     }
 
     private void RevealFullLine()
     {
         if (typingCoroutine != null)
+        {
             StopCoroutine(typingCoroutine);
+            typingCoroutine = null;
+        }
 
-        dialogueText.ForceMeshUpdate();
-        dialogueText.maxVisibleCharacters = dialogueText.textInfo.characterCount;
+        if (dialogueText != null)
+        {
+            dialogueText.ForceMeshUpdate();
+            dialogueText.maxVisibleCharacters = dialogueText.textInfo.characterCount;
+        }
 
         isTyping = false;
 
         if (continueArrow != null)
+        {
             continueArrow.SetActive(true);
+        }
     }
 
     private void ShowNextLine()
@@ -148,10 +202,24 @@ public class DialogueTypewriter : MonoBehaviour
 
     private void EndDialogue()
     {
+        if (typingCoroutine != null)
+        {
+            StopCoroutine(typingCoroutine);
+            typingCoroutine = null;
+        }
+
         dialogueActive = false;
+        isTyping = false;
 
         if (dialogueBox != null)
+        {
             dialogueBox.SetActive(false);
+        }
+
+        if (continueArrow != null)
+        {
+            continueArrow.SetActive(false);
+        }
 
         onDialogueFinished?.Invoke();
     }

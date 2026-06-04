@@ -1,14 +1,12 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using System.Linq;
-using UnityEditor;
-
+using UnityEngine;
 
 public class EnemyBattle : BattleEntity
 {
-    Dictionary<string, Action> enemyActions = new Dictionary <string, Action>();
+    private readonly Dictionary<string, Action> enemyActions =
+        new Dictionary<string, Action>();
 
     public enum aiTypes
     {
@@ -16,69 +14,128 @@ public class EnemyBattle : BattleEntity
         BOSS
     }
 
-    [SerializeField] aiTypes AI;
+    [Header("AI")]
+    [SerializeField] private aiTypes AI = aiTypes.RAND;
 
     [Header("Action #1")]
-    [SerializeField] int action1Damage;
-    [SerializeField] string action1Name;
-    [SerializeField] Action.actionTypes action1Type;
-    [SerializeField] Action.targetingTypes action1TargetingType;
-
+    [SerializeField] private int action1Damage;
+    [SerializeField] private string action1Name;
+    [SerializeField] private Action.actionTypes action1Type;
+    [SerializeField] private Action.targetingTypes action1TargetingType;
 
     [Header("Action #2")]
-    [SerializeField] int action2Damage;
-    [SerializeField] string action2Name;
-    [SerializeField] Action.actionTypes action2Type;
-    [SerializeField] Action.targetingTypes action2TargetingType;
+    [SerializeField] private int action2Damage;
+    [SerializeField] private string action2Name;
+    [SerializeField] private Action.actionTypes action2Type;
+    [SerializeField] private Action.targetingTypes action2TargetingType;
 
     [Header("Action #3")]
-    [SerializeField] int action3Damage;
-    [SerializeField] string action3Name;
-    [SerializeField] Action.actionTypes action3Type;
-    [SerializeField] Action.targetingTypes action3TargetingType;
-
+    [SerializeField] private int action3Damage;
+    [SerializeField] private string action3Name;
+    [SerializeField] private Action.actionTypes action3Type;
+    [SerializeField] private Action.targetingTypes action3TargetingType;
 
     [Header("Action #4")]
-    [SerializeField] int action4Damage;
-    [SerializeField] string action4Name;
-    [SerializeField] Action.actionTypes action4Type;
-    [SerializeField] Action.targetingTypes action4TargetingType;
+    [SerializeField] private int action4Damage;
+    [SerializeField] private string action4Name;
+    [SerializeField] private Action.actionTypes action4Type;
+    [SerializeField] private Action.targetingTypes action4TargetingType;
 
-    BattleEntity target;
+    private BattleEntity target;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        addActions();
+    }
 
     public override void addActions()
     {
-        string action1Label = "Action1";
-        string action2Label = "Action2";
-        string action3Label = "Action3";
-        string action4Label = "Action4";
+        enemyActions.Clear();
 
-        Action action1 = new Action();
-        action1.Init(action1Damage, action1Name, action1TargetingType.ToString(), action1Type.ToString());
-        enemyActions.Add(action1Label, action1);
+        AddActionIfAssigned(
+            "Action1",
+            action1Damage,
+            action1Name,
+            action1TargetingType,
+            action1Type
+        );
 
-        Action action2 = new Action();
-        action2.Init(action2Damage, action2Name, action2TargetingType.ToString(), action2Type.ToString());
-        enemyActions.Add(action2Label, action2);
+        AddActionIfAssigned(
+            "Action2",
+            action2Damage,
+            action2Name,
+            action2TargetingType,
+            action2Type
+        );
 
-        Action action3 = new Action();
-        action3.Init(action3Damage, action3Name, action3TargetingType.ToString(), action3Type.ToString());
-        enemyActions.Add(action3Label, action3);
+        AddActionIfAssigned(
+            "Action3",
+            action3Damage,
+            action3Name,
+            action3TargetingType,
+            action3Type
+        );
 
-        Action action4 = new Action();
-        action4.Init(action4Damage, action4Name, action4TargetingType.ToString(), action4Type.ToString());
-        enemyActions.Add(action4Label, action4);
+        AddActionIfAssigned(
+            "Action4",
+            action4Damage,
+            action4Name,
+            action4TargetingType,
+            action4Type
+        );
+
+        Debug.Log(
+            entityName +
+            " initialized " +
+            enemyActions.Count +
+            " action(s)."
+        );
     }
 
-    public override List <BattleEntity> getAllTargets()
+    private void AddActionIfAssigned(
+        string label,
+        int damage,
+        string actionName,
+        Action.targetingTypes targetingType,
+        Action.actionTypes actionType
+    )
     {
-        List <PlayerBattle> enemyTargets = BattleController.Instance.getPlayers();
-        List <BattleEntity> targets = new List<BattleEntity>();
-        foreach (PlayerBattle enemy in enemyTargets)
+        if (string.IsNullOrWhiteSpace(actionName))
         {
-            targets.Add(enemy);
+            return;
         }
-        return targets;
+
+        Action action = new Action();
+
+        action.Init(
+            damage,
+            actionName,
+            targetingType.ToString(),
+            actionType.ToString()
+        );
+
+        enemyActions.Add(label, action);
+    }
+
+    public override List<BattleEntity> getAllTargets()
+    {
+        List<BattleEntity> validTargets = new List<BattleEntity>();
+
+        if (BattleController.Instance == null)
+        {
+            return validTargets;
+        }
+
+        foreach (PlayerBattle player in BattleController.Instance.getPlayers())
+        {
+            if (player != null && !player.isEntityDead())
+            {
+                validTargets.Add(player);
+            }
+        }
+
+        return validTargets;
     }
 
     public override BattleEntity getTarget()
@@ -89,46 +146,60 @@ public class EnemyBattle : BattleEntity
     public override IEnumerator pickTarget()
     {
         target = null;
-        List <PlayerBattle> players = BattleController.Instance.getPlayers();
-        if (AI == aiTypes.RAND)
+
+        if (BattleController.Instance == null)
         {
-            int playerTargetIndex = Random.Range(0,players.Count());
-            target = players[playerTargetIndex];
-        } else if (AI == aiTypes.BOSS)
-        {
-            //BOSS code here
+            yield break;
         }
+
+        List<PlayerBattle> availablePlayers = BattleController.Instance
+            .getPlayers()
+            .Where(player => player != null && !player.isEntityDead())
+            .ToList();
+
+        if (availablePlayers.Count == 0)
+        {
+            yield break;
+        }
+
+        target = availablePlayers[
+            Random.Range(0, availablePlayers.Count)
+        ];
+
         yield return null;
     }
 
-    Action randomAttack()
-    {
-        int actionIndex = Random.Range(0,4);
-        return enemyActions.ElementAt(actionIndex).Value;
-    }
     public Action chosenAttack()
     {
-        Action attack = new Action();
-        if (AI == aiTypes.RAND)
+        if (AI != aiTypes.RAND)
         {
-            attack = randomAttack();
+            Debug.LogWarning(
+                "Boss AI is not implemented for " + entityName + "."
+            );
+
+            return null;
         }
-        else if (AI == aiTypes.BOSS)
+
+        if (enemyActions.Count == 0)
         {
-            attack = null;
+            Debug.LogError(entityName + " has no configured attacks.");
+            return null;
         }
-        return attack;
+
+        return enemyActions.ElementAt(
+            Random.Range(0, enemyActions.Count)
+        ).Value;
     }
-    
+
     public override IEnumerator Turn()
     {
-        yield return BattleController.Instance.EnemyTurn(this);
-    }
+        if (BattleController.Instance == null)
+        {
+            yield break;
+        }
 
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        yield return StartCoroutine(
+            BattleController.Instance.EnemyTurn(this)
+        );
     }
 }

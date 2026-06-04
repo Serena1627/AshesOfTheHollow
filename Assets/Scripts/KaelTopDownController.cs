@@ -56,6 +56,7 @@ public class KaelTopDownController : MonoBehaviour
 
     [Header("Animation")]
     [SerializeField] private float animationFPS = 8f;
+    [SerializeField] private bool faceBackOnSceneStart = true;
 
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
@@ -80,6 +81,14 @@ public class KaelTopDownController : MonoBehaviour
             SwitchToNoGearSprites();
     }
 
+    private void Start()
+    {
+        if (faceBackOnSceneStart)
+        {
+            FaceBack();
+        }
+    }
+
     private void Update()
     {
         ReadInput();
@@ -90,6 +99,20 @@ public class KaelTopDownController : MonoBehaviour
     private void FixedUpdate()
     {
         MoveWithBlockedTileCheck();
+    }
+
+    public void FaceBack()
+    {
+        input = Vector2.zero;
+        lastDirection = Vector2.up;
+
+        frameIndex = 0;
+        animationTimer = 0f;
+
+        if (spriteRenderer != null && backIdle != null)
+        {
+            spriteRenderer.sprite = backIdle;
+        }
     }
 
     private void ReadInput()
@@ -308,22 +331,16 @@ public class KaelTopDownController : MonoBehaviour
         ApplySpriteSet(armoredSprites);
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    public Vector3 GetFollowerSpawnPosition(float distanceBehindPlayer)
     {
-        if (other.CompareTag("Enemy"))
-        {
-            Debug.Log("ENTERED!");
+        Vector2 behindDirection = -lastDirection.normalized;
 
-            EnemyOverworld enemy = other.GetComponent<EnemyOverworld>();
+        Vector3 spawnPosition = transform.position + new Vector3(
+            behindDirection.x * distanceBehindPlayer,
+            behindDirection.y * distanceBehindPlayer,
+            0f
+        );
 
-            if (enemy != null)
-            {
-                enemy.startFight();
-            }
-            else
-            {
-                Debug.LogWarning("Enemy tag found, but EnemyOverworld script is missing.");
-            }
-        }
+        return spawnPosition;
     }
 }

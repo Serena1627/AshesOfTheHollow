@@ -1,33 +1,52 @@
-using System;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using Unity.VisualScripting;
 
 public class BattleEntity : MonoBehaviour
 {
-
+    [Header("Stats")]
     [SerializeField] public int health;
-    int maxHealth;
     [SerializeField] public int speed;
     [SerializeField] public string entityName;
     [SerializeField] public int physDef;
     [SerializeField] public int spDef;
-    [SerializeField] public BattleController battleController;
-    public Boolean isDead = false;
-    //public List <Action> actions = new List<Action>();
 
-    public Boolean isEntityDead()
+    [HideInInspector] public bool isDead;
+
+    private int maxHealth;
+    public int CurrentHealth => health;
+    public int MaxHealth => maxHealth;
+
+    public void RestoreHealthFromPartyState(int savedHealth, int savedMaxHealth)
     {
-        return isDead;
+        maxHealth = Mathf.Max(1, savedMaxHealth);
+        health = Mathf.Clamp(savedHealth, 0, maxHealth);
+        isDead = health <= 0;
+
+        SpriteRenderer renderer = GetComponent<SpriteRenderer>();
+
+        if (renderer != null)
+        {
+            renderer.enabled = !isDead;
+        }
+
+        Debug.Log(
+            entityName +
+            " restored from PartyManager. HP: " +
+            health +
+            " / " +
+            maxHealth
+        );
     }
 
-    Boolean isDefenderDead()
+    protected virtual void Awake()
     {
-        if (health <= 0)
-        {
-            isDead = true;
-        }
+        maxHealth = health;
+        isDead = false;
+    }
+
+    public bool isEntityDead()
+    {
         return isDead;
     }
 
@@ -38,91 +57,115 @@ public class BattleEntity : MonoBehaviour
 
     public virtual BattleEntity getTarget()
     {
-        return new BattleEntity();
+        return null;
     }
 
-    public virtual List <BattleEntity> getAllTargets()
+    public virtual List<BattleEntity> getAllTargets()
     {
-        List <BattleEntity> targets = new List<BattleEntity>();
-        return targets;
+        return new List<BattleEntity>();
+    }
+
+    public virtual void addActions()
+    {
+    }
+
+    public virtual IEnumerator Turn()
+    {
+        yield return null;
     }
 
     public IEnumerator Attack(Action action)
     {
-        List <BattleEntity> targets = new List<BattleEntity>();
-        if (action.getTargeting() == "SINGLE")
+        if (action == null)
+        {
+            Debug.LogWarning(
+                entityName + " has no valid action and skips the turn."
+            );
+
+            yield break;
+        }
+
+        List<BattleEntity> targets = new List<BattleEntity>();
+
+        if (action.getTargeting() == Action.targetingTypes.SINGLE.ToString())
         {
             yield return StartCoroutine(pickTarget());
-            BattleEntity target = getTarget();
-            if (target == null)
+
+            BattleEntity selectedTarget = getTarget();
+
+            if (selectedTarget == null)
             {
+                Debug.Log(
+                    entityName +
+                    "'s attack was cancelled because no target was chosen."
+                );
+
                 yield break;
             }
-            targets.Add(target);
+
+            targets.Add(selectedTarget);
         }
-        else if (action.getTargeting() == "SPREAD")
+        else if (action.getTargeting() ==
+                 Action.targetingTypes.SPREAD.ToString())
         {
             targets = getAllTargets();
         }
-        Debug.Log($"{entityName} used {action.getActionName()}!");
+
+        if (targets.Count == 0)
+        {
+            Debug.Log(entityName + "'s attack had no valid targets.");
+            yield break;
+        }
+
+        Debug.Log(entityName + " used " + action.getActionName() + "!");
+
         action.doAction(targets);
     }
 
     public void takeDamage(int damage, string attackType)
     {
-        int defenceNumberUsed = 0;
-        if (attackType == "PHYS")
-        {
-            defenceNumberUsed = physDef;
-        }
-        else if (attackType == "MAG")
-        {
-            defenceNumberUsed = spDef;
-        }
-        health -= (damage - defenceNumberUsed);
-        Debug.Log($"{entityName} took {damage - defenceNumberUsed} damage!");
-        Debug.Log($"{entityName} Health: {health}");
-        if (isDefenderDead()) {
-            Debug.Log($"{entityName} died!");
-        }
+        int defence = attackType == Action.actionTypes.PHYS.ToString()
+            ? physDef
+            : spDef;
 
+        int finalDamage = Mathf.Max(0, damage - defence);
+
+        health = Mathf.Max(0, health - finalDamage);
+
+        Debug.Log(
+            entityName +
+            " took " +
+            finalDamage +
+            " damage. Health: " +
+            health
+        );
+
+        if (health <= 0 && !isDead)
+        {
+            isDead = true;
+            Debug.Log(entityName + " died!");
+
+            SpriteRenderer renderer = GetComponent<SpriteRenderer>();
+
+            if (renderer != null)
+            {
+                renderer.enabled = false;
+            }
+        }
     }
 
     public void heal(int healAmount)
     {
-        if (health + healAmount > maxHealth)
+        if (isDead)
         {
-            health = maxHealth;
+            return;
         }
-        else
-        {
-            health += healAmount;
-        }
-        
-    }
 
-    public virtual void addActions()
-    {
- 
-    }
+        health = Mathf.Min(
+            maxHealth,
+            health + Mathf.Max(0, healAmount)
+        );
 
-    //public virtual void turn()
-    public virtual IEnumerator Turn()
-    {
-        yield return null;
-    }
-    
-
-    void Start()
-    {
-        addActions();
-        maxHealth = health;
-        //isDead = false;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Debug.Log(entityName + " Health: " + health);
     }
 }

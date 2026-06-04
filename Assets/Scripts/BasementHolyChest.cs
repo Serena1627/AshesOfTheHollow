@@ -18,31 +18,41 @@ public class BasementHolyChest : MonoBehaviour
     [Header("White Flash")]
     [SerializeField] private CanvasGroup whiteFlashGroup;
     [SerializeField] private float flashInDuration = 0.15f;
+    [SerializeField] private float flashHoldDuration = 0.08f;
     [SerializeField] private float flashOutDuration = 0.45f;
 
     [Header("Player Upgrade")]
     [SerializeField] private KaelTopDownController playerController;
 
-    private bool playerInRange = false;
-    private bool opened = false;
-    private bool sequenceRunning = false;
+    [Header("Dialogue After Chest")]
+    [SerializeField] private BasementDialogueSequence basementDialogueSequence;
+
+    private bool playerInRange;
+    public bool opened;
+    private bool sequenceRunning;
 
     private void Start()
     {
         if (risingSwordRenderer != null)
+        {
             risingSwordRenderer.enabled = false;
+        }
 
         if (whiteFlashGroup != null)
+        {
+            whiteFlashGroup.gameObject.SetActive(true);
             whiteFlashGroup.alpha = 0f;
+            whiteFlashGroup.interactable = false;
+            whiteFlashGroup.blocksRaycasts = false;
+        }
     }
 
     private void Update()
     {
-        if (opened || sequenceRunning)
+        if (opened || sequenceRunning || !playerInRange)
+        {
             return;
-
-        if (!playerInRange)
-            return;
+        }
 
         if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
         {
@@ -55,17 +65,26 @@ public class BasementHolyChest : MonoBehaviour
         sequenceRunning = true;
         opened = true;
 
-        yield return StartCoroutine(RiseSword());
+        Debug.Log("Chest sequence started.");
 
+        yield return StartCoroutine(RiseSword());
         yield return StartCoroutine(WhiteFlash());
 
-        SwapBackgroundToOpenChest();
-        GiveKaelArmorAndSword();
-
         if (risingSwordRenderer != null)
+        {
             risingSwordRenderer.enabled = false;
+        }
 
         sequenceRunning = false;
+
+        if (basementDialogueSequence != null)
+        {
+            basementDialogueSequence.PlayAfterChestDialogue();
+        }
+        else
+        {
+            Debug.LogWarning("BasementDialogueSequence is not assigned on BasementHolyChest.");
+        }
 
         Debug.Log("Kael received the armor and holy sword.");
     }
@@ -73,22 +92,27 @@ public class BasementHolyChest : MonoBehaviour
     private IEnumerator RiseSword()
     {
         if (risingSwordRenderer == null || risingSwordTransform == null)
+        {
+            Debug.LogWarning("Rising sword renderer or transform is not assigned.");
             yield break;
+        }
 
         risingSwordRenderer.enabled = true;
 
         Vector3 startPosition = risingSwordTransform.position;
-        Vector3 endPosition = startPosition + new Vector3(0f, swordRiseDistance, 0f);
+        Vector3 endPosition = startPosition + Vector3.up * swordRiseDistance;
 
         float timer = 0f;
 
         while (timer < swordRiseDuration)
         {
             timer += Time.deltaTime;
+
             float t = Mathf.Clamp01(timer / swordRiseDuration);
             float easedT = Mathf.SmoothStep(0f, 1f, t);
 
-            risingSwordTransform.position = Vector3.Lerp(startPosition, endPosition, easedT);
+            risingSwordTransform.position =
+                Vector3.Lerp(startPosition, endPosition, easedT);
 
             yield return null;
         }
@@ -101,7 +125,14 @@ public class BasementHolyChest : MonoBehaviour
     private IEnumerator WhiteFlash()
     {
         if (whiteFlashGroup == null)
+        {
+            Debug.LogWarning("WhiteFlash CanvasGroup is not assigned. Applying upgrade without flash.");
+            SwapBackgroundAndUpgradePlayer();
             yield break;
+        }
+
+        whiteFlashGroup.gameObject.SetActive(true);
+        whiteFlashGroup.alpha = 0f;
 
         float timer = 0f;
 
@@ -114,34 +145,46 @@ public class BasementHolyChest : MonoBehaviour
 
         whiteFlashGroup.alpha = 1f;
 
-        // Swap while the screen is fully white.
-        SwapBackgroundToOpenChest();
-        GiveKaelArmorAndSword();
+        // Change visuals while the screen is completely white.
+        SwapBackgroundAndUpgradePlayer();
 
-        yield return new WaitForSeconds(0.08f);
+        yield return new WaitForSeconds(flashHoldDuration);
 
         timer = 0f;
 
         while (timer < flashOutDuration)
         {
             timer += Time.deltaTime;
-            whiteFlashGroup.alpha = 1f - Mathf.Clamp01(timer / flashOutDuration);
+            whiteFlashGroup.alpha =
+                1f - Mathf.Clamp01(timer / flashOutDuration);
+
             yield return null;
         }
 
         whiteFlashGroup.alpha = 0f;
     }
 
-    private void SwapBackgroundToOpenChest()
+    private void SwapBackgroundAndUpgradePlayer()
     {
         if (basementBackgroundRenderer != null && openChestBackground != null)
+        {
             basementBackgroundRenderer.sprite = openChestBackground;
-    }
+            Debug.Log("Basement background changed to opened chest.");
+        }
+        else
+        {
+            Debug.LogWarning("Basement background renderer or opened chest sprite is not assigned.");
+        }
 
-    private void GiveKaelArmorAndSword()
-    {
         if (playerController != null)
+        {
             playerController.SwitchToArmoredSprites();
+            Debug.Log("Kael switched to armored sprites.");
+        }
+        else
+        {
+            Debug.LogWarning("PlayerController is not assigned on BasementHolyChest.");
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -156,6 +199,8 @@ public class BasementHolyChest : MonoBehaviour
     private void OnTriggerExit2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
+        {
             playerInRange = false;
+        }
     }
 }

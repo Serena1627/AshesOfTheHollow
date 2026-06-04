@@ -1,109 +1,86 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using JetBrains.Annotations;
-using NUnit.Framework;
-using TMPro;
-using Unity.Collections;
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEditor.PackageManager;
-using UnityEditor.UI;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class BattleController : MonoBehaviour
 {
-    public static BattleController Instance;
-    public List <PlayerBattle> players = new List<PlayerBattle>();
-    public List <EnemyBattle> enemies = new List<EnemyBattle>();
-    public List <BattleEntity> battleEntities = new List <BattleEntity>();
-    public List <BattleEntity> turnOrder = new List <BattleEntity>();
+    public static BattleController Instance { get; private set; }
 
-    private bool actionDecided = false;
-    private bool attackDecided = false;
-    private bool itemDecided = false;
-    private BattleUIController.actionChoices actionChoice = BattleUIController.actionChoices.NONE;
-    private string attackChoice = "";
-    private Item itemChoice = null;
+    [Header("Runtime Participants")]
+    [SerializeField] private List<PlayerBattle> players = new List<PlayerBattle>();
+    [SerializeField] private List<EnemyBattle> enemies = new List<EnemyBattle>();
+    [SerializeField] private List<BattleEntity> battleEntities = new List<BattleEntity>();
+    [SerializeField] private List<BattleEntity> turnOrder = new List<BattleEntity>();
 
-    public bool waitingForChoice = false;
+    [Header("Runtime Items")]
+    [SerializeField] private List<Item> items = new List<Item>();
 
-    public List <PlayerBattle> getPlayers()
-    {
-        return players;
-    }
-
-    public List <EnemyBattle> getEnemies()
-    {
-        return enemies;
-    }
-    List <BattleEntity> targets = new List<BattleEntity>();
-
-    public List<Item> items = new List<Item>();
-
-
+    private bool battleEnded;
 
     private void Awake()
     {
         Instance = this;
-        GameObject[] playerList = GameObject.FindGameObjectsWithTag("Player");
-        GameObject[] enemyList = GameObject.FindGameObjectsWithTag("Enemy");
-        foreach (GameObject obj in playerList)
+    }
+
+    private void RestorePartyHealthFromManager()
+    {
+        if (PartyManager.Instance == null)
         {
-            if (obj != null) {
-                PlayerBattle player = obj.GetComponent<PlayerBattle>();
-                players.Add(player);
-                battleEntities.Add(player);
-                //Debug.Log($"Added {player.entityName}");
-            }
+            Debug.LogWarning(
+                "PartyManager was not found. Battle party will use prefab health values."
+            );
+
+            return;
         }
-        foreach (GameObject obj in enemyList)
+
+        foreach (PlayerBattle player in players)
         {
-            if (obj != null) {
-                EnemyBattle enemy = obj.GetComponent<EnemyBattle>();
-                enemies.Add(enemy);
-                battleEntities.Add(enemy);
-                //Debug.Log($"Added {enemy.entityName}");
+            if (player != null)
+            {
+                PartyManager.Instance.ApplyStoredHealth(player);
             }
         }
     }
 
-    
-    void findTurnOrder()
+    private void Start()
     {
-        turnOrder = battleEntities.OrderByDescending(entity => entity.speed).ToList();
+        FindBattleParticipants();
+        RestorePartyHealthFromManager();
+
+        if (players.Count == 0 || enemies.Count == 0)
+        {
+            Debug.LogError(
+                "Battle cannot start: spawned players or enemies were not registered."
+            );
+
+            return;
+        }
+
+        if (BattleUIController.Instance == null)
+        {
+            Debug.LogError(
+                "Battle cannot start: BattleUIController.Instance is null."
+            );
+
+            return;
+        }
+
+        BuildTurnOrder();
+        LoadItemsFromInventory();
+
+        StartCoroutine(BattleLoop());
     }
-    Boolean arePlayersWiped()
+
+    public List<PlayerBattle> getPlayers()
     {
-        int size = players.Count();
-        int playersDead = 0;
-        List <PlayerBattle> playersToRemove = new List<PlayerBattle>();
-        //Debug.Log(size);
-        foreach(PlayerBattle player in players)
-        {
-            //Debug.Log(player.entityName);
-            if (player.isEntityDead())
-            {
-                playersDead++;
-                //turnOrder.Remove(player);
-                //players.Remove(player);
-                playersToRemove.Add(player);
-            }
-        }
-        foreach (PlayerBattle player in playersToRemove)
-        {
-            players.Remove(player);
-        }
-        if (playersDead == size) {
-            return true;
-        }
-        else
-        {
-            return false;
-        } 
+        return players;
+    }
+
+    public List<EnemyBattle> getEnemies()
+    {
+        return enemies;
     }
 
     public List<Item> getItems()
@@ -111,218 +88,370 @@ public class BattleController : MonoBehaviour
         return items;
     }
 
-    void setItems()
+    private void FindBattleParticipants()
     {
-        HealItem item = new HealItem();
-        item.Init("TESTPOTION", Item.itemTypes.SINGLE.ToString(), 2);
-        items.Add(item);
-    }
+        players.Clear();
+        enemies.Clear();
+        battleEntities.Clear();
+        turnOrder.Clear();
 
-    Boolean areEnemiesWiped()
-    {
-        int size = enemies.Count();
-        int enemiesDead = 0;
-        List <EnemyBattle> enemiesToRemove = new List<EnemyBattle>();
-        foreach(EnemyBattle enemy in enemies)
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Player"))
         {
-            if (enemy.isEntityDead())
+            PlayerBattle player = obj.GetComponent<PlayerBattle>();
+
+            if (player == null)
             {
-                enemiesDead++;
-                //turnOrder.Remove(enemy);
-                //enemies.Remove(enemy);
-                enemiesToRemove.Add(enemy);
+                Debug.LogWarning(
+                    obj.name + " is tagged Player but does not have PlayerBattle."
+                );
+
+                continue;
             }
-        }
-        foreach (EnemyBattle enemy in enemiesToRemove)
-        {
-            enemies.Remove(enemy);
-        }
-        if (enemiesDead == size) {
-            return true;
-        }
-        else
-        {
-            return false;
-        } 
-    }
 
+            players.Add(player);
+            battleEntities.Add(player);
 
-    void endBattle()
-    {
-        if (players.Count() == 0)
-        {
-            Debug.Log("YOU LOSE");
-        } 
-        else if (enemies.Count() == 0)
-        {
-            Debug.Log("YOU WIN!");
-            StartCoroutine(LevelLoader.unloadBattle());
+            Debug.Log("Registered player: " + player.entityName);
         }
-    }
 
-    /*
-    IEnumerator PlayerAttack(PlayerBattle player, Action action)
-    {
-        targets.Clear();
-        if (action.getTargeting() == "SINGLE")
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Enemy"))
         {
-            //waitingForChoice = true;
-            yield return StartCoroutine(BattleUIController.Instance.targeting(enemies));
-            EnemyBattle target = BattleUIController.Instance.returnTarget();
-            targets.Add(target);
-        }
-        else if (action.getTargeting() == "SPREAD")
-        {
-            targets = player.getAllTargets();
-        }
-        action.doAction(targets);
-    }
-    */
+            EnemyBattle enemy = obj.GetComponent<EnemyBattle>();
 
-    public IEnumerator AttackLoop(PlayerBattle player)
-    //public void AttackLoop(PlayerBattle player)
-    {
-        Debug.Log ("PICK ATTACK");
-        yield return StartCoroutine(BattleUIController.Instance.playerAttacks(player));
-        Action action = BattleUIController.Instance.getAttack();
-        if (action == null)
-        {
-            yield return StartCoroutine(MenuLoop(player));
-        }
-        else
-        {
-            yield return StartCoroutine(player.Attack(action));
-            if (player.getTarget() == null)
+            if (enemy == null)
             {
-                yield return StartCoroutine(AttackLoop(player));
+                Debug.LogWarning(
+                    obj.name + " is tagged Enemy but does not have EnemyBattle."
+                );
+
+                continue;
             }
+
+            enemies.Add(enemy);
+            battleEntities.Add(enemy);
+
+            Debug.Log("Registered enemy: " + enemy.entityName);
         }
     }
 
-    public List<BattleEntity> getItemTargets(Item item, PlayerBattle player)
+    private void BuildTurnOrder()
     {
-        List<BattleEntity> itemTargets = new List<BattleEntity>();
-        if (item.getType() == Item.itemTypes.SINGLE.ToString())
-        {
-            itemTargets.Add(player);
-        } else if (item.getType() == Item.itemTypes.PARTY.ToString())
-        {
-            foreach (PlayerBattle entity in players)
-            {
-                itemTargets.Add(entity);
-            }
-        }
-        return itemTargets;
-    }
+        turnOrder = battleEntities
+            .OrderByDescending(entity => entity.speed)
+            .ThenBy(entity => entity is EnemyBattle ? 1 : 0)
+            .ThenBy(entity => entity.entityName)
+            .ToList();
 
-    IEnumerator ItemLoop(PlayerBattle player)
-    {
-        Debug.Log ("PICK ITEM");
-        yield return StartCoroutine(BattleUIController.Instance.playerItems());
-        itemChoice = BattleUIController.Instance.getItem();
-        //yield return new WaitUntil(() => itemDecided);
+        Debug.Log("Turn order created with " + turnOrder.Count + " entities.");
 
-        if (itemChoice == null)
+        foreach (BattleEntity entity in turnOrder)
         {
-            
-            //Instance.StartCoroutine(MenuLoop(player));
-            yield return StartCoroutine(MenuLoop(player));
-        }
-        else
-        {
-            targets = getItemTargets(itemChoice, player);
-            Debug.Log($"{player.entityName} used {itemChoice.getName()}!");
-            itemChoice.useItem(targets);
-            items.Remove(itemChoice);
-            //yield return StartCoroutine();
-            //player.useItem(itemChoice);
+            Debug.Log(
+                "Turn order: " +
+                entity.entityName +
+                " | Speed: " +
+                entity.speed
+            );
         }
     }
 
-    IEnumerator MenuLoop(PlayerBattle player)
-    //public void MenuLoop(PlayerBattle player)
+    private void LoadItemsFromInventory()
     {
-        Debug.Log ("ATTACK OR ITEM?");
-        Debug.Log("Waiting For Selection");
-        yield return StartCoroutine(BattleUIController.Instance.playerMenu());
-        BattleUIController.actionChoices actionChoice = BattleUIController.Instance.getAction();
+        items.Clear();
 
-
-        //yield return new WaitUntil(() => actionChoice != )
-
-        if (actionChoice == BattleUIController.actionChoices.ATTACK)
+        if (InventoryManager.Instance == null)
         {
-            //Instance.StartCoroutine(Instance.AttackLoop(player));
-            yield return StartCoroutine(AttackLoop(player));
-            //AttackLoop(player);
+            Debug.LogWarning(
+                "InventoryManager was not found. No battle items will be available."
+            );
+
+            return;
         }
-        else if (actionChoice == BattleUIController.actionChoices.ITEM)
-        {
-            yield return StartCoroutine(ItemLoop(player));
 
-        }
+        items = InventoryManager.Instance.CreateBattleItems();
+
+        Debug.Log("Loaded " + items.Count + " battle item type(s).");
     }
 
-    //public static void PlayerTurn(PlayerBattle player)
-    public IEnumerator PlayerTurn (PlayerBattle player)
-    {
-        yield return StartCoroutine(MenuLoop(player));
-        //Instance.MenuLoop(player);
-    }
-
-    public IEnumerator EnemyTurn (EnemyBattle enemy)
-    {
-        Action action = enemy.chosenAttack();
-        //Debug.Log($"{enemy.entityName} used {action.getActionName()}!");
-        yield return StartCoroutine(enemy.Attack(action));
-    }
-
-    //void Turn(BattleEntity currentBattleEntity)
-    IEnumerator Turn (BattleEntity currentBattleEntity)
-    {
-        Debug.Log($"{currentBattleEntity.entityName}'s Turn!");
-        yield return StartCoroutine(currentBattleEntity.Turn());
-    }
-    
-    IEnumerator Battle()
-    //void battle()
+    private IEnumerator BattleLoop()
     {
         Debug.Log("BATTLE START!");
-        Boolean enemiesORPlayersDead = false;
-        while (!enemiesORPlayersDead)
+
+        while (!battleEnded)
         {
-            foreach (BattleEntity entity in turnOrder) {
-                if (arePlayersWiped() || areEnemiesWiped())
-                //if (isSideWiped(players) || isSideWiped(enemies))
+            foreach (BattleEntity entity in turnOrder)
+            {
+                if (CheckBattleEnd())
                 {
-                    enemiesORPlayersDead = true;
-                    break;
-                } else if (entity.isDead){
+                    EndBattle();
+                    yield break;
+                }
+
+                if (entity == null || entity.isEntityDead())
+                {
                     continue;
                 }
-                //yield return turn(entity);
-                yield return StartCoroutine(Turn(entity));
-                //turn(entity);
+
+                Debug.Log(entity.entityName + "'s Turn!");
+
+                yield return StartCoroutine(entity.Turn());
+
+                if (CheckBattleEnd())
+                {
+                    EndBattle();
+                    yield break;
+                }
             }
         }
-        endBattle();
-    }
-    
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        findTurnOrder();
-        setItems();
-        StartCoroutine(Battle());
-        //battle();
     }
 
-
-
-    // Update is called once per frame
-    void Update()
+    private bool CheckBattleEnd()
     {
-        
+        bool partyDefeated =
+            players.Count == 0 ||
+            players.All(player => player == null || player.isEntityDead());
+
+        bool enemiesDefeated =
+            enemies.Count == 0 ||
+            enemies.All(enemy => enemy == null || enemy.isEntityDead());
+
+        return partyDefeated || enemiesDefeated;
+    }
+
+    private void SavePartyHealthToManager()
+    {
+        if (PartyManager.Instance == null)
+        {
+            Debug.LogWarning(
+                "PartyManager was not found. Battle HP could not be saved."
+            );
+
+            return;
+        }
+
+        foreach (PlayerBattle player in players)
+        {
+            if (player != null)
+            {
+                PartyManager.Instance.SaveBattleHealth(player);
+            }
+        }
+    }
+
+    private void EndBattle()
+    {
+        if (battleEnded)
+        {
+            return;
+        }
+
+        battleEnded = true;
+
+        bool allPlayersDead = players.Count == 0 ||
+            players.All(player => player == null || player.isEntityDead());
+
+        bool allEnemiesDead = enemies.Count == 0 ||
+            enemies.All(enemy => enemy == null || enemy.isEntityDead());
+
+        SavePartyHealthToManager();
+
+        if (allPlayersDead)
+        {
+            Debug.Log("YOU LOSE");
+            return;
+        }
+
+        if (allEnemiesDead)
+        {
+            Debug.Log("YOU WIN!");
+
+            StartCoroutine(ReturnToOverworldAfterVictory());
+        }
+    }
+
+    private IEnumerator ReturnToOverworldAfterVictory()
+    {
+        BattleData.MarkCurrentEncounterDefeated();
+
+        string returnSceneName = BattleData.previousSceneName;
+
+        if (string.IsNullOrWhiteSpace(returnSceneName))
+        {
+            Debug.LogError(
+                "Battle won, but BattleData.previousSceneName is empty."
+            );
+
+            yield break;
+        }
+
+        yield return new WaitForSecondsRealtime(0.5f);
+
+        Time.timeScale = 1f;
+
+        BattleData.ClearCurrentBattleSetup();
+
+        SceneManager.LoadScene(
+            returnSceneName,
+            LoadSceneMode.Single
+        );
+    }
+
+    // -------------------------------------------------------------------------
+    // Player Turn
+    // -------------------------------------------------------------------------
+
+    public IEnumerator PlayerTurn(PlayerBattle player)
+    {
+        if (player == null || player.isEntityDead())
+        {
+            yield break;
+        }
+
+        Debug.Log("PlayerTurn reached for: " + player.entityName);
+
+        bool turnComplete = false;
+
+        while (!turnComplete)
+        {
+            yield return StartCoroutine(
+                BattleUIController.Instance.PlayerMenu()
+            );
+
+            switch (BattleUIController.Instance.GetAction())
+            {
+                case BattleUIController.ActionChoice.Attack:
+                    {
+                        yield return StartCoroutine(
+                            BattleUIController.Instance.PlayerAttacks(player)
+                        );
+
+                        Action selectedAttack =
+                            BattleUIController.Instance.GetAttack();
+
+                        if (selectedAttack == null)
+                        {
+                            Debug.Log(
+                                "No attack selected. Returning to the main action menu."
+                            );
+
+                            break;
+                        }
+
+                        yield return StartCoroutine(
+                            player.Attack(selectedAttack)
+                        );
+
+                        if (player.getTarget() != null)
+                        {
+                            turnComplete = true;
+                        }
+
+                        break;
+                    }
+
+                case BattleUIController.ActionChoice.Item:
+                    {
+                        if (items.Count == 0)
+                        {
+                            Debug.Log("No usable items available.");
+                            break;
+                        }
+
+                        yield return StartCoroutine(
+                            BattleUIController.Instance.PlayerItems()
+                        );
+
+                        Item selectedItem =
+                            BattleUIController.Instance.GetItem();
+
+                        if (selectedItem == null)
+                        {
+                            Debug.Log(
+                                "No item selected. Returning to the main action menu."
+                            );
+
+                            break;
+                        }
+
+                        selectedItem.useItem(
+                            GetItemTargets(selectedItem, player)
+                        );
+
+                        if (InventoryManager.Instance != null)
+                        {
+                            InventoryManager.Instance.ConsumeItem(
+                                selectedItem.getName()
+                            );
+
+                            LoadItemsFromInventory();
+                        }
+                        else
+                        {
+                            items.Remove(selectedItem);
+                        }
+
+                        turnComplete = true;
+                        break;
+                    }
+            }
+        }
+    }
+
+    private List<BattleEntity> GetItemTargets(
+        Item item,
+        PlayerBattle actingPlayer
+    )
+    {
+        List<BattleEntity> result = new List<BattleEntity>();
+
+        if (item == null)
+        {
+            return result;
+        }
+
+        if (item.getType() == Item.itemTypes.SINGLE.ToString())
+        {
+            result.Add(actingPlayer);
+        }
+        else if (item.getType() == Item.itemTypes.PARTY.ToString())
+        {
+            foreach (PlayerBattle player in players)
+            {
+                if (player != null && !player.isEntityDead())
+                {
+                    result.Add(player);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    // -------------------------------------------------------------------------
+    // Enemy Turn
+    // -------------------------------------------------------------------------
+
+    public IEnumerator EnemyTurn(EnemyBattle enemy)
+    {
+        if (enemy == null || enemy.isEntityDead())
+        {
+            yield break;
+        }
+
+        Action selectedAttack = enemy.chosenAttack();
+
+        if (selectedAttack == null)
+        {
+            Debug.LogWarning(
+                enemy.entityName +
+                " has no valid configured attack and skips its turn."
+            );
+
+            yield break;
+        }
+
+        yield return StartCoroutine(
+            enemy.Attack(selectedAttack)
+        );
     }
 }
