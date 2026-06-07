@@ -15,7 +15,8 @@ public class BattleEncounterTrigger : MonoBehaviour
     [SerializeField] private BattleBackgroundType battleBackground;
 
     [Tooltip("Assign battle prefabs such as HoundBattle, not overworld sprites.")]
-    [SerializeField] private List<GameObject> enemyPrefabs =
+    [SerializeField]
+    private List<GameObject> enemyPrefabs =
         new List<GameObject>();
 
     [Header("Scene")]
@@ -87,6 +88,22 @@ public class BattleEncounterTrigger : MonoBehaviour
             " | Return position: " + BattleData.previousPlayerPosition
         );
 
-        SceneManager.LoadScene(battleSceneName, LoadSceneMode.Single);
+        if (PixelatedBattleTransition.Instance != null)
+        {
+            PixelatedBattleTransition.Instance.BeginBattleTransition(
+                battleSceneName
+            );
+        }
+        else
+        {
+            Debug.LogWarning(
+                "PixelatedBattleTransition was not found. Loading battle normally."
+            );
+
+            SceneManager.LoadScene(
+                battleSceneName,
+                LoadSceneMode.Single
+            );
+        }
     }
 }
