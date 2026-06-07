@@ -18,71 +18,84 @@ public class SceneArrivalPositioner : MonoBehaviour
 
     private IEnumerator Start()
     {
-        string currentSceneName =
-            SceneManager.GetActiveScene().name;
+        string currentSceneName = SceneManager.GetActiveScene().name;
+
+        Debug.Log("SceneArrivalPositioner active in scene: " + currentSceneName);
 
         if (!SceneEntryData.TryConsumeEntryForScene(
-            currentSceneName,
-            out string requestedSpawnId
-        ))
+                currentSceneName,
+                out string requestedSpawnId))
         {
-            Debug.Log(
-                "No requested arrival position for scene: " +
-                currentSceneName
-            );
-
+            Debug.Log("No requested spawn ID for scene: " + currentSceneName);
             yield break;
         }
 
-        // Wait for Player and other scene-start scripts to finish initialization.
+        requestedSpawnId = requestedSpawnId.Trim();
+
+        Debug.Log("Requested spawn ID: [" + requestedSpawnId + "]");
+        Debug.Log("Arrival point count: " + arrivalPoints.Count);
+
+        foreach (ArrivalPoint point in arrivalPoints)
+        {
+            string listedId = point != null && point.spawnId != null
+                ? point.spawnId.Trim()
+                : "NULL";
+
+            Debug.Log(
+                "Available arrival ID: [" +
+                listedId +
+                "] | Transform: " +
+                (point != null && point.spawnPoint != null
+                    ? point.spawnPoint.name
+                    : "NULL")
+            );
+        }
+
+        yield return null;
         yield return null;
 
         ArrivalPoint selectedArrival = arrivalPoints.Find(
             point => point != null &&
-                     point.spawnId == requestedSpawnId
+                     point.spawnPoint != null &&
+                     !string.IsNullOrWhiteSpace(point.spawnId) &&
+                     point.spawnId.Trim() == requestedSpawnId
         );
 
-        if (selectedArrival == null ||
-            selectedArrival.spawnPoint == null)
+        if (selectedArrival == null)
         {
             Debug.LogWarning(
-                "SceneArrivalPositioner could not find spawn ID: " +
-                requestedSpawnId
+                "SceneArrivalPositioner could not find spawn ID: [" +
+                requestedSpawnId +
+                "]"
             );
 
             yield break;
         }
 
-        GameObject playerObject =
-            GameObject.FindGameObjectWithTag("Player");
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
 
         if (playerObject == null)
         {
-            Debug.LogWarning(
-                "SceneArrivalPositioner could not find the Player object."
-            );
-
+            Debug.LogWarning("Could not find Player object.");
             yield break;
         }
 
-        Vector3 destination =
-            selectedArrival.spawnPoint.position;
+        Vector3 destination = selectedArrival.spawnPoint.position;
 
-        Rigidbody2D playerRigidbody =
-            playerObject.GetComponent<Rigidbody2D>();
+        Rigidbody2D rb = playerObject.GetComponent<Rigidbody2D>();
 
-        if (playerRigidbody != null)
+        if (rb != null)
         {
-            playerRigidbody.position =
-                new Vector2(destination.x, destination.y);
+            rb.position = new Vector2(destination.x, destination.y);
+            rb.linearVelocity = Vector2.zero;
         }
 
         playerObject.transform.position = destination;
 
         Debug.Log(
-            "Moved Kael to arrival point: " +
+            "Moved Kael to " +
             requestedSpawnId +
-            " at " +
+            " at position " +
             destination
         );
     }

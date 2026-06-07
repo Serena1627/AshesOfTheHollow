@@ -7,6 +7,24 @@ public static class SceneEntryData
     {
         destinationSceneName = sceneName;
         destinationSpawnId = spawnId;
+
+        UnityEngine.Debug.Log(
+            "SceneEntryData set: " +
+            destinationSceneName +
+            " / " +
+            destinationSpawnId
+        );
+    }
+
+    public static bool HasPendingEntryForScene(string currentSceneName)
+    {
+        if (string.IsNullOrWhiteSpace(destinationSceneName) ||
+            string.IsNullOrWhiteSpace(destinationSpawnId))
+        {
+            return false;
+        }
+
+        return destinationSceneName == currentSceneName;
     }
 
     public static bool TryConsumeEntryForScene(
@@ -15,6 +33,15 @@ public static class SceneEntryData
     )
     {
         spawnId = null;
+
+        UnityEngine.Debug.Log(
+            "SceneEntryData checked by: " +
+            currentSceneName +
+            " | stored: " +
+            destinationSceneName +
+            " / " +
+            destinationSpawnId
+        );
 
         if (string.IsNullOrWhiteSpace(destinationSceneName) ||
             string.IsNullOrWhiteSpace(destinationSpawnId))

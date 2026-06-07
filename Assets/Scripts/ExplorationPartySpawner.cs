@@ -16,6 +16,8 @@ public class ExplorationPartySpawner : MonoBehaviour
         // Allow SceneArrivalPositioner to move Kael first.
         yield return null;
         yield return null;
+        yield return null;
+        yield return null;
 
         if (!allowPaladinFollower)
         {

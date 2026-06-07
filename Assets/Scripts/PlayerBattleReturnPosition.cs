@@ -1,9 +1,22 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerBattleReturnPosition : MonoBehaviour
 {
     private void Start()
     {
+        string currentSceneName = SceneManager.GetActiveScene().name;
+
+        if (SceneEntryData.HasPendingEntryForScene(currentSceneName))
+        {
+            Debug.Log(
+                "PlayerBattleReturnPosition skipped because SceneEntryData has an arrival point for " +
+                currentSceneName
+            );
+
+            return;
+        }
+
         if (!BattleData.TryGetReturnPosition(out Vector3 returnPosition))
         {
             return;
@@ -21,6 +34,9 @@ public class PlayerBattleReturnPosition : MonoBehaviour
 
         BattleData.ClearReturnPosition();
 
-        Debug.Log("Player returned to overworld battle position: " + returnPosition);
+        Debug.Log(
+            "Player returned to overworld battle position: " +
+            returnPosition
+        );
     }
 }
