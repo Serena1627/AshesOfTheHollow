@@ -32,6 +32,12 @@ public class PartyManager : MonoBehaviour
     private List<PartyMemberHealthState> partyHealthStates =
         new List<PartyMemberHealthState>();
 
+    [Header("Mira Recruitment")]
+    [SerializeField] private bool miraRecruited = false;
+    [SerializeField] private GameObject miraBattlePrefab;
+
+    public bool MiraRecruited => miraRecruited;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -126,6 +132,26 @@ public class PartyManager : MonoBehaviour
         AddPartyMember(paladinBattlePrefab);
 
         Debug.Log("Paladin has joined the party.");
+    }
+
+    public void RecruitMira()
+    {
+        if (miraRecruited)
+        {
+            return;
+        }
+
+        miraRecruited = true;
+
+        if (miraBattlePrefab == null)
+        {
+            Debug.LogWarning("Mira was recruited, but Mira Battle Prefab is not assigned.");
+            return;
+        }
+
+        AddPartyMember(miraBattlePrefab);
+
+        Debug.Log("Mira has joined the party.");
     }
 
     /// <summary>

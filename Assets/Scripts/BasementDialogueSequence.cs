@@ -14,29 +14,31 @@ public class BasementDialogueSequence : MonoBehaviour
     [SerializeField] private DialogueTypewriter.DialogueLine[] afterChestDialogue;
     [SerializeField] private float afterChestDialogueDelay = 0.35f;
 
-    private bool openingDialoguePlayed;
     private bool afterChestDialoguePlayed;
 
     private void Start()
     {
-        StartCoroutine(PlayOpeningDialogueAfterDelay());
+        if (!StoryProgress.BasementOpeningDialoguePlayed)
+        {
+            StartCoroutine(PlayOpeningDialogueAfterDelay());
+        }
     }
 
     private IEnumerator PlayOpeningDialogueAfterDelay()
     {
-        if (openingDialoguePlayed)
-            yield break;
-
         yield return new WaitForSeconds(openingDialogueDelay);
 
         PlayDialogue(openingDialogue);
-        openingDialoguePlayed = true;
+
+        StoryProgress.MarkBasementOpeningDialoguePlayed();
     }
 
     public void PlayAfterChestDialogue()
     {
         if (afterChestDialoguePlayed)
+        {
             return;
+        }
 
         StartCoroutine(PlayAfterChestDialogueAfterDelay());
     }
@@ -46,6 +48,7 @@ public class BasementDialogueSequence : MonoBehaviour
         yield return new WaitForSeconds(afterChestDialogueDelay);
 
         PlayDialogue(afterChestDialogue);
+
         afterChestDialoguePlayed = true;
     }
 

@@ -45,6 +45,12 @@ public class BasementHolyChest : MonoBehaviour
             whiteFlashGroup.interactable = false;
             whiteFlashGroup.blocksRaycasts = false;
         }
+
+        if (StoryProgress.HolyChestOpened)
+        {
+            opened = true;
+            RestoreOpenedChestState();
+        }
     }
 
     private void Update()
@@ -75,6 +81,8 @@ public class BasementHolyChest : MonoBehaviour
             risingSwordRenderer.enabled = false;
         }
 
+        StoryProgress.MarkHolyChestOpened();
+
         sequenceRunning = false;
 
         if (basementDialogueSequence != null)
@@ -87,6 +95,31 @@ public class BasementHolyChest : MonoBehaviour
         }
 
         Debug.Log("Kael received the armor and holy sword.");
+    }
+
+    private void RestoreOpenedChestState()
+    {
+        if (basementBackgroundRenderer != null && openChestBackground != null)
+        {
+            basementBackgroundRenderer.sprite = openChestBackground;
+        }
+
+        if (playerController == null)
+        {
+            playerController = FindFirstObjectByType<KaelTopDownController>();
+        }
+
+        if (playerController != null)
+        {
+            playerController.SwitchToArmoredSprites();
+        }
+
+        if (risingSwordRenderer != null)
+        {
+            risingSwordRenderer.enabled = false;
+        }
+
+        Debug.Log("Restored already-opened holy chest state.");
     }
 
     private IEnumerator RiseSword()
@@ -145,7 +178,6 @@ public class BasementHolyChest : MonoBehaviour
 
         whiteFlashGroup.alpha = 1f;
 
-        // Change visuals while the screen is completely white.
         SwapBackgroundAndUpgradePlayer();
 
         yield return new WaitForSeconds(flashHoldDuration);
@@ -176,6 +208,11 @@ public class BasementHolyChest : MonoBehaviour
             Debug.LogWarning("Basement background renderer or opened chest sprite is not assigned.");
         }
 
+        if (playerController == null)
+        {
+            playerController = FindFirstObjectByType<KaelTopDownController>();
+        }
+
         if (playerController != null)
         {
             playerController.SwitchToArmoredSprites();
@@ -189,6 +226,11 @@ public class BasementHolyChest : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (opened)
+        {
+            return;
+        }
+
         if (other.CompareTag("Player"))
         {
             playerInRange = true;
