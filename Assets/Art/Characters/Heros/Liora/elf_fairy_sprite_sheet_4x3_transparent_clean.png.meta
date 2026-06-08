@@ -1,0 +1,455 @@
+fileFormatVersion: 2
+guid: 6b4a8022c759f9b4097cb57aa9c46086
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3243992425037305871
+    second: elf_fairy_sprite_sheet_4x3_transparent_clean_0
+  - first:
+      213: -1873545173673597700
+    second: elf_fairy_sprite_sheet_4x3_transparent_clean_1
+  - first:
+      213: -2501822157282876204
+    second: elf_fairy_sprite_sheet_4x3_transparent_clean_2
+  - first:
+      213: -151327035257065656
+    second: elf_fairy_sprite_sheet_4x3_transparent_clean_3
+  - first:
+      213: 7869390888875021438
+    second: elf_fairy_sprite_sheet_4x3_transparent_clean_4
+  - first:
+      213: 6534089898298567231
+    second: elf_fairy_sprite_sheet_4x3_transparent_clean_5
+  - first:
+      213: -389353969149330435
+    second: elf_fairy_sprite_sheet_4x3_transparent_clean_6
+  - first:
+      213: 6324554557037627193
+    second: elf_fairy_sprite_sheet_4x3_transparent_clean_7
+  - first:
+      213: 3738555930256312442
+    second: elf_fairy_sprite_sheet_4x3_transparent_clean_8
+  - first:
+      213: 65068976872800730
+    second: elf_fairy_sprite_sheet_4x3_transparent_clean_9
+  - first:
+      213: 1635494448317268212
+    second: elf_fairy_sprite_sheet_4x3_transparent_clean_10
+  - first:
+      213: 908603129412004745
+    second: elf_fairy_sprite_sheet_4x3_transparent_clean_11
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: elf_fairy_sprite_sheet_4x3_transparent_clean_0
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 2141
+        width: 375
+        height: 618
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0818645ce9f40d20800000000000000
+      internalID: 3243992425037305871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: elf_fairy_sprite_sheet_4x3_transparent_clean_1
+      rect:
+        serializedVersion: 2
+        x: 521
+        y: 2141
+        width: 379
+        height: 618
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf4a98c4794dff5e0800000000000000
+      internalID: -1873545173673597700
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: elf_fairy_sprite_sheet_4x3_transparent_clean_2
+      rect:
+        serializedVersion: 2
+        x: 1000
+        y: 2141
+        width: 369
+        height: 618
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d4e3ffc00eb74dd0800000000000000
+      internalID: -2501822157282876204
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: elf_fairy_sprite_sheet_4x3_transparent_clean_3
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 1441
+        width: 361
+        height: 618
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84fe69afcd066edf0800000000000000
+      internalID: -151327035257065656
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: elf_fairy_sprite_sheet_4x3_transparent_clean_4
+      rect:
+        serializedVersion: 2
+        x: 532
+        y: 1441
+        width: 357
+        height: 618
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e745712d151b53d60800000000000000
+      internalID: 7869390888875021438
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: elf_fairy_sprite_sheet_4x3_transparent_clean_5
+      rect:
+        serializedVersion: 2
+        x: 1005
+        y: 1441
+        width: 359
+        height: 618
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3aed86b420cdaa50800000000000000
+      internalID: 6534089898298567231
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: elf_fairy_sprite_sheet_4x3_transparent_clean_6
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 742
+        width: 375
+        height: 616
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dfb37f0c0acb89af0800000000000000
+      internalID: -389353969149330435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: elf_fairy_sprite_sheet_4x3_transparent_clean_7
+      rect:
+        serializedVersion: 2
+        x: 521
+        y: 741
+        width: 380
+        height: 618
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9374ec65cd455c750800000000000000
+      internalID: 6324554557037627193
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: elf_fairy_sprite_sheet_4x3_transparent_clean_8
+      rect:
+        serializedVersion: 2
+        x: 997
+        y: 742
+        width: 375
+        height: 616
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a788bd39fc402e330800000000000000
+      internalID: 3738555930256312442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: elf_fairy_sprite_sheet_4x3_transparent_clean_9
+      rect:
+        serializedVersion: 2
+        x: 85
+        y: 40
+        width: 303
+        height: 620
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad1c664c3eb27e000800000000000000
+      internalID: 65068976872800730
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: elf_fairy_sprite_sheet_4x3_transparent_clean_10
+      rect:
+        serializedVersion: 2
+        x: 555
+        y: 40
+        width: 311
+        height: 620
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f00318198172b610800000000000000
+      internalID: 1635494448317268212
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: elf_fairy_sprite_sheet_4x3_transparent_clean_11
+      rect:
+        serializedVersion: 2
+        x: 1027
+        y: 40
+        width: 316
+        height: 620
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98b29627bb10c9c00800000000000000
+      internalID: 908603129412004745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      elf_fairy_sprite_sheet_4x3_transparent_clean_0: 3243992425037305871
+      elf_fairy_sprite_sheet_4x3_transparent_clean_1: -1873545173673597700
+      elf_fairy_sprite_sheet_4x3_transparent_clean_10: 1635494448317268212
+      elf_fairy_sprite_sheet_4x3_transparent_clean_11: 908603129412004745
+      elf_fairy_sprite_sheet_4x3_transparent_clean_2: -2501822157282876204
+      elf_fairy_sprite_sheet_4x3_transparent_clean_3: -151327035257065656
+      elf_fairy_sprite_sheet_4x3_transparent_clean_4: 7869390888875021438
+      elf_fairy_sprite_sheet_4x3_transparent_clean_5: 6534089898298567231
+      elf_fairy_sprite_sheet_4x3_transparent_clean_6: -389353969149330435
+      elf_fairy_sprite_sheet_4x3_transparent_clean_7: 6324554557037627193
+      elf_fairy_sprite_sheet_4x3_transparent_clean_8: 3738555930256312442
+      elf_fairy_sprite_sheet_4x3_transparent_clean_9: 65068976872800730
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
