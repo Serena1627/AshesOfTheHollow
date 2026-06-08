@@ -343,4 +343,61 @@ public class KaelTopDownController : MonoBehaviour
 
         return spawnPosition;
     }
+
+    public void FaceFront()
+    {
+        input = Vector2.zero;
+        lastDirection = Vector2.down;
+
+        frameIndex = 0;
+        animationTimer = 0f;
+
+        if (spriteRenderer == null)
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+        }
+
+        if (spriteRenderer != null && frontIdle != null)
+        {
+            spriteRenderer.sprite = frontIdle;
+        }
+    }
+
+    public void FaceLeft()
+    {
+        input = Vector2.zero;
+        lastDirection = Vector2.left;
+
+        frameIndex = 0;
+        animationTimer = 0f;
+
+        if (spriteRenderer == null)
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+        }
+
+        if (spriteRenderer != null && leftIdle != null)
+        {
+            spriteRenderer.sprite = leftIdle;
+        }
+    }
+
+    public void FaceRight()
+    {
+        input = Vector2.zero;
+        lastDirection = Vector2.right;
+
+        frameIndex = 0;
+        animationTimer = 0f;
+
+        if (spriteRenderer == null)
+        {
+            spriteRenderer = GetComponent<SpriteRenderer>();
+        }
+
+        if (spriteRenderer != null && rightIdle != null)
+        {
+            spriteRenderer.sprite = rightIdle;
+        }
+    }
 }

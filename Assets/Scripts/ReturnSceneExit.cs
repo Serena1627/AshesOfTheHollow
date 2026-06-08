@@ -9,6 +9,9 @@ public class ReturnSceneExit : MonoBehaviour
     [Tooltip("Spawn point ID to use in the destination scene.")]
     [SerializeField] private string destinationSpawnId;
 
+    [Tooltip("front, back, left, or right")]
+    [SerializeField] private string destinationFacing = "back";
+
     [Header("Optional Requirement")]
     [SerializeField] private bool requirePaladinRecruited;
 
@@ -37,26 +40,21 @@ public class ReturnSceneExit : MonoBehaviour
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(destinationSpawnId))
-        {
-            Debug.LogWarning(
-                "ReturnSceneExit: Destination Spawn Id is empty. " +
-                "The destination scene will use its default player position."
-            );
-        }
-
         isLoading = true;
 
         SceneEntryData.SetNextEntry(
             nextSceneName,
-            destinationSpawnId
+            destinationSpawnId,
+            destinationFacing
         );
 
         Debug.Log(
             "Loading " +
             nextSceneName +
             " at spawn point: " +
-            destinationSpawnId
+            destinationSpawnId +
+            " facing: " +
+            destinationFacing
         );
 
         SceneManager.LoadScene(nextSceneName, LoadSceneMode.Single);

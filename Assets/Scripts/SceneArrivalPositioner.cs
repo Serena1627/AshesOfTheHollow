@@ -20,36 +20,15 @@ public class SceneArrivalPositioner : MonoBehaviour
     {
         string currentSceneName = SceneManager.GetActiveScene().name;
 
-        Debug.Log("SceneArrivalPositioner active in scene: " + currentSceneName);
-
         if (!SceneEntryData.TryConsumeEntryForScene(
                 currentSceneName,
-                out string requestedSpawnId))
+                out string requestedSpawnId,
+                out string requestedFacing))
         {
-            Debug.Log("No requested spawn ID for scene: " + currentSceneName);
             yield break;
         }
 
         requestedSpawnId = requestedSpawnId.Trim();
-
-        Debug.Log("Requested spawn ID: [" + requestedSpawnId + "]");
-        Debug.Log("Arrival point count: " + arrivalPoints.Count);
-
-        foreach (ArrivalPoint point in arrivalPoints)
-        {
-            string listedId = point != null && point.spawnId != null
-                ? point.spawnId.Trim()
-                : "NULL";
-
-            Debug.Log(
-                "Available arrival ID: [" +
-                listedId +
-                "] | Transform: " +
-                (point != null && point.spawnPoint != null
-                    ? point.spawnPoint.name
-                    : "NULL")
-            );
-        }
 
         yield return null;
         yield return null;
@@ -64,9 +43,8 @@ public class SceneArrivalPositioner : MonoBehaviour
         if (selectedArrival == null)
         {
             Debug.LogWarning(
-                "SceneArrivalPositioner could not find spawn ID: [" +
-                requestedSpawnId +
-                "]"
+                "SceneArrivalPositioner could not find spawn ID: " +
+                requestedSpawnId
             );
 
             yield break;
@@ -76,7 +54,7 @@ public class SceneArrivalPositioner : MonoBehaviour
 
         if (playerObject == null)
         {
-            Debug.LogWarning("Could not find Player object.");
+            Debug.LogWarning("SceneArrivalPositioner could not find Player.");
             yield break;
         }
 
@@ -92,11 +70,55 @@ public class SceneArrivalPositioner : MonoBehaviour
 
         playerObject.transform.position = destination;
 
+        KaelTopDownController kael =
+            playerObject.GetComponent<KaelTopDownController>();
+
+        if (kael != null)
+        {
+            ApplyFacing(kael, requestedFacing);
+        }
+
         Debug.Log(
             "Moved Kael to " +
             requestedSpawnId +
-            " at position " +
-            destination
+            " facing " +
+            requestedFacing
         );
+    }
+
+    private void ApplyFacing(
+        KaelTopDownController kael,
+        string facing
+    )
+    {
+        if (string.IsNullOrWhiteSpace(facing))
+        {
+            return;
+        }
+
+        switch (facing.Trim().ToLower())
+        {
+            case "back":
+            case "up":
+                kael.FaceBack();
+                break;
+
+            case "left":
+                kael.FaceLeft();
+                break;
+
+            case "right":
+                kael.FaceRight();
+                break;
+
+            case "front":
+            case "down":
+                kael.FaceFront();
+                break;
+
+            default:
+                Debug.LogWarning("Unknown facing direction: " + facing);
+                break;
+        }
     }
 }

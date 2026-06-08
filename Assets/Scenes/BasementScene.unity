@@ -1624,6 +1624,53 @@ MonoBehaviour:
   target: {fileID: 1980686520}
   backgroundRenderer: {fileID: 958224389}
   smoothSpeed: 8
+--- !u!1 &993253924
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 993253926}
+  - component: {fileID: 993253925}
+  m_Layer: 0
+  m_Name: ExplorationPartySpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &993253925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 993253924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 270ed2112dd2cf14fa12f66eca0df11a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ExplorationPartySpawner
+  paladinFollowerPrefab: {fileID: 8162663909719026417, guid: 5c91643223aee234384968e5b30cb0cf, type: 3}
+  paladinSpawnDistance: 1.1
+  allowPaladinFollower: 1
+--- !u!4 &993253926
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 993253924}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.49522, y: -4.49886, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1034390176
 GameObject:
   m_ObjectHideFlags: 0
@@ -2055,6 +2102,7 @@ GameObject:
   - component: {fileID: 1546239791}
   - component: {fileID: 1546239790}
   - component: {fileID: 1546239792}
+  - component: {fileID: 1546239793}
   m_Layer: 0
   m_Name: StairExitTrigger
   m_TagString: Untagged
@@ -2130,7 +2178,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1546239789}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e21d0374b52a894787e10a3ecbce6ae, type: 3}
   m_Name: 
@@ -2138,6 +2186,22 @@ MonoBehaviour:
   nextSceneName: DamagedHouseScene
   requireHolySword: 1
   holyChest: {fileID: 1390707124}
+--- !u!114 &1546239793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1546239789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62d0609d48a6349469b5618ef6bac88e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ReturnSceneExit
+  nextSceneName: DamagedHouseScene
+  destinationSpawnId: FromBasement
+  destinationFacing: left
+  requirePaladinRecruited: 0
 --- !u!1 &1626999693
 GameObject:
   m_ObjectHideFlags: 0
@@ -2626,6 +2690,7 @@ SceneRoots:
   - {fileID: 111300478}
   - {fileID: 79042019}
   - {fileID: 1724305602}
+  - {fileID: 993253926}
   - {fileID: 1546239791}
   - {fileID: 759339859}
   - {fileID: 4437396}

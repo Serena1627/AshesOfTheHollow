@@ -2,17 +2,25 @@ public static class SceneEntryData
 {
     private static string destinationSceneName;
     private static string destinationSpawnId;
+    private static string destinationFacing;
 
-    public static void SetNextEntry(string sceneName, string spawnId)
+    public static void SetNextEntry(
+        string sceneName,
+        string spawnId,
+        string facing = ""
+    )
     {
         destinationSceneName = sceneName;
         destinationSpawnId = spawnId;
+        destinationFacing = facing;
 
         UnityEngine.Debug.Log(
             "SceneEntryData set: " +
             destinationSceneName +
             " / " +
-            destinationSpawnId
+            destinationSpawnId +
+            " / facing: " +
+            destinationFacing
         );
     }
 
@@ -29,10 +37,12 @@ public static class SceneEntryData
 
     public static bool TryConsumeEntryForScene(
         string currentSceneName,
-        out string spawnId
+        out string spawnId,
+        out string facing
     )
     {
         spawnId = null;
+        facing = null;
 
         UnityEngine.Debug.Log(
             "SceneEntryData checked by: " +
@@ -40,7 +50,9 @@ public static class SceneEntryData
             " | stored: " +
             destinationSceneName +
             " / " +
-            destinationSpawnId
+            destinationSpawnId +
+            " / facing: " +
+            destinationFacing
         );
 
         if (string.IsNullOrWhiteSpace(destinationSceneName) ||
@@ -55,9 +67,11 @@ public static class SceneEntryData
         }
 
         spawnId = destinationSpawnId;
+        facing = destinationFacing;
 
         destinationSceneName = null;
         destinationSpawnId = null;
+        destinationFacing = null;
 
         return true;
     }
