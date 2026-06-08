@@ -136,9 +136,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PaladinFollowPlayer
   player: {fileID: 0}
   moveSpeed: 4
-  followDelay: 0.45
-  minimumDistanceFromPlayer: 1.3
+  followDelay: 0.35
+  stopDistance: 0.75
   recordSpacing: 0.05
+  movingVerticalFollowDistance: 1.05
+  movingHorizontalFollowDistance: 1.1
+  movingSideVerticalOffset: -0.2
+  idleVerticalFollowDistance: 0.9
+  idleHorizontalFollowDistance: 0.9
+  idleSideVerticalOffset: -0.1
+  minimumDistanceFromTarget: 0.55
 --- !u!114 &4735223635411550311
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -181,6 +188,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfbaf21ceef0c3e4f923da6285910820, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TopDownDynamicSorting
+  baseSortingOrder: 5000
   sortingOffset: 0
   sortingPrecision: 100
+  minimumSortingOrder: 1
+  maximumSortingOrder: 10000
   feetPoint: {fileID: 0}

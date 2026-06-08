@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1949279440533568348}
   - component: {fileID: 4757706947359059407}
   - component: {fileID: -7260842850171711075}
+  - component: {fileID: 7359879554410380359}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -176,6 +177,7 @@ MonoBehaviour:
   - {fileID: 5051326298024522546, guid: cfdcd0c1cbc19604080fadf6ea879a4b, type: 3}
   - {fileID: 2147978493310720585, guid: cfdcd0c1cbc19604080fadf6ea879a4b, type: 3}
   animationFPS: 8
+  faceBackOnSceneStart: 1
 --- !u!61 &4757706947359059407
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -234,3 +236,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cfcc8e35ec521d4cb90d8fcaf09514c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerBattleReturnPosition
+--- !u!114 &7359879554410380359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4482188340101228447}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfbaf21ceef0c3e4f923da6285910820, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TopDownDynamicSorting
+  sortingOffset: 0
+  sortingPrecision: 100
+  feetPoint: {fileID: 0}

@@ -24,12 +24,16 @@ public class MiraHealthPotionInteraction : MonoBehaviour
     [SerializeField] private string joinMessage = "Mira has joined your party.";
 
     [Header("Visuals")]
+    [Tooltip("The unconscious Mira scene object from the Hierarchy.")]
     [SerializeField] private GameObject injuredMiraVisual;
+
+    [Tooltip("Optional standing Mira scene object. Leave empty if Mira should only become a follower.")]
     [SerializeField] private GameObject recoveredMiraVisual;
 
     [Header("Interaction")]
     [SerializeField] private Collider2D interactionTrigger;
     [SerializeField] private bool disableAfterRecruitment = true;
+
     [Header("Mira Follower Spawn")]
     [SerializeField] private GameObject miraFollowerPrefab;
     [SerializeField] private float miraSpawnDistance = 1.1f;
@@ -46,7 +50,7 @@ public class MiraHealthPotionInteraction : MonoBehaviour
 
         if (PartyManager.Instance != null && PartyManager.Instance.MiraRecruited)
         {
-            ShowRecoveredMira();
+            HideMiraSceneVisuals();
 
             if (disableAfterRecruitment && interactionTrigger != null)
             {
@@ -114,9 +118,10 @@ public class MiraHealthPotionInteraction : MonoBehaviour
 
         yield return StartCoroutine(PlayDialogue(hasPotionDialogue));
 
+        HideMiraSceneVisuals();
+
         PartyManager.Instance.RecruitMira();
 
-        ShowRecoveredMira();
         SpawnMiraFollowerNow();
 
         if (partyJoinAnnouncement != null)
@@ -124,6 +129,10 @@ public class MiraHealthPotionInteraction : MonoBehaviour
             yield return StartCoroutine(
                 partyJoinAnnouncement.ShowAnnouncement(joinMessage)
             );
+        }
+        else
+        {
+            Debug.LogWarning("PartyJoinAnnouncement is not assigned for Mira recruitment.");
         }
 
         if (disableAfterRecruitment && interactionTrigger != null)
@@ -153,7 +162,7 @@ public class MiraHealthPotionInteraction : MonoBehaviour
         yield return new WaitUntil(() => !dialogueTypewriter.IsDialogueActive);
     }
 
-    private void ShowRecoveredMira()
+    private void HideMiraSceneVisuals()
     {
         if (injuredMiraVisual != null)
         {
@@ -162,7 +171,7 @@ public class MiraHealthPotionInteraction : MonoBehaviour
 
         if (recoveredMiraVisual != null)
         {
-            recoveredMiraVisual.SetActive(true);
+            recoveredMiraVisual.SetActive(false);
         }
     }
 
@@ -174,8 +183,15 @@ public class MiraHealthPotionInteraction : MonoBehaviour
             return;
         }
 
-        GameObject paladinFollower =
-            GameObject.Find("PaladinFollower(Clone)");
+        GameObject existingMiraFollower = GameObject.Find("MiraFollower");
+
+        if (existingMiraFollower != null)
+        {
+            Debug.Log("Mira follower already exists.");
+            return;
+        }
+
+        GameObject paladinFollower = GameObject.Find("PaladinFollower");
 
         Transform target = null;
 
@@ -199,7 +215,8 @@ public class MiraHealthPotionInteraction : MonoBehaviour
             return;
         }
 
-        Vector3 spawnPosition = target.position + Vector3.down * miraSpawnDistance;
+        Vector3 spawnPosition =
+            target.position + Vector3.down * miraSpawnDistance;
 
         GameObject miraFollower = Instantiate(
             miraFollowerPrefab,
@@ -207,12 +224,18 @@ public class MiraHealthPotionInteraction : MonoBehaviour
             Quaternion.identity
         );
 
+        miraFollower.name = "MiraFollower";
+
         PaladinFollowPlayer followScript =
             miraFollower.GetComponent<PaladinFollowPlayer>();
 
         if (followScript != null)
         {
             followScript.SetPlayer(target);
+        }
+        else
+        {
+            Debug.LogWarning("Mira follower prefab is missing PaladinFollowPlayer.");
         }
 
         Debug.Log("Mira follower spawned after recruitment.");
