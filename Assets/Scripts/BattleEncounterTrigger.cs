@@ -106,4 +106,21 @@ public class BattleEncounterTrigger : MonoBehaviour
             );
         }
     }
+
+    public void ConfigureEncounter(
+        string newEncounterId,
+        GameObject newEncounterRoot,
+        string newBattleBackground,
+        List<GameObject> newEnemyPrefabs,
+        string newBattleSceneName
+    ){
+        encounterId = newEncounterId;
+        encounterRoot = newEncounterRoot;
+        if (System.Enum.TryParse<BattleBackgroundType>(newBattleBackground, true, out BattleBackgroundType result))
+        {
+            battleBackground = result;
+        }
+        enemyPrefabs = new List<GameObject>(newEnemyPrefabs);
+        battleSceneName = newBattleSceneName;
+    }
 }
