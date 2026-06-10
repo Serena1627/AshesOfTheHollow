@@ -1284,7 +1284,7 @@ RectTransform:
   - {fileID: 762846367}
   - {fileID: 1771406690}
   - {fileID: 1905552972}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1205183182}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1308,8 +1308,8 @@ MonoBehaviour:
   page2: {fileID: 669683988}
   page1Slot1: {fileID: 1498130156}
   page1Slot2: {fileID: 1925915473}
-  page2Slot1: {fileID: 1498130156}
-  page2Slot2: {fileID: 1925915473}
+  page2Slot1: {fileID: 1745013686}
+  page2Slot2: {fileID: 1646862419}
   previousPageButton: {fileID: 1771406687}
   nextPageButton: {fileID: 1905552969}
   portraitEntries:
@@ -1955,6 +1955,7 @@ Transform:
   - {fileID: 2109879075}
   - {fileID: 1720519665}
   - {fileID: 2109684948}
+  - {fileID: 712010736}
   - {fileID: 1835353901}
   - {fileID: 585945142}
   m_Father: {fileID: 0}
@@ -13314,4 +13315,3 @@ SceneRoots:
   - {fileID: 1892772226}
   - {fileID: 1205183182}
   - {fileID: 1316378997}
-  - {fileID: 712010736}
