@@ -3,6 +3,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+[System.Serializable]
+public class CharacterPortraitEntry
+{
+    public string characterName;
+    public Sprite portrait;
+}
+
 public class PartyMenuPageManager : MonoBehaviour
 {
     [Header("Card Prefab")]
@@ -27,22 +34,14 @@ public class PartyMenuPageManager : MonoBehaviour
     [Header("Portrait Lookup")]
     [SerializeField] private List<CharacterPortraitEntry> portraitEntries = new List<CharacterPortraitEntry>();
 
-    [Header("Current Party Members")]
+    [Header("Temporary Party Members")]
     [SerializeField] private List<PartyMemberData> partyMembers = new List<PartyMemberData>();
 
     private int currentPage = 0;
-
-    private const int membersPerPage = 2;
-    private const int maxPartyMembers = 4;
+    private int membersPerPage = 2;
+    private int maxPartyMembers = 4;
 
     private readonly List<PartyMemberCardUI> spawnedCards = new List<PartyMemberCardUI>();
-
-    [System.Serializable]
-    public class CharacterPortraitEntry
-    {
-        public string characterName;
-        public Sprite portrait;
-    }
 
     private void Awake()
     {
@@ -53,74 +52,27 @@ public class PartyMenuPageManager : MonoBehaviour
             nextPageButton.onClick.AddListener(GoToNextPage);
     }
 
-    public void LoadPartyFromPrefabs(List<GameObject> partyPrefabs)
+    private void OnEnable()
     {
-        partyMembers.Clear();
-
-        if (partyPrefabs == null)
-        {
-            RefreshMenu();
-            return;
-        }
-
-        int count = Mathf.Min(partyPrefabs.Count, maxPartyMembers);
-
-        for (int i = 0; i < count; i++)
-        {
-            GameObject prefab = partyPrefabs[i];
-
-            if (prefab == null)
-                continue;
-
-            PlayerBattle battleData = prefab.GetComponent<PlayerBattle>();
-
-            if (battleData == null)
-            {
-                Debug.LogWarning(prefab.name + " does not have PlayerBattle, so it cannot be shown in the party menu.");
-                continue;
-            }
-
-            int currentHP = battleData.CurrentHealth;
-            int maxHP = battleData.MaxHealth;
-
-            if (PartyManager.Instance != null &&
-                PartyManager.Instance.TryGetPartyHealth(
-                    battleData.entityName,
-                    out int storedCurrentHP,
-                    out int storedMaxHP
-                ))
-            {
-                currentHP = storedCurrentHP;
-                maxHP = storedMaxHP;
-            }
-
-            PartyMemberData memberData = new PartyMemberData
-            {
-                characterName = battleData.entityName,
-                characterClass = GetClassNameFromPrefabName(prefab.name),
-                characterPortrait = GetPortraitForCharacter(battleData.entityName),
-                currentHP = currentHP,
-                maxHP = maxHP
-            };
-
-            partyMembers.Add(memberData);
-        }
-
-        currentPage = 0;
         RefreshMenu();
     }
 
     public void RefreshMenu()
     {
+        if (partyMembers.Count > maxPartyMembers)
+        {
+            Debug.LogWarning("Party has more than 4 members. Only the first 4 will be shown.");
+        }
+
         currentPage = Mathf.Clamp(currentPage, 0, GetMaxPageIndex());
 
-        ShowCorrectPage();
         ClearSpawnedCards();
-        SpawnCardsForCurrentPage();
+        SpawnCards();
+        ShowCurrentPage();
         UpdateNavigationButtons();
     }
-
-    private void SpawnCardsForCurrentPage()
+    
+    private void SpawnCards()
     {
         if (partyCardPrefab == null)
         {
@@ -128,112 +80,56 @@ public class PartyMenuPageManager : MonoBehaviour
             return;
         }
 
-        Transform[] currentPageSlots = GetSlotsForCurrentPage();
-
-        int startIndex = currentPage * membersPerPage;
-        int endIndex = Mathf.Min(startIndex + membersPerPage, partyMembers.Count);
-
-        int slotIndex = 0;
-
-        for (int memberIndex = startIndex; memberIndex < endIndex; memberIndex++)
+        Transform[] slots =
         {
-            if (slotIndex >= currentPageSlots.Length)
-                break;
+            page1Slot1,
+            page1Slot2,
+            page2Slot1,
+            page2Slot2
+        };
 
-            Transform slot = currentPageSlots[slotIndex];
+        int count = Mathf.Min(partyMembers.Count, maxPartyMembers);
 
-            if (slot == null)
+        for (int i = 0; i < count; i++)
+        {
+            if (slots[i] == null)
             {
-                Debug.LogWarning("PartyMenuPageManager: Missing slot on page " + (currentPage + 1));
-                slotIndex++;
+                Debug.LogWarning("Missing slot assignment for party member index " + i);
                 continue;
             }
 
             PartyMemberCardUI card = Instantiate(partyCardPrefab);
 
             RectTransform cardRect = card.GetComponent<RectTransform>();
-            RectTransform slotRect = slot.GetComponent<RectTransform>();
+            RectTransform slotRect = slots[i].GetComponent<RectTransform>();
 
-            if (cardRect != null && slotRect != null)
-            {
-                cardRect.SetParent(slotRect, false);
+            cardRect.SetParent(slotRect, false);
 
-                cardRect.anchorMin = Vector2.zero;
-                cardRect.anchorMax = Vector2.one;
-                cardRect.offsetMin = Vector2.zero;
-                cardRect.offsetMax = Vector2.zero;
-                cardRect.localScale = Vector3.one;
-                cardRect.localRotation = Quaternion.identity;
-                cardRect.anchoredPosition = Vector2.zero;
-            }
-            else
-            {
-                card.transform.SetParent(slot, false);
-                card.transform.localPosition = Vector3.zero;
-                card.transform.localScale = Vector3.one;
-                card.transform.localRotation = Quaternion.identity;
-            }
+            cardRect.anchorMin = Vector2.zero;
+            cardRect.anchorMax = Vector2.one;
+            cardRect.pivot = new Vector2(0.5f, 0.5f);
 
-            card.Setup(partyMembers[memberIndex]);
+            cardRect.anchoredPosition = Vector2.zero;
+            cardRect.sizeDelta = Vector2.zero;
+
+            cardRect.offsetMin = Vector2.zero;
+            cardRect.offsetMax = Vector2.zero;
+
+            cardRect.localScale = Vector3.one;
+            cardRect.localRotation = Quaternion.identity;
+
+            card.Setup(partyMembers[i]);
             spawnedCards.Add(card);
-
-            slotIndex++;
         }
     }
 
-    private Transform[] GetSlotsForCurrentPage()
-    {
-        if (currentPage == 0)
-        {
-            return new Transform[]
-            {
-                page1Slot1,
-                page1Slot2
-            };
-        }
-
-        return new Transform[]
-        {
-            page2Slot1,
-            page2Slot2
-        };
-    }
-
-    private void ShowCorrectPage()
+    private void ShowCurrentPage()
     {
         if (page1 != null)
             page1.SetActive(currentPage == 0);
 
         if (page2 != null)
             page2.SetActive(currentPage == 1);
-    }
-
-    public void GoToNextPage()
-    {
-        int maxPage = GetMaxPageIndex();
-
-        if (currentPage >= maxPage)
-            return;
-
-        currentPage++;
-        RefreshMenu();
-    }
-
-    public void GoToPreviousPage()
-    {
-        if (currentPage <= 0)
-            return;
-
-        currentPage--;
-        RefreshMenu();
-    }
-
-    private int GetMaxPageIndex()
-    {
-        if (partyMembers.Count <= 2)
-            return 0;
-
-        return 1;
     }
 
     private void UpdateNavigationButtons()
@@ -245,6 +141,37 @@ public class PartyMenuPageManager : MonoBehaviour
 
         if (nextPageButton != null)
             nextPageButton.gameObject.SetActive(currentPage < maxPage);
+
+    }
+
+    private int GetMaxPageIndex()
+    {
+        if (partyMembers.Count <= 2)
+            return 0;
+
+        return 1;
+    }
+
+    public void GoToNextPage()
+    {
+        int maxPage = GetMaxPageIndex();
+
+        if (currentPage < maxPage)
+        {
+            currentPage++;
+            ShowCurrentPage();
+            UpdateNavigationButtons();
+        }
+    }
+
+    public void GoToPreviousPage()
+    {
+        if (currentPage > 0)
+        {
+            currentPage--;
+            ShowCurrentPage();
+            UpdateNavigationButtons();
+        }
     }
 
     private void ClearSpawnedCards()
@@ -272,6 +199,73 @@ public class PartyMenuPageManager : MonoBehaviour
         {
             Destroy(slot.GetChild(i).gameObject);
         }
+    }
+
+    public void LoadPartyFromPrefabs(List<GameObject> partyPrefabs)
+    {
+        partyMembers.Clear();
+
+        Debug.Log("PartyMenuPageManager: LoadPartyFromPrefabs called.");
+
+        if (partyPrefabs == null)
+        {
+            Debug.LogWarning("PartyMenuPageManager: partyPrefabs is null.");
+            RefreshMenu();
+            return;
+        }
+        
+        Debug.Log("PartyMenuPageManager: partyPrefabs count = " + partyPrefabs.Count);
+        int count = Mathf.Min(partyPrefabs.Count, maxPartyMembers);
+
+        for (int i = 0; i < count; i++)
+        {
+            GameObject prefab = partyPrefabs[i];
+
+            if (prefab == null){
+                Debug.LogWarning("PartyMenuPageManager: prefab at index " + i + " is null.");
+                continue;
+            }
+
+            PlayerBattle battleData = prefab.GetComponent<PlayerBattle>();
+
+            if (battleData == null)
+            {
+                Debug.LogWarning(prefab.name + " does not have PlayerBattle, so it cannot be shown in the party menu.");
+                continue;
+            }
+
+            Debug.Log("PartyMenuPageManager: Found PlayerBattle entityName = " + battleData.entityName);
+            int currentHP = battleData.CurrentHealth;
+            int maxHP = battleData.MaxHealth;
+
+            if (PartyManager.Instance != null &&
+                PartyManager.Instance.TryGetPartyHealth(battleData.entityName, out int storedCurrentHP, out int storedMaxHP))
+            {
+                currentHP = storedCurrentHP;
+                maxHP = storedMaxHP;
+                Debug.Log("PartyMenuPageManager: Stored HP found for " + battleData.entityName + ": " + currentHP + " / " + maxHP);
+            }
+            else
+            {
+                Debug.Log("PartyMenuPageManager: No stored HP found. Using PlayerBattle HP.");
+            }
+
+            PartyMemberData memberData = new PartyMemberData
+            {
+                characterName = battleData.entityName,
+                characterClass = GetClassNameFromPrefabName(prefab.name),
+                characterPortrait = GetPortraitForCharacter(battleData.entityName),
+                currentHP = currentHP,
+                maxHP = maxHP
+            };
+
+            Debug.Log("PartyMenuPageManager: Created memberData for " + memberData.characterName);
+
+            partyMembers.Add(memberData);
+        }
+
+        currentPage = 0;
+        RefreshMenu();
     }
 
     private string GetClassNameFromPrefabName(string prefabName)
@@ -306,14 +300,8 @@ public class PartyMenuPageManager : MonoBehaviour
             if (entry == null)
                 continue;
 
-            if (string.Equals(
-                entry.characterName,
-                characterName,
-                System.StringComparison.OrdinalIgnoreCase
-            ))
-            {
+            if (string.Equals(entry.characterName, characterName, System.StringComparison.OrdinalIgnoreCase))
                 return entry.portrait;
-            }
         }
 
         return null;
