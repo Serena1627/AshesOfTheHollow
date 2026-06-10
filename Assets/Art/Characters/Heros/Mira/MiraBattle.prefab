@@ -106,7 +106,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerBattle
   health: 20
   speed: 2
-  entityName: Paladin
+  entityName: Mira
   physDef: 2
   spDef: 2
   isDead: 0
