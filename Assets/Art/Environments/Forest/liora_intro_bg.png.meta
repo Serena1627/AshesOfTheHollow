@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: c2337b5717ed2714d9a434b7c3f1c4e0
+guid: 2670ea2ba0022bd4489729f38a80bebb
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8750756355730269390
-    second: ForestMap_0
+      213: 6529068474267292693
+    second: liora_intro_bg_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -51,7 +51,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ForestMap_0
+      name: liora_intro_bg_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1254
-        height: 1254
+        width: 1672
+        height: 941
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ec46b43ca8ee07970800000000000000
-      internalID: 8750756355730269390
+      spriteID: 51457e25f29eb9a50800000000000000
+      internalID: 6529068474267292693
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ForestMap_0: 8750756355730269390
+      liora_intro_bg_0: 6529068474267292693
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
