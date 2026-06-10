@@ -136,14 +136,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PaladinFollowPlayer
   player: {fileID: 0}
   moveSpeed: 4
-  followDelay: 0.35
+  followDelay: 0.1
   stopDistance: 0.5
   recordSpacing: 0.05
   movingVerticalFollowDistance: 1
-  movingHorizontalFollowDistance: 1
+  movingSideHorizontalOffset: 2
   movingSideVerticalOffset: 0
   idleVerticalFollowDistance: 0
-  idleHorizontalFollowDistance: 3
+  idleSideHorizontalOffset: 3
   idleSideVerticalOffset: 0
   minimumDistanceFromTarget: 0.65
 --- !u!114 &4735223635411550311

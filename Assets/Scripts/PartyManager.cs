@@ -7,7 +7,8 @@ public class PartyManager : MonoBehaviour
 
     [Header("Current Battle Party")]
     [Tooltip("Battle prefabs for party members currently available in combat.")]
-    [SerializeField] private List<GameObject> currentPartyPrefabs = new List<GameObject>();
+    [SerializeField] private List<GameObject> currentPartyPrefabs =
+        new List<GameObject>();
 
     [Header("Recruitable Member Prefabs")]
     [Tooltip("Assign the Paladin battle prefab here, not the village NPC sprite/prefab.")]
@@ -16,8 +17,13 @@ public class PartyManager : MonoBehaviour
     [Header("Recruitment State")]
     [SerializeField] private bool paladinRecruited;
 
-
     public bool PaladinRecruited => paladinRecruited;
+
+    [Header("Mira Recruitment")]
+    [SerializeField] private bool miraRecruited = false;
+    [SerializeField] private GameObject miraBattlePrefab;
+
+    public bool MiraRecruited => miraRecruited;
 
     [System.Serializable]
     public class PartyMemberHealthState
@@ -32,12 +38,6 @@ public class PartyManager : MonoBehaviour
     private List<PartyMemberHealthState> partyHealthStates =
         new List<PartyMemberHealthState>();
 
-    [Header("Mira Recruitment")]
-    [SerializeField] private bool miraRecruited = false;
-    [SerializeField] private GameObject miraBattlePrefab;
-
-    public bool MiraRecruited => miraRecruited;
-
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -49,27 +49,18 @@ public class PartyManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        foreach (GameObject partyMemberPrefab in currentPartyPrefabs)
-        {
-            RegisterInitialHealthFromPrefab(partyMemberPrefab);
-        }
-
-        // Keeps the party list consistent when testing with recruited flags enabled.
         SyncRecruitedMembersToParty();
+        RegisterAllCurrentPartyHealth();
     }
 
-    /// <summary>
-    /// Returns a copy of the current party prefab list.
-    /// BattleSceneManager can use this to spawn the available party members.
-    /// </summary>
     public List<GameObject> GetCurrentPartyPrefabs()
     {
+        SyncRecruitedMembersToParty();
+        RegisterAllCurrentPartyHealth();
+
         return new List<GameObject>(currentPartyPrefabs);
     }
 
-    /// <summary>
-    /// Adds a battle prefab to the active party if it is not already included.
-    /// </summary>
     public void AddPartyMember(GameObject partyMemberPrefab)
     {
         if (partyMemberPrefab == null)
@@ -80,14 +71,12 @@ public class PartyManager : MonoBehaviour
         if (!currentPartyPrefabs.Contains(partyMemberPrefab))
         {
             currentPartyPrefabs.Add(partyMemberPrefab);
+            Debug.Log(partyMemberPrefab.name + " added to current party.");
         }
 
         RegisterInitialHealthFromPrefab(partyMemberPrefab);
     }
 
-    /// <summary>
-    /// Removes a battle prefab from the active party.
-    /// </summary>
     public void RemovePartyMember(GameObject partyMemberPrefab)
     {
         if (partyMemberPrefab == null)
@@ -101,26 +90,15 @@ public class PartyManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Checks whether a specific battle prefab is already in the active party.
-    /// </summary>
     public bool HasPartyMember(GameObject partyMemberPrefab)
     {
         return partyMemberPrefab != null &&
                currentPartyPrefabs.Contains(partyMemberPrefab);
     }
 
-    /// <summary>
-    /// Called after the Paladin recruitment dialogue and join announcement.
-    /// Adds Paladin's battle prefab to the party.
-    /// </summary>
     public void RecruitPaladin()
     {
-        if (paladinRecruited)
-        {
-            Debug.Log("Paladin has already been recruited.");
-            return;
-        }
+        paladinRecruited = true;
 
         if (paladinBattlePrefab == null)
         {
@@ -128,7 +106,6 @@ public class PartyManager : MonoBehaviour
             return;
         }
 
-        paladinRecruited = true;
         AddPartyMember(paladinBattlePrefab);
 
         Debug.Log("Paladin has joined the party.");
@@ -136,11 +113,6 @@ public class PartyManager : MonoBehaviour
 
     public void RecruitMira()
     {
-        if (miraRecruited)
-        {
-            return;
-        }
-
         miraRecruited = true;
 
         if (miraBattlePrefab == null)
@@ -154,17 +126,27 @@ public class PartyManager : MonoBehaviour
         Debug.Log("Mira has joined the party.");
     }
 
-    /// <summary>
-    /// Ensures recruited characters are present in the party list.
-    /// Useful when testing recruitment flags through the Inspector.
-    /// </summary>
     private void SyncRecruitedMembersToParty()
     {
         if (paladinRecruited && paladinBattlePrefab != null)
         {
             AddPartyMember(paladinBattlePrefab);
         }
+
+        if (miraRecruited && miraBattlePrefab != null)
+        {
+            AddPartyMember(miraBattlePrefab);
+        }
     }
+
+    private void RegisterAllCurrentPartyHealth()
+    {
+        foreach (GameObject partyMemberPrefab in currentPartyPrefabs)
+        {
+            RegisterInitialHealthFromPrefab(partyMemberPrefab);
+        }
+    }
+
     public void RegisterInitialHealthFromPrefab(GameObject partyMemberPrefab)
     {
         if (partyMemberPrefab == null)
@@ -184,19 +166,31 @@ public class PartyManager : MonoBehaviour
             return;
         }
 
-        PartyMemberHealthState existingState =
-            GetHealthState(battleMember.entityName);
+        string memberId = battleMember.entityName;
+
+        if (string.IsNullOrWhiteSpace(memberId))
+        {
+            memberId = partyMemberPrefab.name;
+            Debug.LogWarning(
+                partyMemberPrefab.name +
+                " has an empty entityName. Using prefab name as health ID."
+            );
+        }
+
+        PartyMemberHealthState existingState = GetHealthState(memberId);
 
         if (existingState != null)
         {
             return;
         }
 
+        int startingHealth = Mathf.Max(1, battleMember.health);
+
         PartyMemberHealthState newState = new PartyMemberHealthState
         {
-            memberId = battleMember.entityName,
-            currentHealth = battleMember.health,
-            maxHealth = battleMember.health
+            memberId = memberId,
+            currentHealth = startingHealth,
+            maxHealth = startingHealth
         };
 
         partyHealthStates.Add(newState);
@@ -218,14 +212,20 @@ public class PartyManager : MonoBehaviour
             return;
         }
 
-        PartyMemberHealthState state =
-            GetHealthState(battleMember.entityName);
+        string memberId = battleMember.entityName;
+
+        if (string.IsNullOrWhiteSpace(memberId))
+        {
+            memberId = battleMember.name;
+        }
+
+        PartyMemberHealthState state = GetHealthState(memberId);
 
         if (state == null)
         {
             state = new PartyMemberHealthState
             {
-                memberId = battleMember.entityName
+                memberId = memberId
             };
 
             partyHealthStates.Add(state);
@@ -251,19 +251,34 @@ public class PartyManager : MonoBehaviour
             return;
         }
 
-        PartyMemberHealthState state =
-            GetHealthState(battleMember.entityName);
+        string memberId = battleMember.entityName;
+
+        if (string.IsNullOrWhiteSpace(memberId))
+        {
+            memberId = battleMember.name;
+        }
+
+        PartyMemberHealthState state = GetHealthState(memberId);
 
         if (state == null)
         {
             state = new PartyMemberHealthState
             {
-                memberId = battleMember.entityName,
+                memberId = memberId,
                 currentHealth = battleMember.CurrentHealth,
                 maxHealth = battleMember.MaxHealth
             };
 
             partyHealthStates.Add(state);
+
+            Debug.Log(
+                "Created missing HP state for " +
+                state.memberId +
+                ": " +
+                state.currentHealth +
+                " / " +
+                state.maxHealth
+            );
 
             return;
         }

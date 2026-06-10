@@ -139,13 +139,13 @@ MonoBehaviour:
   followDelay: 0.35
   stopDistance: 0.75
   recordSpacing: 0.05
-  movingVerticalFollowDistance: 1.05
-  movingHorizontalFollowDistance: 1.1
-  movingSideVerticalOffset: -0.2
-  idleVerticalFollowDistance: 0.9
-  idleHorizontalFollowDistance: 0.9
-  idleSideVerticalOffset: -0.1
-  minimumDistanceFromTarget: 0.55
+  movingVerticalFollowDistance: 0
+  movingSideHorizontalOffset: 1
+  movingSideVerticalOffset: 0
+  idleVerticalFollowDistance: 0
+  idleSideHorizontalOffset: 3
+  idleSideVerticalOffset: 0
+  minimumDistanceFromTarget: 1
 --- !u!114 &4735223635411550311
 MonoBehaviour:
   m_ObjectHideFlags: 0
