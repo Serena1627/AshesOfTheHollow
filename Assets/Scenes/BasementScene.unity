@@ -4926,10 +4926,22 @@ MonoBehaviour:
   hasPotionDialogue:
   - speakerName: Mira
     dialogueText: Whew... Thank you.
-    portrait: {fileID: 0}
+    portrait: {fileID: -5930123909296542379, guid: e5f803cd17759d34197088275e047d86, type: 3}
   - speakerName: Mira
     dialogueText: I'm feeling a lot better!
-    portrait: {fileID: 0}
+    portrait: {fileID: -5930123909296542379, guid: e5f803cd17759d34197088275e047d86, type: 3}
+  - speakerName: Mira
+    dialogueText: Woah wait, what is the holy Paladin from the city doing with you?
+    portrait: {fileID: -2702553545466948747, guid: d856ee498bcf75445ae98eecb26cdfc0, type: 3}
+  - speakerName: Paladin
+    dialogueText: So... this is the person you wanted to save with that potion.
+    portrait: {fileID: -6226177044132118711, guid: c2f8b7f7382e1d14882a29e8ab0e366d, type: 3}
+  - speakerName: Paladin
+    dialogueText: 'I can feel a large amount of mana within her. '
+    portrait: {fileID: 4907242074090915066, guid: 0fc49aca0aa58be459d3df532d47cdfa, type: 3}
+  - speakerName: Kael
+    dialogueText: Mira... follow us, we'll explain on the way
+    portrait: {fileID: 2034640904416277011, guid: ecd0716ae287d5b439e7acbfa289bda9, type: 3}
   alreadyJoinedDialogue: []
   partyJoinAnnouncement: {fileID: 474615226}
   joinMessage: Mira has joined your party.
