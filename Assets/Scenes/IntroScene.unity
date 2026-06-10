@@ -439,8 +439,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Kael
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 4ff4c867aeecf0a42adf14925431bfd2, type: 2}
-  m_sharedMaterial: {fileID: -3336225693381202189, guid: 4ff4c867aeecf0a42adf14925431bfd2, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 13b3452e183e9854c93637890479c017, type: 2}
+  m_sharedMaterial: {fileID: 5287989781180244259, guid: 13b3452e183e9854c93637890479c017, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
