@@ -1317,7 +1317,7 @@ MonoBehaviour:
     portrait: {fileID: 985370388053682827, guid: da83f3e63b9812144b2962c96ae16a37, type: 3}
   - characterName: Mira
     portrait: {fileID: -8252720274790035708, guid: 80ce3d42d362ce844ad7060ebec3fe2b, type: 3}
-  - characterName: Paul
+  - characterName: Paladin
     portrait: {fileID: -7493618342402433999, guid: 879e7b5987acac64c86f90bae5727a37, type: 3}
   partyMembers: []
 --- !u!1 &762846366
