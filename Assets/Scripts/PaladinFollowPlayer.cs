@@ -8,12 +8,36 @@ public class PaladinFollowPlayer : MonoBehaviour
 
     [Header("Follow Settings")]
     [SerializeField] private float moveSpeed = 4f;
-    [SerializeField] private float followDelay = 0.45f;
-    [SerializeField] private float minimumDistanceFromPlayer = 1.0f;
+    [SerializeField] private float followDelay = 0.35f;
+    [SerializeField] private float stopDistance = 0.06f;
     [SerializeField] private float recordSpacing = 0.05f;
 
-    private readonly List<PathPoint> playerPath = new List<PathPoint>();
-    private Vector3 lastRecordedPlayerPosition;
+    [Header("Moving Formation")]
+    [SerializeField] private float movingVerticalFollowDistance = 1.05f;
+
+    [Tooltip("Distance behind the target while moving left/right.")]
+    [SerializeField] private float movingSideHorizontalOffset = 1.15f;
+
+    [Tooltip("Vertical offset while moving left/right. Negative means slightly below.")]
+    [SerializeField] private float movingSideVerticalOffset = -0.25f;
+
+    [Header("Idle Formation")]
+    [SerializeField] private float idleVerticalFollowDistance = 0.85f;
+
+    [Tooltip("Distance behind the target while idle and facing left/right.")]
+    [SerializeField] private float idleSideHorizontalOffset = 0.95f;
+
+    [Tooltip("Vertical offset while idle and facing left/right. Negative means slightly below.")]
+    [SerializeField] private float idleSideVerticalOffset = -0.15f;
+
+    [Header("Safety")]
+    [SerializeField] private float minimumDistanceFromTarget = 0.55f;
+
+    private readonly List<PathPoint> targetPath = new List<PathPoint>();
+
+    private Vector3 lastRecordedTargetPosition;
+    private Vector2 targetFacingDirection = Vector2.down;
+    private float lastTargetMovedTime;
 
     public Vector2 MovementDirection { get; private set; }
     public bool IsMoving { get; private set; }
@@ -21,11 +45,13 @@ public class PaladinFollowPlayer : MonoBehaviour
     private struct PathPoint
     {
         public Vector3 position;
+        public Vector2 facingDirection;
         public float time;
 
-        public PathPoint(Vector3 position, float time)
+        public PathPoint(Vector3 position, Vector2 facingDirection, float time)
         {
             this.position = position;
+            this.facingDirection = facingDirection;
             this.time = time;
         }
     }
@@ -36,7 +62,7 @@ public class PaladinFollowPlayer : MonoBehaviour
 
         if (player == null)
         {
-            Debug.LogWarning("Paladin follower could not find an object tagged Player.");
+            Debug.LogWarning(name + " could not find an object tagged Player.");
             enabled = false;
             return;
         }
@@ -59,8 +85,9 @@ public class PaladinFollowPlayer : MonoBehaviour
             ResetPath();
         }
 
-        RecordPlayerPath();
-        FollowRecordedPath();
+        UpdateTargetFacingDirection();
+        RecordTargetPath();
+        FollowFormation();
         RemoveOldPathPoints();
     }
 
@@ -91,51 +118,95 @@ public class PaladinFollowPlayer : MonoBehaviour
 
     private void ResetPath()
     {
-        playerPath.Clear();
-        lastRecordedPlayerPosition = player.position;
-        playerPath.Add(new PathPoint(player.position, Time.time));
+        targetPath.Clear();
+
+        lastRecordedTargetPosition = player.position;
+        targetFacingDirection = Vector2.down;
+        lastTargetMovedTime = Time.time;
+
+        targetPath.Add(
+            new PathPoint(
+                player.position,
+                targetFacingDirection,
+                Time.time
+            )
+        );
 
         StopMoving();
     }
 
-    private void RecordPlayerPath()
+    private void UpdateTargetFacingDirection()
     {
-        if (Vector3.Distance(player.position, lastRecordedPlayerPosition) < recordSpacing)
+        Vector2 delta = player.position - lastRecordedTargetPosition;
+
+        if (delta.sqrMagnitude <= 0.0001f)
         {
             return;
         }
 
-        playerPath.Add(new PathPoint(player.position, Time.time));
-        lastRecordedPlayerPosition = player.position;
+        lastTargetMovedTime = Time.time;
+
+        if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+        {
+            targetFacingDirection = delta.x > 0f
+                ? Vector2.right
+                : Vector2.left;
+        }
+        else
+        {
+            targetFacingDirection = delta.y > 0f
+                ? Vector2.up
+                : Vector2.down;
+        }
     }
 
-    private void FollowRecordedPath()
+    private void RecordTargetPath()
     {
-        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
-
-        // Paladin has reached his allowed distance from Kael.
-        // He must not continue into Kael's exact position.
-        if (distanceToPlayer <= minimumDistanceFromPlayer)
+        if (Vector3.Distance(player.position, lastRecordedTargetPosition) < recordSpacing)
         {
-            StopMoving();
             return;
         }
 
-        float delayedTime = Time.time - followDelay;
-        Vector3 targetPosition = transform.position;
-        bool targetFound = false;
+        targetPath.Add(
+            new PathPoint(
+                player.position,
+                targetFacingDirection,
+                Time.time
+            )
+        );
 
-        for (int i = playerPath.Count - 1; i >= 0; i--)
+        lastRecordedTargetPosition = player.position;
+    }
+
+    private void FollowFormation()
+    {
+        bool targetRecentlyMoved = Time.time - lastTargetMovedTime < 0.15f;
+
+        Vector3 baseTargetPosition;
+        Vector2 baseFacingDirection;
+
+        if (targetRecentlyMoved)
         {
-            if (playerPath[i].time <= delayedTime)
-            {
-                targetPosition = playerPath[i].position;
-                targetFound = true;
-                break;
-            }
+            GetDelayedTargetPoint(out baseTargetPosition, out baseFacingDirection);
+        }
+        else
+        {
+            baseTargetPosition = player.position;
+            baseFacingDirection = targetFacingDirection;
         }
 
-        if (!targetFound)
+        Vector3 desiredPosition = GetFormationPosition(
+            baseTargetPosition,
+            baseFacingDirection,
+            targetRecentlyMoved
+        );
+
+        desiredPosition = KeepAwayFromCurrentTargetPosition(desiredPosition);
+
+        float distanceToDesiredPosition =
+            Vector3.Distance(transform.position, desiredPosition);
+
+        if (distanceToDesiredPosition <= stopDistance)
         {
             StopMoving();
             return;
@@ -143,32 +214,11 @@ public class PaladinFollowPlayer : MonoBehaviour
 
         Vector3 previousPosition = transform.position;
 
-        Vector3 nextPosition = Vector3.MoveTowards(
+        transform.position = Vector3.MoveTowards(
             transform.position,
-            targetPosition,
+            desiredPosition,
             moveSpeed * Time.deltaTime
         );
-
-        // Prevent the movement step from passing inside the protected space around Kael.
-        float nextDistanceToPlayer = Vector2.Distance(nextPosition, player.position);
-
-        if (nextDistanceToPlayer < minimumDistanceFromPlayer)
-        {
-            Vector2 awayFromPlayer =
-                (Vector2)(transform.position - player.position);
-
-            if (awayFromPlayer.sqrMagnitude <= 0.001f)
-            {
-                awayFromPlayer = Vector2.down;
-            }
-
-            awayFromPlayer.Normalize();
-
-            nextPosition = player.position +
-                (Vector3)(awayFromPlayer * minimumDistanceFromPlayer);
-        }
-
-        transform.position = nextPosition;
 
         Vector2 movement = transform.position - previousPosition;
 
@@ -183,13 +233,98 @@ public class PaladinFollowPlayer : MonoBehaviour
         }
     }
 
+    private void GetDelayedTargetPoint(
+        out Vector3 delayedPosition,
+        out Vector2 delayedFacingDirection
+    )
+    {
+        float delayedTime = Time.time - followDelay;
+
+        delayedPosition = player.position;
+        delayedFacingDirection = targetFacingDirection;
+
+        for (int i = targetPath.Count - 1; i >= 0; i--)
+        {
+            if (targetPath[i].time <= delayedTime)
+            {
+                delayedPosition = targetPath[i].position;
+                delayedFacingDirection = targetPath[i].facingDirection;
+                return;
+            }
+        }
+    }
+
+    private Vector3 GetFormationPosition(
+        Vector3 baseTargetPosition,
+        Vector2 facingDirection,
+        bool useMovingSpacing
+    )
+    {
+        float verticalDistance = useMovingSpacing
+            ? movingVerticalFollowDistance
+            : idleVerticalFollowDistance;
+
+        float sideHorizontalOffset = useMovingSpacing
+            ? movingSideHorizontalOffset
+            : idleSideHorizontalOffset;
+
+        float sideVerticalOffset = useMovingSpacing
+            ? movingSideVerticalOffset
+            : idleSideVerticalOffset;
+
+        if (facingDirection == Vector2.right)
+        {
+            return baseTargetPosition + new Vector3(
+                -sideHorizontalOffset,
+                sideVerticalOffset,
+                0f
+            );
+        }
+
+        if (facingDirection == Vector2.left)
+        {
+            return baseTargetPosition + new Vector3(
+                sideHorizontalOffset,
+                sideVerticalOffset,
+                0f
+            );
+        }
+
+        if (facingDirection == Vector2.up)
+        {
+            return baseTargetPosition + Vector3.down * verticalDistance;
+        }
+
+        return baseTargetPosition + Vector3.up * verticalDistance;
+    }
+
+    private Vector3 KeepAwayFromCurrentTargetPosition(Vector3 desiredPosition)
+    {
+        Vector2 fromTarget = desiredPosition - player.position;
+
+        if (fromTarget.sqrMagnitude < minimumDistanceFromTarget * minimumDistanceFromTarget)
+        {
+            if (fromTarget.sqrMagnitude <= 0.0001f)
+            {
+                fromTarget = Vector2.down;
+            }
+
+            fromTarget.Normalize();
+
+            desiredPosition = player.position +
+                (Vector3)(fromTarget * minimumDistanceFromTarget);
+        }
+
+        return desiredPosition;
+    }
+
     private void RemoveOldPathPoints()
     {
         float oldestNeededTime = Time.time - followDelay - 1f;
 
-        while (playerPath.Count > 2 && playerPath[1].time < oldestNeededTime)
+        while (targetPath.Count > 2 && targetPath[1].time < oldestNeededTime)
         {
-            playerPath.RemoveAt(0);
+            targetPath.RemoveAt(0);
         }
     }
 

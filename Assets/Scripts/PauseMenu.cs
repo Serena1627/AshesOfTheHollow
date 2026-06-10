@@ -1,9 +1,15 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PauseMenu : MonoBehaviour
 {
+    [Header("Pause UI")]
     [SerializeField] private GameObject pauseCanvas;
+
+    [Header("Party UI")]
+    [SerializeField] private GameObject partyMenuCanvas;
+    [SerializeField] private PartyMenuPageManager partyMenuPageManager;
 
     private bool isPaused = false;
 
@@ -12,14 +18,24 @@ public class PauseMenu : MonoBehaviour
         if (pauseCanvas != null)
             pauseCanvas.SetActive(false);
 
+        if (partyMenuCanvas != null)
+            partyMenuCanvas.SetActive(false);
+
         Time.timeScale = 1f;
     }
 
     private void Update()
     {
-        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        if (Keyboard.current != null && Keyboard.current.pKey.wasPressedThisFrame)
         {
-            TogglePause();
+            if (partyMenuCanvas != null && partyMenuCanvas.activeSelf)
+            {
+                ClosePartyMenu();
+            }
+            else
+            {
+                TogglePause();
+            }
         }
     }
 
@@ -32,19 +48,72 @@ public class PauseMenu : MonoBehaviour
     public void PauseGame()
     {
         isPaused = true;
-        pauseCanvas.SetActive(true);
+
+        if (pauseCanvas != null)
+            pauseCanvas.SetActive(true);
+
+        if (partyMenuCanvas != null)
+            partyMenuCanvas.SetActive(false);
+
         Time.timeScale = 0f;
     }
 
     public void ResumeGame()
     {
         isPaused = false;
-        pauseCanvas.SetActive(false);
+
+        if (pauseCanvas != null)
+            pauseCanvas.SetActive(false);
+
+        if (partyMenuCanvas != null)
+            partyMenuCanvas.SetActive(false);
+
         Time.timeScale = 1f;
     }
 
-    public void PartyMenuPlaceholder()
+    public void ShowPartyMenu()
     {
-        Debug.Log("Party menu not implemented yet.");
+        if (PartyManager.Instance == null)
+        {
+            Debug.LogWarning("PauseMenu: No PartyManager instance found.");
+            return;
+        }
+
+        if (partyMenuCanvas == null)
+        {
+            Debug.LogWarning("PauseMenu: Party Menu Canvas is not assigned.");
+            return;
+        }
+
+        if (partyMenuPageManager == null)
+        {
+            Debug.LogWarning("PauseMenu: PartyMenuPageManager is not assigned.");
+            return;
+        }
+
+        List<GameObject> currentPartyPrefabs = PartyManager.Instance.GetCurrentPartyPrefabs();
+
+
+        partyMenuPageManager.LoadPartyFromPrefabs(currentPartyPrefabs);
+
+        if (pauseCanvas != null)
+            pauseCanvas.SetActive(false);
+
+        partyMenuCanvas.SetActive(true);
+
+        isPaused = true;
+        Time.timeScale = 0f;
+    }
+
+    public void ClosePartyMenu()
+    {
+        if (partyMenuCanvas != null)
+            partyMenuCanvas.SetActive(false);
+
+        if (pauseCanvas != null)
+            pauseCanvas.SetActive(true);
+
+        isPaused = true;
+        Time.timeScale = 0f;
     }
 }

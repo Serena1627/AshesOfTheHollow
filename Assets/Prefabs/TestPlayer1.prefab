@@ -106,10 +106,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerBattle
   health: 11
   speed: 3
-  entityName: TESTPLAYER1
+  entityName: Kael
   physDef: 0
   spDef: 0
-  battleController: {fileID: 0}
   isDead: 0
   action1Damage: 5
   action1Name: P1|PHYS|A1
@@ -119,5 +118,3 @@ MonoBehaviour:
   action2Name: P1|MAG|A2
   action2Type: 1
   action2TargetingType: 0
-  singleTargetEnemy: {fileID: 0}
-  target: {fileID: 0}
