@@ -5000,8 +5000,8 @@ MonoBehaviour:
   page2: {fileID: 32421850}
   page1Slot1: {fileID: 1725983230}
   page1Slot2: {fileID: 1633061053}
-  page2Slot1: {fileID: 1725983230}
-  page2Slot2: {fileID: 1633061053}
+  page2Slot1: {fileID: 1580678081}
+  page2Slot2: {fileID: 546632872}
   previousPageButton: {fileID: 983851211}
   nextPageButton: {fileID: 107687293}
   portraitEntries:

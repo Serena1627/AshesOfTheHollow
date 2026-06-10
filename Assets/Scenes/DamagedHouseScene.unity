@@ -4057,8 +4057,8 @@ MonoBehaviour:
   page2: {fileID: 520255144}
   page1Slot1: {fileID: 410745736}
   page1Slot2: {fileID: 424719099}
-  page2Slot1: {fileID: 410745736}
-  page2Slot2: {fileID: 424719099}
+  page2Slot1: {fileID: 1685872705}
+  page2Slot2: {fileID: 1600903224}
   previousPageButton: {fileID: 1303993587}
   nextPageButton: {fileID: 1760262186}
   portraitEntries:
