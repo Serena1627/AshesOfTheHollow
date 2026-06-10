@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class BattleUIController : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class BattleUIController : MonoBehaviour
         Attack,
         Item
     }
+
+    [Header("Battle Box")]
+    [SerializeField] private GameObject battleBox;
 
     [Header("Main Action Menu")]
     [SerializeField] private GameObject actionOptions;
@@ -32,6 +36,11 @@ public class BattleUIController : MonoBehaviour
     [SerializeField] private GameObject itemOptionsMenu;
     [SerializeField] private Transform itemButtonContainer;
     [SerializeField] private Button itemButtonTemplate;
+
+    [Header("Message Menu")]
+    [SerializeField] private GameObject messageMenu;
+    [SerializeField] private TMP_Text messageText;
+    [SerializeField] private TMP_Text continueText;
 
     [Header("Shared Back Button Template")]
     [SerializeField] private Button backButtonTemplate;
@@ -56,11 +65,12 @@ public class BattleUIController : MonoBehaviour
 
         Instance = this;
 
-        // Hide menus before BattleController.Start() can begin the first turn.
-        SetMenuActive(actionOptions, false);
-        SetMenuActive(attackOptionsMenu, false);
-        SetMenuActive(targetOptionsMenu, false);
-        SetMenuActive(itemOptionsMenu, false);
+        HideAllPages();
+
+        if (battleBox != null)
+        {
+            battleBox.SetActive(false);
+        }
 
         Debug.Log("BattleUIController ready and menus initialized.");
     }
@@ -71,26 +81,27 @@ public class BattleUIController : MonoBehaviour
 
     public IEnumerator PlayerMenu()
     {
+        if (battleBox == null)
+        {
+            Debug.LogError("BattleUIController: Battle Box is missing.");
+            yield break;
+        }
+
         if (actionOptions == null)
         {
-            Debug.LogError(
-                "BattleUIController: Action Options is missing. Assign BattleBox."
-            );
-
+            Debug.LogError("BattleUIController: Action Options should be MainActionMenu, not BattleBox.");
             yield break;
         }
 
         selectedMenuAction = ActionChoice.None;
 
-        SetMenuActive(actionOptions, true);
-
-        Debug.Log("BattleBox opened: " + actionOptions.activeInHierarchy);
+        ShowMainActionMenu();
 
         yield return new WaitUntil(
             () => selectedMenuAction != ActionChoice.None
         );
 
-        SetMenuActive(actionOptions, false);
+        HideAllPagesButKeepBattleBox();
     }
 
     public void AttackButtonAction()
@@ -134,13 +145,13 @@ public class BattleUIController : MonoBehaviour
             yield break;
         }
 
-        SetMenuActive(attackOptionsMenu, true);
+        ShowAttackMenu();
 
         yield return new WaitUntil(
             () => chosenAttack != null || backPressed
         );
 
-        SetMenuActive(attackOptionsMenu, false);
+        HideAllPagesButKeepBattleBox();
         RemoveButtons(generatedAttackButtons);
     }
 
@@ -214,13 +225,13 @@ public class BattleUIController : MonoBehaviour
             yield break;
         }
 
-        SetMenuActive(targetOptionsMenu, true);
+        ShowTargetMenu();
 
         yield return new WaitUntil(
             () => chosenTarget != null || backPressed
         );
 
-        SetMenuActive(targetOptionsMenu, false);
+        HideAllPagesButKeepBattleBox();
         RemoveButtons(generatedTargetButtons);
     }
 
@@ -294,10 +305,7 @@ public class BattleUIController : MonoBehaviour
             itemButtonContainer == null ||
             itemButtonTemplate == null)
         {
-            Debug.LogWarning(
-                "Item menu is not configured. Returning to the action menu."
-            );
-
+            Debug.LogWarning("Item menu is not configured. Returning to the action menu.");
             yield break;
         }
 
@@ -310,13 +318,13 @@ public class BattleUIController : MonoBehaviour
             yield break;
         }
 
-        SetMenuActive(itemOptionsMenu, true);
+        ShowItemMenu();
 
         yield return new WaitUntil(
             () => chosenItem != null || backPressed
         );
 
-        SetMenuActive(itemOptionsMenu, false);
+        HideAllPagesButKeepBattleBox();
         RemoveButtons(generatedItemButtons);
     }
 
@@ -375,6 +383,131 @@ public class BattleUIController : MonoBehaviour
     }
 
     // -------------------------------------------------------------------------
+    // Battle Messages
+    // -------------------------------------------------------------------------
+
+    public IEnumerator ShowBattleMessage(string message)
+    {
+        if (battleBox == null)
+        {
+            Debug.LogError("BattleUIController: Battle Box is missing.");
+            yield break;
+        }
+
+        battleBox.SetActive(true);
+        HideAllPagesButKeepBattleBox();
+
+        if (messageMenu != null)
+        {
+            messageMenu.SetActive(true);
+        }
+
+        if (messageText != null)
+        {
+            messageText.text = message;
+        }
+
+        if (continueText != null)
+        {
+            continueText.gameObject.SetActive(true);
+        }
+
+        yield return new WaitUntil(() =>
+            Keyboard.current != null &&
+            Keyboard.current.spaceKey.wasPressedThisFrame
+        );
+
+        if (messageMenu != null)
+        {
+            messageMenu.SetActive(false);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Page Switching
+    // -------------------------------------------------------------------------
+
+    private void ShowMainActionMenu()
+    {
+        if (battleBox != null)
+        {
+            battleBox.SetActive(true);
+        }
+
+        SetMenuActive(actionOptions, true);
+        SetMenuActive(attackOptionsMenu, false);
+        SetMenuActive(targetOptionsMenu, false);
+        SetMenuActive(itemOptionsMenu, false);
+        SetMenuActive(messageMenu, false);
+    }
+
+    private void ShowAttackMenu()
+    {
+        if (battleBox != null)
+        {
+            battleBox.SetActive(true);
+        }
+
+        SetMenuActive(actionOptions, false);
+        SetMenuActive(attackOptionsMenu, true);
+        SetMenuActive(targetOptionsMenu, false);
+        SetMenuActive(itemOptionsMenu, false);
+        SetMenuActive(messageMenu, false);
+    }
+
+    private void ShowTargetMenu()
+    {
+        if (battleBox != null)
+        {
+            battleBox.SetActive(true);
+        }
+
+        SetMenuActive(actionOptions, false);
+        SetMenuActive(attackOptionsMenu, false);
+        SetMenuActive(targetOptionsMenu, true);
+        SetMenuActive(itemOptionsMenu, false);
+        SetMenuActive(messageMenu, false);
+    }
+
+    private void ShowItemMenu()
+    {
+        if (battleBox != null)
+        {
+            battleBox.SetActive(true);
+        }
+
+        SetMenuActive(actionOptions, false);
+        SetMenuActive(attackOptionsMenu, false);
+        SetMenuActive(targetOptionsMenu, false);
+        SetMenuActive(itemOptionsMenu, true);
+        SetMenuActive(messageMenu, false);
+    }
+
+    public void HideBattleUI()
+    {
+        if (battleBox != null)
+        {
+            battleBox.SetActive(false);
+        }
+
+        HideAllPages();
+    }
+
+    private void HideAllPagesButKeepBattleBox()
+    {
+        SetMenuActive(actionOptions, false);
+        SetMenuActive(attackOptionsMenu, false);
+        SetMenuActive(targetOptionsMenu, false);
+        SetMenuActive(itemOptionsMenu, false);
+        SetMenuActive(messageMenu, false);
+    }
+
+    private void HideAllPages()
+    {
+        HideAllPagesButKeepBattleBox();
+    }
+
+    // -------------------------------------------------------------------------
     // Back Button / Cleanup
     // -------------------------------------------------------------------------
 
@@ -404,6 +537,13 @@ public class BattleUIController : MonoBehaviour
 
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(BackButtonAction);
+
+        TMP_Text label = button.GetComponentInChildren<TMP_Text>();
+
+        if (label != null)
+        {
+            label.text = "Back";
+        }
 
         buttonList.Add(button);
     }

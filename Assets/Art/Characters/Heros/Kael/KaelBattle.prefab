@@ -109,15 +109,12 @@ MonoBehaviour:
   entityName: Kael
   physDef: 0
   spDef: 0
-  battleController: {fileID: 0}
   isDead: 0
   action1Damage: 5
-  action1Name: ATK|PHYS
+  action1Name: Slash
   action1Type: 0
   action1TargetingType: 0
   action2Damage: 7
-  action2Name: ATK|MGK
+  action2Name: Holy Fire
   action2Type: 1
-  action2TargetingType: 0
-  singleTargetEnemy: {fileID: 0}
-  target: {fileID: 0}
+  action2TargetingType: 1

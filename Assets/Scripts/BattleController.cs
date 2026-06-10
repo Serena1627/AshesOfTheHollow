@@ -17,31 +17,16 @@ public class BattleController : MonoBehaviour
     [Header("Runtime Items")]
     [SerializeField] private List<Item> items = new List<Item>();
 
+    [Header("Battle Messages")]
+    [SerializeField] private bool showActionSummaryMessages = true;
+    [SerializeField] private bool showDamageLines = true;
+    [SerializeField] private bool showDefeatLines = true;
+
     private bool battleEnded;
 
     private void Awake()
     {
         Instance = this;
-    }
-
-    private void RestorePartyHealthFromManager()
-    {
-        if (PartyManager.Instance == null)
-        {
-            Debug.LogWarning(
-                "PartyManager was not found. Battle party will use prefab health values."
-            );
-
-            return;
-        }
-
-        foreach (PlayerBattle player in players)
-        {
-            if (player != null)
-            {
-                PartyManager.Instance.ApplyStoredHealth(player);
-            }
-        }
     }
 
     private void Start()
@@ -131,6 +116,26 @@ public class BattleController : MonoBehaviour
             battleEntities.Add(enemy);
 
             Debug.Log("Registered enemy: " + enemy.entityName);
+        }
+    }
+
+    private void RestorePartyHealthFromManager()
+    {
+        if (PartyManager.Instance == null)
+        {
+            Debug.LogWarning(
+                "PartyManager was not found. Battle party will use prefab health values."
+            );
+
+            return;
+        }
+
+        foreach (PlayerBattle player in players)
+        {
+            if (player != null)
+            {
+                PartyManager.Instance.ApplyStoredHealth(player);
+            }
         }
     }
 
@@ -247,10 +252,12 @@ public class BattleController : MonoBehaviour
 
         battleEnded = true;
 
-        bool allPlayersDead = players.Count == 0 ||
+        bool allPlayersDead =
+            players.Count == 0 ||
             players.All(player => player == null || player.isEntityDead());
 
-        bool allEnemiesDead = enemies.Count == 0 ||
+        bool allEnemiesDead =
+            enemies.Count == 0 ||
             enemies.All(enemy => enemy == null || enemy.isEntityDead());
 
         SavePartyHealthToManager();
@@ -264,7 +271,6 @@ public class BattleController : MonoBehaviour
         if (allEnemiesDead)
         {
             Debug.Log("YOU WIN!");
-
             StartCoroutine(ReturnToOverworldAfterVictory());
         }
     }
@@ -320,79 +326,153 @@ public class BattleController : MonoBehaviour
             switch (BattleUIController.Instance.GetAction())
             {
                 case BattleUIController.ActionChoice.Attack:
+                {
+                    yield return StartCoroutine(
+                        BattleUIController.Instance.PlayerAttacks(player)
+                    );
+
+                    Action selectedAttack =
+                        BattleUIController.Instance.GetAttack();
+
+                    if (selectedAttack == null)
                     {
-                        yield return StartCoroutine(
-                            BattleUIController.Instance.PlayerAttacks(player)
+                        Debug.Log(
+                            "No attack selected. Returning to the main action menu."
                         );
-
-                        Action selectedAttack =
-                            BattleUIController.Instance.GetAttack();
-
-                        if (selectedAttack == null)
-                        {
-                            Debug.Log(
-                                "No attack selected. Returning to the main action menu."
-                            );
-
-                            break;
-                        }
-
-                        yield return StartCoroutine(
-                            player.Attack(selectedAttack)
-                        );
-
-                        if (player.getTarget() != null)
-                        {
-                            turnComplete = true;
-                        }
 
                         break;
                     }
+
+                    List<BattleEntity> targets =
+                        new List<BattleEntity>();
+
+                    yield return StartCoroutine(
+                        GetPlayerTargetsForAction(
+                            selectedAttack,
+                            targets
+                        )
+                    );
+
+                    if (targets.Count == 0)
+                    {
+                        Debug.Log(
+                            "No target selected. Returning to the main action menu."
+                        );
+
+                        break;
+                    }
+
+                    yield return StartCoroutine(
+                        ResolveActionEffects(
+                            player.entityName,
+                            selectedAttack,
+                            targets
+                        )
+                    );
+
+                    turnComplete = true;
+                    break;
+                }
 
                 case BattleUIController.ActionChoice.Item:
+                {
+                    if (items.Count == 0)
                     {
-                        if (items.Count == 0)
-                        {
-                            Debug.Log("No usable items available.");
-                            break;
-                        }
-
                         yield return StartCoroutine(
-                            BattleUIController.Instance.PlayerItems()
+                            ShowBattleMessage("No usable items are available.")
                         );
 
-                        Item selectedItem =
-                            BattleUIController.Instance.GetItem();
-
-                        if (selectedItem == null)
-                        {
-                            Debug.Log(
-                                "No item selected. Returning to the main action menu."
-                            );
-
-                            break;
-                        }
-
-                        selectedItem.useItem(
-                            GetItemTargets(selectedItem, player)
-                        );
-
-                        if (InventoryManager.Instance != null)
-                        {
-                            InventoryManager.Instance.ConsumeItem(
-                                selectedItem.getName()
-                            );
-
-                            LoadItemsFromInventory();
-                        }
-                        else
-                        {
-                            items.Remove(selectedItem);
-                        }
-
-                        turnComplete = true;
                         break;
                     }
+
+                    yield return StartCoroutine(
+                        BattleUIController.Instance.PlayerItems()
+                    );
+
+                    Item selectedItem =
+                        BattleUIController.Instance.GetItem();
+
+                    if (selectedItem == null)
+                    {
+                        Debug.Log(
+                            "No item selected. Returning to the main action menu."
+                        );
+
+                        break;
+                    }
+
+                    selectedItem.useItem(
+                        GetItemTargets(selectedItem, player)
+                    );
+
+                    yield return StartCoroutine(
+                        ShowBattleMessage(
+                            player.entityName +
+                            " used " +
+                            selectedItem.getName() +
+                            "."
+                        )
+                    );
+
+                    if (InventoryManager.Instance != null)
+                    {
+                        InventoryManager.Instance.ConsumeItem(
+                            selectedItem.getName()
+                        );
+
+                        LoadItemsFromInventory();
+                    }
+                    else
+                    {
+                        items.Remove(selectedItem);
+                    }
+
+                    turnComplete = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    private IEnumerator GetPlayerTargetsForAction(
+        Action selectedAttack,
+        List<BattleEntity> targets
+    )
+    {
+        targets.Clear();
+
+        if (selectedAttack == null)
+        {
+            yield break;
+        }
+
+        if (selectedAttack.getTargeting() ==
+            Action.targetingTypes.SINGLE.ToString())
+        {
+            yield return StartCoroutine(
+                BattleUIController.Instance.Targeting(enemies)
+            );
+
+            EnemyBattle selectedTarget =
+                BattleUIController.Instance.ReturnTarget();
+
+            if (selectedTarget != null && !selectedTarget.isEntityDead())
+            {
+                targets.Add(selectedTarget);
+            }
+
+            yield break;
+        }
+
+        if (selectedAttack.getTargeting() ==
+            Action.targetingTypes.SPREAD.ToString())
+        {
+            foreach (EnemyBattle enemy in enemies)
+            {
+                if (enemy != null && !enemy.isEntityDead())
+                {
+                    targets.Add(enemy);
+                }
             }
         }
     }
@@ -447,11 +527,168 @@ public class BattleController : MonoBehaviour
                 " has no valid configured attack and skips its turn."
             );
 
+            yield return StartCoroutine(
+                ShowBattleMessage(
+                    enemy.entityName + " hesitates."
+                )
+            );
+
+            yield break;
+        }
+
+        List<BattleEntity> targets = new List<BattleEntity>();
+
+        yield return StartCoroutine(
+            GetEnemyTargetsForAction(
+                enemy,
+                selectedAttack,
+                targets
+            )
+        );
+
+        if (targets.Count == 0)
+        {
+            yield return StartCoroutine(
+                ShowBattleMessage(
+                    enemy.entityName + " has no valid target."
+                )
+            );
+
             yield break;
         }
 
         yield return StartCoroutine(
-            enemy.Attack(selectedAttack)
+            ResolveActionEffects(
+                enemy.entityName,
+                selectedAttack,
+                targets
+            )
+        );
+    }
+
+    private IEnumerator GetEnemyTargetsForAction(
+        EnemyBattle enemy,
+        Action selectedAttack,
+        List<BattleEntity> targets
+    )
+    {
+        targets.Clear();
+
+        if (enemy == null || selectedAttack == null)
+        {
+            yield break;
+        }
+
+        if (selectedAttack.getTargeting() ==
+            Action.targetingTypes.SINGLE.ToString())
+        {
+            yield return StartCoroutine(enemy.pickTarget());
+
+            BattleEntity selectedTarget = enemy.getTarget();
+
+            if (selectedTarget != null && !selectedTarget.isEntityDead())
+            {
+                targets.Add(selectedTarget);
+            }
+
+            yield break;
+        }
+
+        if (selectedAttack.getTargeting() ==
+            Action.targetingTypes.SPREAD.ToString())
+        {
+            foreach (BattleEntity target in enemy.getAllTargets())
+            {
+                if (target != null && !target.isEntityDead())
+                {
+                    targets.Add(target);
+                }
+            }
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Action Resolution / Combined Battle Message
+    // -------------------------------------------------------------------------
+
+    private IEnumerator ResolveActionEffects(
+        string actorName,
+        Action action,
+        List<BattleEntity> targets
+    )
+    {
+        if (action == null || targets == null || targets.Count == 0)
+        {
+            yield break;
+        }
+
+        List<string> messageLines = new List<string>();
+
+        if (showActionSummaryMessages)
+        {
+            messageLines.Add(
+                actorName +
+                " uses " +
+                action.getActionName() +
+                "!"
+            );
+        }
+
+        foreach (BattleEntity target in targets)
+        {
+            if (target == null || target.isEntityDead())
+            {
+                continue;
+            }
+
+            int healthBefore = target.CurrentHealth;
+            bool wasDeadBefore = target.isEntityDead();
+
+            action.doAction(target);
+
+            int healthAfter = target.CurrentHealth;
+            int damageTaken = Mathf.Max(0, healthBefore - healthAfter);
+
+            if (showDamageLines)
+            {
+                messageLines.Add(
+                    target.entityName +
+                    " took " +
+                    damageTaken +
+                    " damage."
+                );
+            }
+
+            if (showDefeatLines &&
+                !wasDeadBefore &&
+                target.isEntityDead())
+            {
+                messageLines.Add(
+                    target.entityName + " was defeated."
+                );
+            }
+        }
+
+        if (messageLines.Count > 0)
+        {
+            yield return StartCoroutine(
+                ShowBattleMessage(
+                    string.Join("\n", messageLines)
+                )
+            );
+        }
+    }
+
+    private IEnumerator ShowBattleMessage(string message)
+    {
+        if (BattleUIController.Instance == null)
+        {
+            Debug.Log(message);
+            yield break;
+        }
+
+        yield return StartCoroutine(
+            BattleUIController.Instance.ShowBattleMessage(message)
         );
     }
 }

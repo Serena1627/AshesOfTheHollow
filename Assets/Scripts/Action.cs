@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class Action
 {
@@ -16,15 +14,18 @@ public class Action
         SINGLE,
         SPREAD
     }
-    int damage;
-    string actionName;
-    string actionType;
-    string targeting;
-    
-    //The reason I'm not using a contructor is that if we add partcle effects
-    //we may need to use Unity functions and stuff, that which the Unity API
-    //is unavailable for
-    public void Init(int _damage, string _name, string _targeting, string _type)
+
+    private int damage;
+    private string actionName;
+    private string actionType;
+    private string targeting;
+
+    public void Init(
+        int _damage,
+        string _name,
+        string _targeting,
+        string _type
+    )
     {
         damage = _damage;
         actionName = _name;
@@ -37,28 +38,46 @@ public class Action
         return targeting;
     }
 
-    public void doAction(List <BattleEntity> targets)
-    {
-        Debug.Log(targets.Count);
-        foreach (BattleEntity target in targets)
-        {
-            target.takeDamage(damage, actionType);
-        }
-    }
-
     public string getActionName()
     {
         return actionName;
     }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
 
+    public int getDamage()
+    {
+        return damage;
     }
 
-    // Update is called once per frame
-    void Update()
+    public string getActionType()
     {
-        
+        return actionType;
+    }
+
+    public void doAction(List<BattleEntity> targets)
+    {
+        if (targets == null)
+        {
+            return;
+        }
+
+        foreach (BattleEntity target in targets)
+        {
+            if (target == null)
+            {
+                continue;
+            }
+
+            target.takeDamage(damage, actionType);
+        }
+    }
+
+    public void doAction(BattleEntity target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        target.takeDamage(damage, actionType);
     }
 }

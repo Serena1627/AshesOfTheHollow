@@ -579,7 +579,7 @@ MonoBehaviour:
       friend Mira.
     portrait: {fileID: 4907242074090915066, guid: 0fc49aca0aa58be459d3df532d47cdfa, type: 3}
   dialogueDelay: 0.1
-  disablePlayerMovementDuringDialogue: 1
+  disablePlayerMovementDuringDialogue: 0
 --- !u!1 &569575675
 GameObject:
   m_ObjectHideFlags: 0
