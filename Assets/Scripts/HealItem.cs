@@ -1,9 +1,9 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class HealItem : Item
 {
-    int healAmount;
+    private int healAmount;
 
     public void Init(string _name, string _itemType, int _healAmount)
     {
@@ -11,11 +11,26 @@ public class HealItem : Item
         healAmount = _healAmount;
     }
 
-    public override void useItem(List <BattleEntity> targets)
+    public int GetHealAmount()
     {
+        return healAmount;
+    }
+
+    public override void useItem(List<BattleEntity> targets)
+    {
+        if (targets == null)
+        {
+            return;
+        }
+
         foreach (BattleEntity target in targets)
         {
-            Debug.Log($"{target} healed {healAmount} HP!");
+            if (target == null)
+            {
+                continue;
+            }
+
+            Debug.Log(target.entityName + " healed " + healAmount + " HP!");
             target.heal(healAmount);
         }
     }

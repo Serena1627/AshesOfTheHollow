@@ -67,14 +67,15 @@ public class InventoryManager : MonoBehaviour
             return;
         }
 
-        InventoryItemStack existingStack =
-            inventoryItems.Find(item => item.itemName == itemName);
+        InventoryItemStack existingStack = FindItemStack(itemName);
 
         if (existingStack != null)
         {
             existingStack.quantity += amount;
+
             Debug.Log("Received " + itemName + " x" + amount + ".");
             OnInventoryChanged?.Invoke();
+
             return;
         }
 
@@ -95,7 +96,6 @@ public class InventoryManager : MonoBehaviour
 
     public bool ConsumeItem(string itemName)
     {
-        Debug.Log("Consuming from InventoryManager object: " + gameObject.name);
         InventoryItemStack itemStack = FindItemStack(itemName);
 
         if (itemStack == null || itemStack.quantity <= 0)
@@ -126,6 +126,90 @@ public class InventoryManager : MonoBehaviour
         return itemStack != null ? itemStack.quantity : 0;
     }
 
+    public List<Item> CreateBattleItems()
+    {
+        List<Item> battleItems = new List<Item>();
+
+        Debug.Log("Creating battle items from inventory. Stack count: " + inventoryItems.Count);
+
+        foreach (InventoryItemStack inventoryItem in inventoryItems)
+        {
+            if (inventoryItem == null)
+            {
+                continue;
+            }
+
+            if (inventoryItem.quantity <= 0)
+            {
+                Debug.Log("Skipping " + inventoryItem.itemName + " because quantity is 0.");
+                continue;
+            }
+
+            if (inventoryItem.itemType == InventoryItemType.Weapon)
+            {
+                Debug.Log("Skipping weapon in battle item list: " + inventoryItem.itemName);
+                continue;
+            }
+
+            Item runtimeItem = CreateRuntimeBattleItem(inventoryItem);
+
+            if (runtimeItem != null)
+            {
+                battleItems.Add(runtimeItem);
+
+                Debug.Log(
+                    "Added battle item: " +
+                    runtimeItem.getName() +
+                    " x" +
+                    inventoryItem.quantity
+                );
+            }
+        }
+
+        Debug.Log("Final battle item count: " + battleItems.Count);
+
+        return battleItems;
+    }
+
+    private Item CreateRuntimeBattleItem(InventoryItemStack inventoryItem)
+    {
+        if (inventoryItem == null)
+        {
+            return null;
+        }
+
+        string targetType = inventoryItem.targetType == InventoryTargetType.Single
+            ? Item.itemTypes.SINGLE.ToString()
+            : Item.itemTypes.PARTY.ToString();
+
+        switch (inventoryItem.itemType)
+        {
+            case InventoryItemType.HealingPotion:
+            {
+                HealItem healingPotion = new HealItem();
+
+                healingPotion.Init(
+                    inventoryItem.itemName,
+                    targetType,
+                    inventoryItem.power
+                );
+
+                return healingPotion;
+            }
+
+            case InventoryItemType.Weapon:
+                return null;
+
+            default:
+                Debug.LogWarning(
+                    "Inventory item type is not supported in battle: " +
+                    inventoryItem.itemType
+                );
+
+                return null;
+        }
+    }
+
     private InventoryItemStack FindItemStack(string itemName)
     {
         if (string.IsNullOrWhiteSpace(itemName))
@@ -143,63 +227,15 @@ public class InventoryManager : MonoBehaviour
 
     private string NormalizeItemName(string itemName)
     {
+        if (string.IsNullOrWhiteSpace(itemName))
+        {
+            return string.Empty;
+        }
+
         return itemName
             .Replace("[", "")
             .Replace("]", "")
             .Trim()
             .ToLowerInvariant();
-    }
-    public List<Item> CreateBattleItems()
-    {
-        List<Item> battleItems = new List<Item>();
-
-        foreach (InventoryItemStack inventoryItem in inventoryItems)
-        {
-            if (inventoryItem == null || inventoryItem.quantity <= 0)
-            {
-                continue;
-            }
-
-            Item runtimeItem = CreateRuntimeBattleItem(inventoryItem);
-
-            if (runtimeItem != null)
-            {
-                battleItems.Add(runtimeItem);
-            }
-        }
-
-        return battleItems;
-    }
-
-    private Item CreateRuntimeBattleItem(InventoryItemStack inventoryItem)
-    {
-        string targetType = inventoryItem.targetType == InventoryTargetType.Single
-            ? Item.itemTypes.SINGLE.ToString()
-            : Item.itemTypes.PARTY.ToString();
-
-        switch (inventoryItem.itemType)
-        {
-            case InventoryItemType.HealingPotion:
-                HealItem healingPotion = new HealItem();
-
-                healingPotion.Init(
-                    inventoryItem.itemName,
-                    targetType,
-                    inventoryItem.power
-                );
-
-                return healingPotion;
-
-            case InventoryItemType.Weapon:
-                return null;
-
-            default:
-                Debug.LogWarning(
-                    "Inventory item type is not supported in battle: " +
-                    inventoryItem.itemType
-                );
-
-                return null;
-        }
     }
 }
