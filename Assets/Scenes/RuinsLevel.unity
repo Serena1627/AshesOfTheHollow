@@ -39589,7 +39589,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1949279440533568348, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
       propertyPath: nextSceneName
-      value: SampleScene
+      value: BossScene
       objectReference: {fileID: 0}
     - target: {fileID: 1949279440533568348, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
       propertyPath: endPointTilemap
@@ -39601,7 +39601,7 @@ PrefabInstance:
       objectReference: {fileID: 83896124}
     - target: {fileID: 1949279440533568348, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
       propertyPath: enemyMustBeDefeatedBeforeExit
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4482188340101228447, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
       propertyPath: m_Name
