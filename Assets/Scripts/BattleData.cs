@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public static class BattleData
 {
@@ -46,6 +47,10 @@ public static class BattleData
         }
 
         defeatedEncounterIds.Add(currentEncounterId);
+        if (currentEncounterId == "TTT")
+        {
+            SceneManager.LoadScene("WinScene");
+        }
         Debug.Log("Encounter defeated: " + currentEncounterId);
     }
 

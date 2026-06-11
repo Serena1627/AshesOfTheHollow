@@ -110,7 +110,7 @@ MonoBehaviour:
   physDef: 0
   spDef: 0
   isDead: 0
-  action1Damage: 5
+  action1Damage: 500
   action1Name: Slash
   action1Type: 0
   action1TargetingType: 0
