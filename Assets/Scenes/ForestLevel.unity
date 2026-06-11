@@ -2492,7 +2492,7 @@ MonoBehaviour:
   miraRecruited: 0
   miraBattlePrefab: {fileID: 0}
   lioraRecruited: 0
-  lioraBattlePrefab: {fileID: 0}
+  lioraBattlePrefab: {fileID: 4684052358575500304, guid: 8e2924424e59cdb4e8bc314ba0c6e608, type: 3}
   partyHealthStates: []
 --- !u!4 &902203853
 Transform:
@@ -24388,6 +24388,8 @@ MonoBehaviour:
     portrait: {fileID: -8252720274790035708, guid: 80ce3d42d362ce844ad7060ebec3fe2b, type: 3}
   - characterName: Paladin
     portrait: {fileID: -7493618342402433999, guid: 879e7b5987acac64c86f90bae5727a37, type: 3}
+  - characterName: Liora
+    portrait: {fileID: 1584305947586206230, guid: 30028f5865a63a145a1b2ff7f0ea95d8, type: 3}
   partyMembers: []
 --- !u!114 &1457496948
 MonoBehaviour:
