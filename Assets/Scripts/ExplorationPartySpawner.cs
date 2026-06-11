@@ -11,9 +11,14 @@ public class ExplorationPartySpawner : MonoBehaviour
     [SerializeField] private GameObject miraFollowerPrefab;
     [SerializeField] private float miraSpawnDistance = 1.1f;
 
+    [Header("Liora Follower")]
+    [SerializeField] private GameObject lioraFollowerPrefab;
+    [SerializeField] private float lioraSpawnDistance = 1.1f;
+
     [Header("Settings")]
     [SerializeField] private bool allowPaladinFollower = true;
     [SerializeField] private bool allowMiraFollower = true;
+    [SerializeField] private bool allowLioraFollower = true;
 
     private IEnumerator Start()
     {
@@ -37,6 +42,7 @@ public class ExplorationPartySpawner : MonoBehaviour
         }
 
         GameObject paladinFollower = null;
+        GameObject miraFollower = null;
 
         if (allowPaladinFollower && PartyManager.Instance.PaladinRecruited)
         {
@@ -55,12 +61,29 @@ public class ExplorationPartySpawner : MonoBehaviour
                 ? paladinFollower.transform
                 : playerObject.transform;
 
-            SpawnFollowerBehindTarget(
+            miraFollower = SpawnFollowerBehindTarget(
                 miraFollowerPrefab,
                 miraTarget,
                 miraSpawnDistance,
                 "MiraFollower",
                 "Mira"
+            );
+        }
+
+        if (allowLioraFollower && PartyManager.Instance.LioraRecruited)
+        {
+            Transform lioraTarget = miraFollower != null
+                ? miraFollower.transform
+                : paladinFollower != null
+                    ? paladinFollower.transform
+                    : playerObject.transform;
+
+            SpawnFollowerBehindTarget(
+                lioraFollowerPrefab,
+                lioraTarget,
+                lioraSpawnDistance,
+                "LioraFollower",
+                "Liora"
             );
         }
     }
@@ -89,6 +112,14 @@ public class ExplorationPartySpawner : MonoBehaviour
 
         if (existingFollower != null)
         {
+            PaladinFollowPlayer existingFollowScript =
+                existingFollower.GetComponent<PaladinFollowPlayer>();
+
+            if (existingFollowScript != null)
+            {
+                existingFollowScript.SetPlayer(target);
+            }
+
             Debug.Log(displayName + " follower already exists in this scene.");
             return existingFollower;
         }

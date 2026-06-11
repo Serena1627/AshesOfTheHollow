@@ -48,5 +48,8 @@ MonoBehaviour:
   paladinSpawnDistance: 1.24
   miraFollowerPrefab: {fileID: 8162663909719026417, guid: 2fb86771f198df04d81a087b15f41582, type: 3}
   miraSpawnDistance: 1.5
+  lioraFollowerPrefab: {fileID: 8162663909719026417, guid: eb6ccbd31f99fc443b6d6bda13bde20a, type: 3}
+  lioraSpawnDistance: 1.5
   allowPaladinFollower: 1
   allowMiraFollower: 1
+  allowLioraFollower: 1
