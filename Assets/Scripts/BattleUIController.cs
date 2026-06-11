@@ -186,6 +186,7 @@ public class BattleUIController : MonoBehaviour
 
             button.gameObject.SetActive(true);
             button.interactable = true;
+            button.name = "AttackButton_" + capturedAttack.getActionName();
 
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(() =>
@@ -194,12 +195,7 @@ public class BattleUIController : MonoBehaviour
                 Debug.Log("Attack chosen: " + capturedAttack.getActionName());
             });
 
-            TMP_Text label = button.GetComponentInChildren<TMP_Text>();
-
-            if (label != null)
-            {
-                label.text = capturedAttack.getActionName();
-            }
+            SetButtonText(button, capturedAttack.getActionName());
 
             generatedAttackButtons.Add(button);
         }
@@ -271,6 +267,7 @@ public class BattleUIController : MonoBehaviour
 
             button.gameObject.SetActive(true);
             button.interactable = true;
+            button.name = "TargetButton_" + capturedEnemy.entityName;
 
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(() =>
@@ -279,12 +276,7 @@ public class BattleUIController : MonoBehaviour
                 Debug.Log("Target chosen: " + capturedEnemy.entityName);
             });
 
-            TMP_Text label = button.GetComponentInChildren<TMP_Text>();
-
-            if (label != null)
-            {
-                label.text = capturedEnemy.entityName;
-            }
+            SetButtonText(button, capturedEnemy.entityName);
 
             generatedTargetButtons.Add(button);
         }
@@ -341,10 +333,47 @@ public class BattleUIController : MonoBehaviour
             return;
         }
 
-        foreach (Item item in BattleController.Instance.getItems())
+        if (itemButtonTemplate == null)
+        {
+            Debug.LogError("Item Button Template is not assigned.");
+            return;
+        }
+
+        if (itemButtonContainer == null)
+        {
+            Debug.LogError("Item Button Container is not assigned.");
+            return;
+        }
+
+        List<Item> battleItems = BattleController.Instance.getItems();
+
+        if (battleItems == null || battleItems.Count == 0)
+        {
+            Debug.LogWarning("BattleController has no battle items loaded.");
+            return;
+        }
+
+        foreach (Item item in battleItems)
         {
             if (item == null)
             {
+                continue;
+            }
+
+            string rawItemName = item.getName();
+
+            if (string.IsNullOrWhiteSpace(rawItemName))
+            {
+                continue;
+            }
+
+            int quantity = InventoryManager.Instance != null
+                ? InventoryManager.Instance.GetItemQuantity(rawItemName)
+                : 1;
+
+            if (quantity <= 0)
+            {
+                Debug.Log("Skipping item with zero quantity: " + rawItemName);
                 continue;
             }
 
@@ -358,25 +387,27 @@ public class BattleUIController : MonoBehaviour
             button.gameObject.SetActive(true);
             button.interactable = true;
 
+            string displayName = CleanItemDisplayName(rawItemName);
+            string buttonText = displayName + " x" + quantity;
+
+            button.name = "ItemButton_" + displayName;
+
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(() =>
             {
                 chosenItem = capturedItem;
-                Debug.Log("Item chosen: " + capturedItem.getName());
+
+                Debug.Log(
+                    "Item button clicked. Selected item: " +
+                    capturedItem.getName()
+                );
             });
 
-            TMP_Text label = button.GetComponentInChildren<TMP_Text>();
-
-            if (label != null)
-            {
-                int quantity = InventoryManager.Instance != null
-                    ? InventoryManager.Instance.GetItemQuantity(capturedItem.getName())
-                    : 1;
-
-                label.text = capturedItem.getName() + "  x" + quantity;
-            }
+            SetButtonText(button, buttonText);
 
             generatedItemButtons.Add(button);
+
+            Debug.Log("Generated item button: " + buttonText);
         }
 
         GenerateBackButton(itemButtonContainer, generatedItemButtons);
@@ -534,16 +565,12 @@ public class BattleUIController : MonoBehaviour
 
         button.gameObject.SetActive(true);
         button.interactable = true;
+        button.name = "BackButton";
 
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(BackButtonAction);
 
-        TMP_Text label = button.GetComponentInChildren<TMP_Text>();
-
-        if (label != null)
-        {
-            label.text = "Back";
-        }
+        SetButtonText(button, "Back");
 
         buttonList.Add(button);
     }
@@ -567,6 +594,53 @@ public class BattleUIController : MonoBehaviour
         {
             menu.SetActive(active);
         }
+    }
+
+    private void SetButtonText(Button button, string text)
+    {
+        if (button == null)
+        {
+            return;
+        }
+
+        TMP_Text[] tmpTexts =
+            button.GetComponentsInChildren<TMP_Text>(true);
+
+        foreach (TMP_Text tmpText in tmpTexts)
+        {
+            tmpText.text = text;
+            tmpText.gameObject.SetActive(true);
+        }
+
+        UnityEngine.UI.Text[] normalTexts =
+            button.GetComponentsInChildren<UnityEngine.UI.Text>(true);
+
+        foreach (UnityEngine.UI.Text normalText in normalTexts)
+        {
+            normalText.text = text;
+            normalText.gameObject.SetActive(true);
+        }
+
+        if (tmpTexts.Length == 0 && normalTexts.Length == 0)
+        {
+            Debug.LogWarning(
+                button.name +
+                " has no TMP_Text or Text child to update."
+            );
+        }
+    }
+
+    private string CleanItemDisplayName(string itemName)
+    {
+        if (string.IsNullOrWhiteSpace(itemName))
+        {
+            return string.Empty;
+        }
+
+        return itemName
+            .Replace("[", "")
+            .Replace("]", "")
+            .Trim();
     }
 
     // Compatibility with existing Inspector button events and older code.
