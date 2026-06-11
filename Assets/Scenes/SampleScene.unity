@@ -2026,7 +2026,7 @@ GameObject:
   - component: {fileID: 1159058215}
   - component: {fileID: 1159058214}
   m_Layer: 0
-  m_Name: ProgressToForest
+  m_Name: ProgressToLiora
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -1062,6 +1062,101 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &436748710
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 436748713}
+  - component: {fileID: 436748712}
+  - component: {fileID: 436748711}
+  m_Layer: 0
+  m_Name: ProgressToForest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!61 &436748711
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 436748710}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
+--- !u!114 &436748712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 436748710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62d0609d48a6349469b5618ef6bac88e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ReturnSceneExit
+  nextSceneName: ForestLevel
+  destinationSpawnId: 
+  destinationFacing: back
+  requirePaladinRecruited: 1
+--- !u!4 &436748713
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 436748710}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.4, y: 13.8, z: 0}
+  m_LocalScale: {x: 82.87397, y: 2.39, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &472807840
 GameObject:
   m_ObjectHideFlags: 0
@@ -3604,7 +3699,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LioraMonkeyVictoryRecruitment
   monkeyEncounterId: LioraScene_Monkey_01
   dialogueTypewriter: {fileID: 2014584255}
-  postBattleDialogue: []
+  postBattleDialogue:
+  - speakerName: Liora
+    dialogueText: Thank you for helping me.
+    portrait: {fileID: -4815526334075301163, guid: 816ce70ca7dffcd46b8300b1b65860c6, type: 3}
+  - speakerName: Kael
+    dialogueText: Phew... no problem
+    portrait: {fileID: 916980491678386829, guid: 93d113911d16f1141b97500ebc7b7f9b, type: 3}
+  - speakerName: Paladin
+    dialogueText: 'The Hollow Choir has angered many creatures with their sorcery.
+      That monkey was no exception. '
+    portrait: {fileID: 4907242074090915066, guid: 0fc49aca0aa58be459d3df532d47cdfa, type: 3}
+  - speakerName: Liora
+    dialogueText: That cult again... they destroyed my village.
+    portrait: {fileID: 8706523877615525295, guid: 5187f6fd809c4714480ab1d5aa09aff2, type: 3}
+  - speakerName: Mira
+    dialogueText: They destroyed our village too and this Paladin is from the holy
+      city here to hunt down the cult.
+    portrait: {fileID: -3849295907798211252, guid: d3a95522b75e4044ab08aef4c5443c73, type: 3}
+  - speakerName: Mira
+    dialogueText: Would you like to join us?
+    portrait: {fileID: -5930123909296542379, guid: e5f803cd17759d34197088275e047d86, type: 3}
+  - speakerName: Liora
+    dialogueText: Of course! Lets take down the cult.
+    portrait: {fileID: -4815526334075301163, guid: 816ce70ca7dffcd46b8300b1b65860c6, type: 3}
   partyJoinAnnouncement: {fileID: 1061917057}
   joinMessage: Liora the Archer has joined your party.
   lioraSceneVisual: {fileID: 1721585797}
@@ -4634,3 +4752,4 @@ SceneRoots:
   - {fileID: 1377661846}
   - {fileID: 1846216745}
   - {fileID: 1061917061}
+  - {fileID: 436748713}
