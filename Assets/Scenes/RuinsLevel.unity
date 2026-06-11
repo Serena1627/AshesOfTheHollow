@@ -37858,6 +37858,8 @@ MonoBehaviour:
   pauseCanvas: {fileID: 0}
   partyMenuCanvas: {fileID: 0}
   partyMenuPageManager: {fileID: 0}
+  inventoryMenuCanvas: {fileID: 0}
+  inventoryMenuUI: {fileID: 0}
 --- !u!4 &705946944
 Transform:
   m_ObjectHideFlags: 0
@@ -39333,6 +39335,8 @@ MonoBehaviour:
   pauseCanvas: {fileID: 1142437365}
   partyMenuCanvas: {fileID: 0}
   partyMenuPageManager: {fileID: 0}
+  inventoryMenuCanvas: {fileID: 0}
+  inventoryMenuUI: {fileID: 0}
 --- !u!114 &1142437367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39581,7 +39585,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1949279440533568348, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
       propertyPath: moveSpeed
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1949279440533568348, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
       propertyPath: nextSceneName
