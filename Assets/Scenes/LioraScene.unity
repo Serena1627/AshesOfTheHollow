@@ -1769,6 +1769,8 @@ MonoBehaviour:
     portrait: {fileID: -8252720274790035708, guid: 80ce3d42d362ce844ad7060ebec3fe2b, type: 3}
   - characterName: Paladin
     portrait: {fileID: -7493618342402433999, guid: 879e7b5987acac64c86f90bae5727a37, type: 3}
+  - characterName: Liora
+    portrait: {fileID: 1584305947586206230, guid: 30028f5865a63a145a1b2ff7f0ea95d8, type: 3}
   partyMembers: []
 --- !u!114 &546574766
 MonoBehaviour:
@@ -7314,6 +7316,8 @@ Transform:
   - {fileID: 1442071233}
   - {fileID: 1520289417}
   - {fileID: 113962837}
+  - {fileID: 2134706088}
+  - {fileID: 1874905290}
   - {fileID: 596688611}
   - {fileID: 546574764}
   - {fileID: 1757091726}
@@ -9844,11 +9848,11 @@ RectTransform:
   m_Children:
   - {fileID: 1927431498}
   - {fileID: 1392129088}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1377661846}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 8.47551, y: -7.15009}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!1 &1887508374
@@ -10552,11 +10556,11 @@ Transform:
   m_GameObject: {fileID: 2134706086}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -11.17547, y: 1.08621, z: 0}
+  m_LocalPosition: {x: -2.6999607, y: -6.06388, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1377661846}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2136051592
 GameObject:
@@ -10701,8 +10705,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 1723545004}
   - {fileID: 1377661846}
-  - {fileID: 2134706088}
-  - {fileID: 1874905290}
   - {fileID: 1846216745}
   - {fileID: 1061917061}
   - {fileID: 436748713}

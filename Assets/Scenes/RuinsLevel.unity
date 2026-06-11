@@ -65684,6 +65684,8 @@ MonoBehaviour:
     portrait: {fileID: -8252720274790035708, guid: 80ce3d42d362ce844ad7060ebec3fe2b, type: 3}
   - characterName: Paladin
     portrait: {fileID: -7493618342402433999, guid: 879e7b5987acac64c86f90bae5727a37, type: 3}
+  - characterName: Liora
+    portrait: {fileID: 1584305947586206230, guid: 30028f5865a63a145a1b2ff7f0ea95d8, type: 3}
   partyMembers: []
 --- !u!224 &732836059
 RectTransform:
