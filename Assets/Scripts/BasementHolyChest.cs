@@ -20,6 +20,11 @@ public class BasementHolyChest : MonoBehaviour
     [SerializeField] private float flashInDuration = 0.15f;
     [SerializeField] private float flashHoldDuration = 0.08f;
     [SerializeField] private float flashOutDuration = 0.45f;
+    
+    [Header("Inventory Reward")]
+    [SerializeField] private string holySwordItemName = "Holy Sword";
+    [SerializeField] private int holySwordPower = 50;
+    [SerializeField] private int holySwordQuantity = 1;
 
     [Header("Player Upgrade")]
     [SerializeField] private KaelTopDownController playerController;
@@ -82,6 +87,7 @@ public class BasementHolyChest : MonoBehaviour
         }
 
         StoryProgress.MarkHolyChestOpened();
+        AddHolySwordToInventory();
 
         sequenceRunning = false;
 
@@ -222,6 +228,31 @@ public class BasementHolyChest : MonoBehaviour
         {
             Debug.LogWarning("PlayerController is not assigned on BasementHolyChest.");
         }
+    }
+
+    private void AddHolySwordToInventory()
+    {
+        if (InventoryManager.Instance == null)
+        {
+            Debug.LogWarning("Cannot add Holy Sword because InventoryManager is missing.");
+            return;
+        }
+
+        if (InventoryManager.Instance.GetItemQuantity(holySwordItemName) > 0)
+        {
+            Debug.Log("Holy Sword is already in inventory.");
+            return;
+        }
+
+        InventoryManager.Instance.AddItem(
+            holySwordItemName,
+            InventoryManager.InventoryItemType.Weapon,
+            InventoryManager.InventoryTargetType.Single,
+            holySwordPower,
+            holySwordQuantity
+        );
+
+        Debug.Log("Holy Sword added to inventory.");
     }
 
     private void OnTriggerEnter2D(Collider2D other)

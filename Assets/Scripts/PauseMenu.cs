@@ -11,6 +11,10 @@ public class PauseMenu : MonoBehaviour
     [SerializeField] private GameObject partyMenuCanvas;
     [SerializeField] private PartyMenuPageManager partyMenuPageManager;
 
+    [Header("Inventory UI")]
+    [SerializeField] private GameObject inventoryMenuCanvas;
+    [SerializeField] private InventoryMenuUI inventoryMenuUI;
+
     private bool isPaused = false;
 
     private void Start()
@@ -20,6 +24,9 @@ public class PauseMenu : MonoBehaviour
 
         if (partyMenuCanvas != null)
             partyMenuCanvas.SetActive(false);
+
+        if (inventoryMenuCanvas != null)
+            inventoryMenuCanvas.SetActive(false);
 
         Time.timeScale = 1f;
     }
@@ -31,6 +38,10 @@ public class PauseMenu : MonoBehaviour
             if (partyMenuCanvas != null && partyMenuCanvas.activeSelf)
             {
                 ClosePartyMenu();
+            }
+            else if (inventoryMenuCanvas != null && inventoryMenuCanvas.activeSelf)
+            {
+                CloseInventoryMenu();
             }
             else
             {
@@ -55,6 +66,9 @@ public class PauseMenu : MonoBehaviour
         if (partyMenuCanvas != null)
             partyMenuCanvas.SetActive(false);
 
+        if (inventoryMenuCanvas != null)
+            inventoryMenuCanvas.SetActive(false);
+
         Time.timeScale = 0f;
     }
 
@@ -67,6 +81,9 @@ public class PauseMenu : MonoBehaviour
 
         if (partyMenuCanvas != null)
             partyMenuCanvas.SetActive(false);
+
+        if (inventoryMenuCanvas != null)
+            inventoryMenuCanvas.SetActive(false);
 
         Time.timeScale = 1f;
     }
@@ -91,13 +108,16 @@ public class PauseMenu : MonoBehaviour
             return;
         }
 
-        List<GameObject> currentPartyPrefabs = PartyManager.Instance.GetCurrentPartyPrefabs();
-
+        List<GameObject> currentPartyPrefabs =
+            PartyManager.Instance.GetCurrentPartyPrefabs();
 
         partyMenuPageManager.LoadPartyFromPrefabs(currentPartyPrefabs);
 
         if (pauseCanvas != null)
             pauseCanvas.SetActive(false);
+
+        if (inventoryMenuCanvas != null)
+            inventoryMenuCanvas.SetActive(false);
 
         partyMenuCanvas.SetActive(true);
 
@@ -109,6 +129,47 @@ public class PauseMenu : MonoBehaviour
     {
         if (partyMenuCanvas != null)
             partyMenuCanvas.SetActive(false);
+
+        if (pauseCanvas != null)
+            pauseCanvas.SetActive(true);
+
+        isPaused = true;
+        Time.timeScale = 0f;
+    }
+
+    public void ShowInventoryMenu()
+    {
+        if (inventoryMenuCanvas == null)
+        {
+            Debug.LogWarning("PauseMenu: Inventory Menu Canvas is not assigned.");
+            return;
+        }
+
+        if (InventoryManager.Instance == null)
+        {
+            Debug.LogWarning("PauseMenu: InventoryManager.Instance is missing.");
+            return;
+        }
+
+        if (inventoryMenuUI != null)
+            inventoryMenuUI.RefreshInventoryUI();
+
+        if (pauseCanvas != null)
+            pauseCanvas.SetActive(false);
+
+        if (partyMenuCanvas != null)
+            partyMenuCanvas.SetActive(false);
+
+        inventoryMenuCanvas.SetActive(true);
+
+        isPaused = true;
+        Time.timeScale = 0f;
+    }
+
+    public void CloseInventoryMenu()
+    {
+        if (inventoryMenuCanvas != null)
+            inventoryMenuCanvas.SetActive(false);
 
         if (pauseCanvas != null)
             pauseCanvas.SetActive(true);

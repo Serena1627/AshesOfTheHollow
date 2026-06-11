@@ -9,7 +9,8 @@ public class InventoryManager : MonoBehaviour
 
     public enum InventoryItemType
     {
-        HealingPotion
+        HealingPotion,
+        Weapon
     }
 
     public enum InventoryTargetType
@@ -113,6 +114,8 @@ public class InventoryManager : MonoBehaviour
             Debug.Log(itemStack.itemName + " removed from inventory.");
         }
 
+        OnInventoryChanged?.Invoke();
+
         return true;
     }
 
@@ -186,6 +189,9 @@ public class InventoryManager : MonoBehaviour
                 );
 
                 return healingPotion;
+
+            case InventoryItemType.Weapon:
+                return null;
 
             default:
                 Debug.LogWarning(
