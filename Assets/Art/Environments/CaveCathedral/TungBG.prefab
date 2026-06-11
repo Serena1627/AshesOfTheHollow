@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 302983567913520304}
   - component: {fileID: 5233030834687771314}
   m_Layer: 0
-  m_Name: ForrestBattleBackground
+  m_Name: TungBG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -81,12 +81,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -7340867956988711102, guid: 2ccb22b470f5b0047b58d80f00244881, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 2ccb22b470f5b0047b58d80f00244881, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 16.72, y: 9.41}
+  m_Size: {x: 23.04194, y: 14.84}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1

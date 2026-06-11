@@ -185,7 +185,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 5845260943246381440, guid: 390605631ca2a0d43bd52ae49420e582, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -242,7 +242,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -270,11 +270,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30f74bd12b13a7b4e99508b7dd26f019, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleEncounterTrigger
-  encounterId: 
-  encounterRoot: {fileID: 0}
+  encounterId: TTT
+  encounterRoot: {fileID: 64195564}
   battleBackground: 3
   enemyPrefabs:
-  - {fileID: 0}
+  - {fileID: 4538236444051482330, guid: 6ae02ec086fdefd49878a5e7cc51f2b2, type: 3}
   guestPartyPrefabs: []
   battleSceneName: BattleScene
 --- !u!1 &72303701
