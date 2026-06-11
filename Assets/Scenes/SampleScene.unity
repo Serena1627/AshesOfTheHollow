@@ -2026,7 +2026,7 @@ GameObject:
   - component: {fileID: 1159058215}
   - component: {fileID: 1159058214}
   m_Layer: 0
-  m_Name: ProgressToForest
+  m_Name: ProgressToLiora
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13204,7 +13204,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PartyManager
   currentPartyPrefabs:
-  - {fileID: 7509160197856985987, guid: 07ad3870dfbcfdd4db6dac8962ed3350, type: 3}
+  - {fileID: 4684052358575500304, guid: 5f86e35481e930f49a2772191f417058, type: 3}
   paladinBattlePrefab: {fileID: 0}
   paladinRecruited: 0
   miraRecruited: 0
