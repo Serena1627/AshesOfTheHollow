@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 984547994106677384}
   - component: {fileID: 602288911156490878}
   - component: {fileID: 1927576704781283860}
-  - component: {fileID: 4617121524846276697}
   - component: {fileID: 7938671613439688675}
   m_Layer: 0
   m_Name: MaleCultistBattle
@@ -129,23 +128,6 @@ MonoBehaviour:
   action4Name: 
   action4Type: 0
   action4TargetingType: 0
---- !u!114 &4617121524846276697
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3121491828989010111}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30f74bd12b13a7b4e99508b7dd26f019, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BattleEncounterTrigger
-  encounterId: 
-  encounterRoot: {fileID: 0}
-  battleBackground: 0
-  enemyPrefabs: []
-  battleSceneName: BattleScene
 --- !u!61 &7938671613439688675
 BoxCollider2D:
   m_ObjectHideFlags: 0

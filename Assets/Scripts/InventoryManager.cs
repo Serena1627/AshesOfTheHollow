@@ -5,6 +5,8 @@ public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager Instance { get; private set; }
 
+    public event System.Action OnInventoryChanged;
+
     public enum InventoryItemType
     {
         HealingPotion
@@ -41,6 +43,7 @@ public class InventoryManager : MonoBehaviour
             return;
         }
 
+        Debug.Log("InventoryManager active instance: " + gameObject.name);
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
@@ -70,6 +73,7 @@ public class InventoryManager : MonoBehaviour
         {
             existingStack.quantity += amount;
             Debug.Log("Received " + itemName + " x" + amount + ".");
+            OnInventoryChanged?.Invoke();
             return;
         }
 
@@ -85,12 +89,13 @@ public class InventoryManager : MonoBehaviour
         inventoryItems.Add(newStack);
 
         Debug.Log("Received " + itemName + " x" + amount + ".");
+        OnInventoryChanged?.Invoke();
     }
 
     public bool ConsumeItem(string itemName)
     {
-        InventoryItemStack itemStack =
-            inventoryItems.Find(item => item.itemName == itemName);
+        Debug.Log("Consuming from InventoryManager object: " + gameObject.name);
+        InventoryItemStack itemStack = FindItemStack(itemName);
 
         if (itemStack == null || itemStack.quantity <= 0)
         {
@@ -100,11 +105,12 @@ public class InventoryManager : MonoBehaviour
 
         itemStack.quantity--;
 
-        Debug.Log("Used " + itemName + ". Remaining: " + itemStack.quantity);
+        Debug.Log("Used " + itemStack.itemName + ". Remaining: " + itemStack.quantity);
 
         if (itemStack.quantity <= 0)
         {
             inventoryItems.Remove(itemStack);
+            Debug.Log(itemStack.itemName + " removed from inventory.");
         }
 
         return true;
@@ -112,12 +118,34 @@ public class InventoryManager : MonoBehaviour
 
     public int GetItemQuantity(string itemName)
     {
-        InventoryItemStack itemStack =
-            inventoryItems.Find(item => item.itemName == itemName);
+        InventoryItemStack itemStack = FindItemStack(itemName);
 
         return itemStack != null ? itemStack.quantity : 0;
     }
 
+    private InventoryItemStack FindItemStack(string itemName)
+    {
+        if (string.IsNullOrWhiteSpace(itemName))
+        {
+            return null;
+        }
+
+        string normalizedSearchName = NormalizeItemName(itemName);
+
+        return inventoryItems.Find(item =>
+            item != null &&
+            NormalizeItemName(item.itemName) == normalizedSearchName
+        );
+    }
+
+    private string NormalizeItemName(string itemName)
+    {
+        return itemName
+            .Replace("[", "")
+            .Replace("]", "")
+            .Trim()
+            .ToLowerInvariant();
+    }
     public List<Item> CreateBattleItems()
     {
         List<Item> battleItems = new List<Item>();

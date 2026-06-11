@@ -12,8 +12,6 @@ GameObject:
   - component: {fileID: 602288911156490878}
   - component: {fileID: 1927576704781283860}
   - component: {fileID: 5246507837935122271}
-  - component: {fileID: 6979373321855472592}
-  - component: {fileID: -9096432007155178776}
   - component: {fileID: -610431735834399710}
   m_Layer: 0
   m_Name: FemaleCultistBattle
@@ -158,44 +156,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &6979373321855472592
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3121491828989010111}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8d29445fc2353274183b8968f13ba09a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyChasePlayer2D
-  playerTag: Player
-  detectionRadius: 4
-  chaseSpeed: 2.5
-  stopDistance: 0.35
-  blockedObjectTilemap: {fileID: 0}
-  collisionCheckRadius: 0.18
-  returnToStartWhenPlayerLeaves: 0
-  returnSpeed: 1.5
-  giveUpDistance: 7
---- !u!114 &-9096432007155178776
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3121491828989010111}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30f74bd12b13a7b4e99508b7dd26f019, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BattleEncounterTrigger
-  encounterId: 
-  encounterRoot: {fileID: 0}
-  battleBackground: 0
-  enemyPrefabs: []
-  battleSceneName: BattleScene
 --- !u!61 &-610431735834399710
 BoxCollider2D:
   m_ObjectHideFlags: 0
