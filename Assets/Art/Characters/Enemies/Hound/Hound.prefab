@@ -201,7 +201,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyChasePlayer2D
   playerTag: Player
-  detectionRadius: 4
+  detectionRadius: 10
   chaseSpeed: 2.5
   stopDistance: 0.35
   blockedObjectTilemap: {fileID: 0}
