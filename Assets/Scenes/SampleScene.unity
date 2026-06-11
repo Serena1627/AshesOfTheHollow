@@ -12661,10 +12661,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92e00889497c94e45be0beb5845b4b30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyRandomSpawner2D
-  enemyPrefabs:
-  - {fileID: 4576589525881224447, guid: 7440ab3ed491e1345b3f217c6510d23e, type: 3}
-  - {fileID: 6677784833758569686, guid: 89138da3f876aa04a9dcafa1092b46c3, type: 3}
-  - {fileID: 7163929020962351376, guid: 333c917e32719364da65aa51da571e8f, type: 3}
+  enemySpawnEntries:
+  - overworldPrefab: {fileID: 7163929020962351376, guid: 333c917e32719364da65aa51da571e8f, type: 3}
+    battlePrefab: {fileID: 4538236444051482330, guid: e7b7cdd510e0fb34a92c7d92ee41ea4e, type: 3}
+  - overworldPrefab: {fileID: 4576589525881224447, guid: 7440ab3ed491e1345b3f217c6510d23e, type: 3}
+    battlePrefab: {fileID: 3121491828989010111, guid: 7ac34c1082b82094d9fc0ba4dbd17936, type: 3}
+  - overworldPrefab: {fileID: 6677784833758569686, guid: 89138da3f876aa04a9dcafa1092b46c3, type: 3}
+    battlePrefab: {fileID: 3121491828989010111, guid: fbbe516e929057847901d47d412094c1, type: 3}
   numberOfEnemiesToSpawn: 3
   mapBackgroundRenderer: {fileID: 2109684947}
   blockedObjectTilemap: {fileID: 1518201925}
@@ -13347,6 +13350,8 @@ MonoBehaviour:
   paladinRecruited: 0
   miraRecruited: 0
   miraBattlePrefab: {fileID: 0}
+  lioraRecruited: 0
+  lioraBattlePrefab: {fileID: 0}
   partyHealthStates: []
 --- !u!4 &2109879075
 Transform:

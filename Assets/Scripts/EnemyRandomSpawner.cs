@@ -4,8 +4,18 @@ using UnityEngine.Tilemaps;
 
 public class EnemyRandomSpawner2D : MonoBehaviour
 {
-    [Header("Enemy Prefabs")]
-    [SerializeField] private List<GameObject> enemyPrefabs = new List<GameObject>();
+    [System.Serializable]
+    public class EnemySpawnEntry
+    {
+        [Tooltip("The enemy prefab that appears and moves around on the overworld map.")]
+        public GameObject overworldPrefab;
+
+        [Tooltip("The enemy prefab used inside the BattleScene. This prefab must have EnemyBattle.")]
+        public GameObject battlePrefab;
+    }
+
+    [Header("Enemy Spawn Entries")]
+    [SerializeField] private List<EnemySpawnEntry> enemySpawnEntries = new List<EnemySpawnEntry>();
 
     [Header("Spawn Count")]
     [SerializeField] private int numberOfEnemiesToSpawn = 3;
@@ -71,10 +81,42 @@ public class EnemyRandomSpawner2D : MonoBehaviour
 
     private bool CanSpawn()
     {
-        if (enemyPrefabs == null || enemyPrefabs.Count == 0)
+        if (enemySpawnEntries == null || enemySpawnEntries.Count == 0)
         {
-            Debug.LogWarning("EnemyRandomSpawner2D: No enemy prefabs assigned.");
+            Debug.LogWarning("EnemyRandomSpawner2D: No enemy spawn entries assigned.");
             return false;
+        }
+
+        foreach (EnemySpawnEntry entry in enemySpawnEntries)
+        {
+            if (entry == null)
+            {
+                Debug.LogWarning("EnemyRandomSpawner2D: One enemy spawn entry is null.");
+                return false;
+            }
+
+            if (entry.overworldPrefab == null)
+            {
+                Debug.LogWarning("EnemyRandomSpawner2D: One enemy spawn entry is missing an overworld prefab.");
+                return false;
+            }
+
+            if (entry.battlePrefab == null)
+            {
+                Debug.LogWarning("EnemyRandomSpawner2D: One enemy spawn entry is missing a battle prefab.");
+                return false;
+            }
+
+            if (entry.battlePrefab.GetComponent<EnemyBattle>() == null)
+            {
+                Debug.LogWarning(
+                    "EnemyRandomSpawner2D: Battle prefab " +
+                    entry.battlePrefab.name +
+                    " does not have EnemyBattle."
+                );
+
+                return false;
+            }
         }
 
         if (mapBackgroundRenderer == null)
@@ -101,42 +143,24 @@ public class EnemyRandomSpawner2D : MonoBehaviour
             if (!IsValidSpawnPosition(randomPosition))
                 continue;
 
-            GameObject enemyPrefab = GetRandomEnemyPrefab();
+            EnemySpawnEntry enemyEntry = GetRandomEnemyEntry();
 
-            if (enemyPrefab == null)
+            if (enemyEntry == null || enemyEntry.overworldPrefab == null || enemyEntry.battlePrefab == null)
                 continue;
 
             GameObject spawnedEnemy = Instantiate(
-                enemyPrefab,
+                enemyEntry.overworldPrefab,
                 randomPosition,
                 Quaternion.identity,
                 enemyParent
             );
 
-            BattleEncounterTrigger encounterTrigger = spawnedEnemy.GetComponent<BattleEncounterTrigger>();
+            ConfigureSpawnedEnemyEncounter(
+                spawnedEnemy,
+                enemyEntry.overworldPrefab,
+                enemyEntry.battlePrefab
+            );
 
-            if (encounterTrigger != null)
-            {
-                string encounterId = enemyPrefab.name + "_" + spawnedEnemyPositions.Count;
-
-                List<GameObject> encounterEnemies = new List<GameObject>
-                {
-                    enemyPrefab
-                };
-
-                encounterTrigger.ConfigureEncounter(
-                    encounterId,
-                    spawnedEnemy,
-                    battleBackground,
-                    encounterEnemies,
-                    battleSceneName
-                );
-            }
-            else
-            {
-                Debug.LogWarning(spawnedEnemy.name + " does not have a BattleEncounterTrigger script.");
-            }
-            
             EnemyChasePlayer2D chaseScript = spawnedEnemy.GetComponent<EnemyChasePlayer2D>();
 
             if (chaseScript != null)
@@ -151,6 +175,47 @@ public class EnemyRandomSpawner2D : MonoBehaviour
 
         Debug.LogWarning("EnemyRandomSpawner2D: Failed to find a valid spawn position.");
         return false;
+    }
+
+    private void ConfigureSpawnedEnemyEncounter(
+        GameObject spawnedEnemy,
+        GameObject overworldPrefab,
+        GameObject battlePrefab
+    )
+    {
+        BattleEncounterTrigger encounterTrigger =
+            spawnedEnemy.GetComponent<BattleEncounterTrigger>();
+
+        if (encounterTrigger == null)
+        {
+            Debug.LogWarning(spawnedEnemy.name + " does not have BattleEncounterTrigger.");
+            return;
+        }
+
+        string encounterId =
+            overworldPrefab.name + "_" + spawnedEnemyPositions.Count.ToString("00");
+
+        List<GameObject> encounterEnemies = new List<GameObject>
+        {
+            battlePrefab
+        };
+
+        encounterTrigger.ConfigureEncounter(
+            encounterId,
+            spawnedEnemy,
+            battleBackground,
+            encounterEnemies,
+            battleSceneName
+        );
+
+        Debug.Log(
+            "Configured encounter " +
+            encounterId +
+            " | Overworld prefab: " +
+            overworldPrefab.name +
+            " | Battle prefab: " +
+            battlePrefab.name
+        );
     }
 
     private Vector2 GetRandomPositionInsideMap()
@@ -225,41 +290,13 @@ public class EnemyRandomSpawner2D : MonoBehaviour
         return false;
     }
 
-    private GameObject GetRandomEnemyPrefab()
+    private EnemySpawnEntry GetRandomEnemyEntry()
     {
-        if (enemyPrefabs == null || enemyPrefabs.Count == 0)
+        if (enemySpawnEntries == null || enemySpawnEntries.Count == 0)
             return null;
 
-        int randomIndex = Random.Range(0, enemyPrefabs.Count);
+        int randomIndex = Random.Range(0, enemySpawnEntries.Count);
 
-        return enemyPrefabs[randomIndex];
-    }
-
-    private void ConfigureSpawnedEnemyEncounter(GameObject spawnedEnemy, GameObject enemyPrefab)
-    {
-        BattleEncounterTrigger encounterTrigger =
-            spawnedEnemy.GetComponent<BattleEncounterTrigger>();
-
-        if (encounterTrigger == null)
-        {
-            Debug.LogWarning(spawnedEnemy.name + " does not have BattleEncounterTrigger.");
-            return;
-        }
-
-        string encounterId =
-            enemyPrefab.name + "_" + spawnedEnemyPositions.Count.ToString("00");
-
-        List<GameObject> encounterEnemies = new List<GameObject>
-        {
-            enemyPrefab
-        };
-
-        encounterTrigger.ConfigureEncounter(
-            encounterId,
-            spawnedEnemy,
-            battleBackground,
-            encounterEnemies,
-            battleSceneName
-        );
+        return enemySpawnEntries[randomIndex];
     }
 }

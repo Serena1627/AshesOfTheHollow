@@ -186,6 +186,7 @@ MonoBehaviour:
   battleBackground: 0
   enemyPrefabs:
   - {fileID: 3121491828989010111, guid: 7ac34c1082b82094d9fc0ba4dbd17936, type: 3}
+  guestPartyPrefabs: []
   battleSceneName: BattleScene
 --- !u!114 &8548384487645437067
 MonoBehaviour:
