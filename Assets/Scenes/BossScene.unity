@@ -4571,10 +4571,10 @@ MonoBehaviour:
   currentPartyPrefabs:
   - {fileID: 4684052358575500304, guid: 5f86e35481e930f49a2772191f417058, type: 3}
   paladinBattlePrefab: {fileID: 4684052358575500304, guid: 27e9b99e71747174e8ac1c726ad3ac77, type: 3}
-  paladinRecruited: 0
-  miraRecruited: 0
+  paladinRecruited: 1
+  miraRecruited: 1
   miraBattlePrefab: {fileID: 4684052358575500304, guid: b9cc85ba69f1b374693778ef1a6a10ac, type: 3}
-  lioraRecruited: 0
+  lioraRecruited: 1
   lioraBattlePrefab: {fileID: 4684052358575500304, guid: 8e2924424e59cdb4e8bc314ba0c6e608, type: 3}
   partyHealthStates: []
 --- !u!4 &1678651291
