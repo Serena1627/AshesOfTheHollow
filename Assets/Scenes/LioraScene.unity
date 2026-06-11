@@ -1883,7 +1883,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1061917057
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3606,7 +3606,7 @@ MonoBehaviour:
   dialogueTypewriter: {fileID: 2014584255}
   postBattleDialogue: []
   partyJoinAnnouncement: {fileID: 1061917057}
-  joinMessage: Liora has joined your party.
+  joinMessage: Liora the Archer has joined your party.
   lioraSceneVisual: {fileID: 1721585797}
   monkeySceneVisual: {fileID: 1175651444}
   lioraFollowerPrefab: {fileID: 8162663909719026417, guid: eb6ccbd31f99fc443b6d6bda13bde20a, type: 3}
