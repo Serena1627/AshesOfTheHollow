@@ -1641,6 +1641,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1949279440533568348, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
+      propertyPath: blockedObjectTilemap
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4482188340101228447, guid: 17cc7841558646446bdec512c8a0f89f, type: 3}
       propertyPath: m_Name
       value: Player
