@@ -2492,7 +2492,7 @@ MonoBehaviour:
   miraRecruited: 0
   miraBattlePrefab: {fileID: 0}
   lioraRecruited: 0
-  lioraBattlePrefab: {fileID: 0}
+  lioraBattlePrefab: {fileID: 4684052358575500304, guid: 8e2924424e59cdb4e8bc314ba0c6e608, type: 3}
   partyHealthStates: []
 --- !u!4 &902203853
 Transform:
