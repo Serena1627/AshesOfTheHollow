@@ -85,7 +85,7 @@ SpriteRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 4
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -5111717903506588929, guid: 745a9e8b9a6d7f141896058eb9fb0ac5, type: 3}
+  m_Sprite: {fileID: 3243992425037305871, guid: 6b4a8022c759f9b4097cb57aa9c46086, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -159,22 +159,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PaladinFollowerAnimator
   followMovement: {fileID: 0}
-  frontIdle: {fileID: -5111717903506588929, guid: 745a9e8b9a6d7f141896058eb9fb0ac5, type: 3}
-  backIdle: {fileID: 1737309028838317790, guid: 745a9e8b9a6d7f141896058eb9fb0ac5, type: 3}
-  leftIdle: {fileID: -5661642198066606233, guid: 745a9e8b9a6d7f141896058eb9fb0ac5, type: 3}
-  rightIdle: {fileID: -6912591077337106899, guid: 745a9e8b9a6d7f141896058eb9fb0ac5, type: 3}
+  frontIdle: {fileID: 3243992425037305871, guid: 6b4a8022c759f9b4097cb57aa9c46086, type: 3}
+  backIdle: {fileID: -151327035257065656, guid: 6b4a8022c759f9b4097cb57aa9c46086, type: 3}
+  leftIdle: {fileID: -389353969149330435, guid: 6b4a8022c759f9b4097cb57aa9c46086, type: 3}
+  rightIdle: {fileID: 65068976872800730, guid: 6b4a8022c759f9b4097cb57aa9c46086, type: 3}
   frontWalk:
-  - {fileID: -8681871231632218935, guid: 745a9e8b9a6d7f141896058eb9fb0ac5, type: 3}
-  - {fileID: -2641612478400977769, guid: 745a9e8b9a6d7f141896058eb9fb0ac5, type: 3}
+  - {fileID: -1873545173673597700, guid: 6b4a8022c759f9b4097cb57aa9c46086, type: 3}
+  - {fileID: -2501822157282876204, guid: 6b4a8022c759f9b4097cb57aa9c46086, type: 3}
   backWalk:
-  - {fileID: 2387154160860161554, guid: 745a9e8b9a6d7f141896058eb9fb0ac5, type: 3}
-  - {fileID: 8732581388598947582, guid: 745a9e8b9a6d7f141896058eb9fb0ac5, type: 3}
+  - {fileID: 7869390888875021438, guid: 6b4a8022c759f9b4097cb57aa9c46086, type: 3}
+  - {fileID: 6534089898298567231, guid: 6b4a8022c759f9b4097cb57aa9c46086, type: 3}
   leftWalk:
-  - {fileID: 638871958591502226, guid: 745a9e8b9a6d7f141896058eb9fb0ac5, type: 3}
-  - {fileID: 4062779408672635365, guid: 745a9e8b9a6d7f141896058eb9fb0ac5, type: 3}
+  - {fileID: 6324554557037627193, guid: 6b4a8022c759f9b4097cb57aa9c46086, type: 3}
+  - {fileID: 3738555930256312442, guid: 6b4a8022c759f9b4097cb57aa9c46086, type: 3}
   rightWalk:
-  - {fileID: 5051326298024522546, guid: 745a9e8b9a6d7f141896058eb9fb0ac5, type: 3}
-  - {fileID: 2147978493310720585, guid: 745a9e8b9a6d7f141896058eb9fb0ac5, type: 3}
+  - {fileID: 1635494448317268212, guid: 6b4a8022c759f9b4097cb57aa9c46086, type: 3}
+  - {fileID: 908603129412004745, guid: 6b4a8022c759f9b4097cb57aa9c46086, type: 3}
   animationFPS: 8
 --- !u!114 &1010948283004310233
 MonoBehaviour:

@@ -7,7 +7,8 @@ public class PartyManager : MonoBehaviour
 
     [Header("Current Battle Party")]
     [Tooltip("Battle prefabs for party members currently available in combat.")]
-    [SerializeField] private List<GameObject> currentPartyPrefabs =
+    [SerializeField]
+    private List<GameObject> currentPartyPrefabs =
         new List<GameObject>();
 
     [Header("Recruitable Member Prefabs")]
@@ -24,6 +25,12 @@ public class PartyManager : MonoBehaviour
     [SerializeField] private GameObject miraBattlePrefab;
 
     public bool MiraRecruited => miraRecruited;
+
+    [Header("Liora Recruitment")]
+    [SerializeField] private bool lioraRecruited = false;
+    [SerializeField] private GameObject lioraBattlePrefab;
+
+    public bool LioraRecruited => lioraRecruited;
 
     [System.Serializable]
     public class PartyMemberHealthState
@@ -136,6 +143,10 @@ public class PartyManager : MonoBehaviour
         if (miraRecruited && miraBattlePrefab != null)
         {
             AddPartyMember(miraBattlePrefab);
+        }
+        if (lioraRecruited && lioraBattlePrefab != null)
+        {
+            AddPartyMember(lioraBattlePrefab);
         }
     }
 
@@ -325,5 +336,20 @@ public class PartyManager : MonoBehaviour
                 System.StringComparison.OrdinalIgnoreCase
             )
         );
+    }
+
+    public void RecruitLiora()
+    {
+        lioraRecruited = true;
+
+        if (lioraBattlePrefab == null)
+        {
+            Debug.LogWarning("Liora was recruited, but Liora Battle Prefab is not assigned.");
+            return;
+        }
+
+        AddPartyMember(lioraBattlePrefab);
+
+        Debug.Log("Liora has joined the party.");
     }
 }

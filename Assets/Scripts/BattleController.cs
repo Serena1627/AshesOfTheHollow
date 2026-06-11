@@ -14,6 +14,11 @@ public class BattleController : MonoBehaviour
     [SerializeField] private List<BattleEntity> battleEntities = new List<BattleEntity>();
     [SerializeField] private List<BattleEntity> turnOrder = new List<BattleEntity>();
 
+    [Header("Support Entities")]
+    [Tooltip("Hidden support turn entities, like Liora's fairy.")]
+    [SerializeField] private List<FairySupportBattle> supportEntities =
+        new List<FairySupportBattle>();
+
     [Header("Runtime Items")]
     [SerializeField] private List<Item> items = new List<Item>();
 
@@ -79,6 +84,7 @@ public class BattleController : MonoBehaviour
         enemies.Clear();
         battleEntities.Clear();
         turnOrder.Clear();
+        supportEntities.Clear();
 
         foreach (GameObject obj in GameObject.FindGameObjectsWithTag("Player"))
         {
@@ -116,6 +122,26 @@ public class BattleController : MonoBehaviour
             battleEntities.Add(enemy);
 
             Debug.Log("Registered enemy: " + enemy.entityName);
+        }
+
+        FairySupportBattle[] foundSupportEntities =
+            FindObjectsOfType<FairySupportBattle>();
+
+        foreach (FairySupportBattle supportEntity in foundSupportEntities)
+        {
+            if (supportEntity == null)
+            {
+                continue;
+            }
+
+            if (!supportEntities.Contains(supportEntity))
+            {
+                supportEntities.Add(supportEntity);
+                Debug.Log(
+                    "Registered support entity: " +
+                    supportEntity.FairyName
+                );
+            }
         }
     }
 
@@ -156,6 +182,14 @@ public class BattleController : MonoBehaviour
                 entity.entityName +
                 " | Speed: " +
                 entity.speed
+            );
+        }
+
+        foreach (FairySupportBattle supportEntity in supportEntities)
+        {
+            Debug.Log(
+                "Support entity will act last each round: " +
+                supportEntity.FairyName
             );
         }
     }
@@ -207,6 +241,35 @@ public class BattleController : MonoBehaviour
                     yield break;
                 }
             }
+
+            if (CheckBattleEnd())
+            {
+                EndBattle();
+                yield break;
+            }
+
+            yield return StartCoroutine(RunSupportTurns());
+
+            if (CheckBattleEnd())
+            {
+                EndBattle();
+                yield break;
+            }
+        }
+    }
+
+    private IEnumerator RunSupportTurns()
+    {
+        foreach (FairySupportBattle supportEntity in supportEntities)
+        {
+            if (supportEntity == null)
+            {
+                continue;
+            }
+
+            yield return StartCoroutine(
+                supportEntity.TakeSupportTurn(this)
+            );
         }
     }
 
@@ -528,9 +591,7 @@ public class BattleController : MonoBehaviour
             );
 
             yield return StartCoroutine(
-                ShowBattleMessage(
-                    enemy.entityName + " hesitates."
-                )
+                ShowBattleMessage(enemy.entityName + " hesitates.")
             );
 
             yield break;
@@ -608,7 +669,7 @@ public class BattleController : MonoBehaviour
     }
 
     // -------------------------------------------------------------------------
-    // Action Resolution / Combined Battle Message
+    // Action Resolution
     // -------------------------------------------------------------------------
 
     private IEnumerator ResolveActionEffects(
@@ -644,7 +705,12 @@ public class BattleController : MonoBehaviour
             int healthBefore = target.CurrentHealth;
             bool wasDeadBefore = target.isEntityDead();
 
-            action.doAction(target);
+            action.doAction(
+                new List<BattleEntity>
+                {
+                    target
+                }
+            );
 
             int healthAfter = target.CurrentHealth;
             int damageTaken = Mathf.Max(0, healthBefore - healthAfter);
@@ -677,6 +743,113 @@ public class BattleController : MonoBehaviour
                 )
             );
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // Fairy Healing
+    // -------------------------------------------------------------------------
+
+    public IEnumerator HealLowestWoundedAlly(
+        int healAmount,
+        string healerName,
+        bool showMessageWhenNoOneNeedsHealing
+    )
+    {
+        PlayerBattle target = GetLowestWoundedAlly();
+
+        if (target == null)
+        {
+            if (showMessageWhenNoOneNeedsHealing)
+            {
+                yield return StartCoroutine(
+                    ShowBattleMessage(
+                        healerName + " watches over the party."
+                    )
+                );
+            }
+
+            yield break;
+        }
+
+        int healthBefore = target.CurrentHealth;
+        int maxHealth = Mathf.Max(1, target.MaxHealth);
+
+        int newHealth = Mathf.Clamp(
+            healthBefore + Mathf.Max(0, healAmount),
+            0,
+            maxHealth
+        );
+
+        int actualHealing = newHealth - healthBefore;
+
+        if (actualHealing <= 0)
+        {
+            yield break;
+        }
+
+        target.RestoreHealthFromPartyState(
+            newHealth,
+            maxHealth
+        );
+
+        yield return StartCoroutine(
+            ShowBattleMessage(
+                healerName +
+                " heals " +
+                target.entityName +
+                " for " +
+                actualHealing +
+                " HP."
+            )
+        );
+    }
+
+    private PlayerBattle GetLowestWoundedAlly()
+    {
+        PlayerBattle chosenTarget = null;
+
+        float lowestHealthPercent = float.MaxValue;
+        int highestMissingHealth = -1;
+
+        foreach (PlayerBattle player in players)
+        {
+            if (player == null || player.isEntityDead())
+            {
+                continue;
+            }
+
+            int maxHealth = Mathf.Max(1, player.MaxHealth);
+            int currentHealth = Mathf.Clamp(
+                player.CurrentHealth,
+                0,
+                maxHealth
+            );
+
+            if (currentHealth >= maxHealth)
+            {
+                continue;
+            }
+
+            int missingHealth = maxHealth - currentHealth;
+            float healthPercent = currentHealth / (float)maxHealth;
+
+            bool shouldChoose =
+                chosenTarget == null ||
+                healthPercent < lowestHealthPercent ||
+                (
+                    Mathf.Approximately(healthPercent, lowestHealthPercent) &&
+                    missingHealth > highestMissingHealth
+                );
+
+            if (shouldChoose)
+            {
+                chosenTarget = player;
+                lowestHealthPercent = healthPercent;
+                highestMissingHealth = missingHealth;
+            }
+        }
+
+        return chosenTarget;
     }
 
     private IEnumerator ShowBattleMessage(string message)
