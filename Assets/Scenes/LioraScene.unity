@@ -3712,7 +3712,7 @@ MonoBehaviour:
     portrait: {fileID: 4907242074090915066, guid: 0fc49aca0aa58be459d3df532d47cdfa, type: 3}
   - speakerName: Liora
     dialogueText: That cult again... they destroyed my village.
-    portrait: {fileID: 8706523877615525295, guid: 5187f6fd809c4714480ab1d5aa09aff2, type: 3}
+    portrait: {fileID: 21300000, guid: 5187f6fd809c4714480ab1d5aa09aff2, type: 3}
   - speakerName: Mira
     dialogueText: They destroyed our village too and this Paladin is from the holy
       city here to hunt down the cult.
