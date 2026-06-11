@@ -62,17 +62,40 @@ public class BattleEncounterTrigger : MonoBehaviour
         BattleData.backgroundType = battleBackground;
         BattleData.currentEncounterId = encounterId;
         BattleData.enemyPrefabs = new List<GameObject>(enemyPrefabs);
-
         BattleData.partyPrefabs = BuildBattlePartyWithGuests();
 
         Debug.Log(
             "Starting encounter: " +
             encounterId +
+            " | Background: " +
+            battleBackground +
             " | Party count: " +
             BattleData.partyPrefabs.Count +
             " | Enemy count: " +
             BattleData.enemyPrefabs.Count
         );
+
+        Debug.Log("===== FINAL BATTLE PARTY =====");
+
+        foreach (GameObject partyPrefab in BattleData.partyPrefabs)
+        {
+            Debug.Log(
+                partyPrefab != null
+                    ? "Party prefab: " + partyPrefab.name
+                    : "Party prefab: NULL"
+            );
+        }
+
+        Debug.Log("===== FINAL BATTLE ENEMIES =====");
+
+        foreach (GameObject enemyPrefab in BattleData.enemyPrefabs)
+        {
+            Debug.Log(
+                enemyPrefab != null
+                    ? "Enemy prefab: " + enemyPrefab.name
+                    : "Enemy prefab: NULL"
+            );
+        }
 
         if (PixelatedBattleTransition.Instance != null)
         {
@@ -104,16 +127,24 @@ public class BattleEncounterTrigger : MonoBehaviour
             );
         }
 
+        Debug.Log("Base party count from PartyManager: " + finalParty.Count);
+
         foreach (GameObject guestPrefab in guestPartyPrefabs)
         {
             if (guestPrefab == null)
             {
+                Debug.LogWarning("Guest party prefab is NULL.");
                 continue;
             }
 
             if (!finalParty.Contains(guestPrefab))
             {
                 finalParty.Add(guestPrefab);
+                Debug.Log("Added guest party member: " + guestPrefab.name);
+            }
+            else
+            {
+                Debug.Log("Guest already in party: " + guestPrefab.name);
             }
         }
 
